@@ -24,9 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className="w-[50in]"
-      >
+      <body>
         {children}
       </body>
     </html>
