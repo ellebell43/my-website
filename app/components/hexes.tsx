@@ -1,3 +1,4 @@
+import { Planet } from "./symbols"
 import { hasSystem, randomSystem, System } from "./system"
 
 export const Hex = (props: { id: string, possibleSystem?: boolean }) => {
@@ -9,24 +10,23 @@ export const Hex = (props: { id: string, possibleSystem?: boolean }) => {
   //@ts-ignore
   if (createSystem) system = randomSystem("", Number(x), Number(y))
   let water = system ? system.hydro != 0 : false
+  let asteroid = system ? system.size == 0 : false
   return (
     <div className={`hexagon-out relative`} id={"hex" + props.id}>
       <div className={`hexagon-in absolute top-[.025in] left-[.025in] flex flex-col items-center ${system ? "justify-between" : ""}`}>
         <p className="text-center">{props.id}</p>
-        {system ? <div className={`w-[.4in] h-[.4in] border rounded-full ${water ? "bg-blue-400" : "bg-yellow-800"}`} /> : <></>}
+        {system ? <Planet water={water} asteroid={asteroid} /> : <></>}
         {system ? <p className="text-xs text center">{system.getUWPSmall()}</p> : <></>}
       </div>
     </div>
   )
 }
 
-export const HexCol = (props: { id: string, start: number, style?: string, possibleSystem?: boolean, end?: number }) => {
-  const { id, start, style, end } = props
+export const HexCol = (props: { id: string, start: number, style?: string, possibleSystem?: boolean }) => {
+  const { id, start, style } = props
   // Create an array of Hexes of specified amount
   // start and stop are used to determine length and for the first 2 digits of the Hex id
   const arr = []
-  let last = end
-  if (last == undefined) last = 10
   // @ts-ignore
   for (let i = start; i <= start + 10; i++) {
     const hexId = i < 10 ? "0" + String(i) : String(i)
@@ -42,7 +42,7 @@ export const HexCol = (props: { id: string, start: number, style?: string, possi
   )
 }
 
-export const HexColDouble = (props: { id: number, start: number, end?: number, possibleSystem?: boolean }) => {
+export const HexColDouble = (props: { id: number, start: number, possibleSystem?: boolean }) => {
   const { id, start } = props
   // parse first 2 digits of hex id for both columns
   const id1 = id < 10 ? "0" + String(id) : String(id)
@@ -50,8 +50,8 @@ export const HexColDouble = (props: { id: number, start: number, end?: number, p
   // Create two hex columns, offset the second to create a tight grid
   return (
     <div className="relative w-[2.3in]">
-      <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} end={props.end} />
-      <HexCol id={id2} start={start} style="absolute top-[.67in] right-[-.4in]" possibleSystem={props.possibleSystem} end={props.end} />
+      <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} />
+      <HexCol id={id2} start={start} style="absolute top-[.67in] right-[-.4in]" possibleSystem={props.possibleSystem} />
     </div>
   )
 }
