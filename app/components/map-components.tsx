@@ -64,47 +64,43 @@ export const HexColDouble = (props: { id: number, start: number, possibleSystem?
 
 // Create a hex grid, 8 x 10 hexes
 // startX and startY determines the x,y label for the first hex. All other hexes are based on that. Values are truncated to work within sector dimensions.
-export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31 }) => {
-  const { startX, startY } = props
+export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean }) => {
+  const { startX, startY, generateSystems } = props
   return (
     <div className="flex relative">
-      <HexColDouble id={startX} start={startY} possibleSystem={true} />
-      <HexColDouble id={startX + 2} start={startY} possibleSystem={true} />
-      <HexColDouble id={startX + 4} start={startY} possibleSystem={true} />
-      <HexColDouble id={startX + 6} start={startY} possibleSystem={true} />
+      <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} />
+      <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} />
+      <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} />
+      <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} />
       <div className="absolute top-0 left-[.2in] w-full h-full border" />
     </div>
   )
 }
 
+// Row of 4 subsectors
+export const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean }) => {
+  const { row, generateSystems } = props
+  //@ts-expect-error
+  const y: 1 | 11 | 21 | 31 = (row - 1) * 10 + 1
+  return (
+    <div className="flex" id={`row${row}`}>
+      <Subsector startX={1} startY={y} generateSystems={generateSystems} />
+      <Subsector startX={9} startY={y} generateSystems={generateSystems} />
+      <Subsector startX={17} startY={y} generateSystems={generateSystems} />
+      <Subsector startX={25} startY={y} generateSystems={generateSystems} />
+    </div>
+  )
+}
+
 // Create a full sector, 32 x 40 hex grid
-export const Sector = () => {
+export const Sector = (props: { generateSystems: boolean }) => {
+  const { generateSystems } = props
   return (
     <div className="p-4">
-      <div className="flex" id="row1">
-        <Subsector startX={1} startY={1} />
-        <Subsector startX={9} startY={1} />
-        <Subsector startX={17} startY={1} />
-        <Subsector startX={25} startY={1} />
-      </div>
-      <div className="flex" id="row2">
-        <Subsector startX={1} startY={11} />
-        <Subsector startX={9} startY={11} />
-        <Subsector startX={17} startY={11} />
-        <Subsector startX={25} startY={11} />
-      </div>
-      <div className="flex" id="row3">
-        <Subsector startX={1} startY={21} />
-        <Subsector startX={9} startY={21} />
-        <Subsector startX={17} startY={21} />
-        <Subsector startX={25} startY={21} />
-      </div>
-      <div className="flex" id="row4">
-        <Subsector startX={1} startY={31} />
-        <Subsector startX={9} startY={31} />
-        <Subsector startX={17} startY={31} />
-        <Subsector startX={25} startY={31} />
-      </div>
+      <SubsectorRow row={1} generateSystems={generateSystems} />
+      <SubsectorRow row={2} generateSystems={generateSystems} />
+      <SubsectorRow row={3} generateSystems={generateSystems} />
+      <SubsectorRow row={4} generateSystems={generateSystems} />
     </div>
   )
 }

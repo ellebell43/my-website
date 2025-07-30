@@ -1,13 +1,6 @@
 import { deHexify } from "./functions"
 import { xRange, yRange, starportRange, sizeRange, fullRange, popRange, numRange, faction, d66Range, travelCode, diceRange, tradeCode } from "./types"
 
-/** THINGS TO ADD
- * Travel Codes
- * Temperature
- * Factions
- * Culture
- */
-
 export default class StarSystem {
   // Class property types
   x: xRange
