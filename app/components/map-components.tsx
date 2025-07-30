@@ -1,12 +1,15 @@
 import { Planet } from "./symbols"
-import { hasSystem, randomSystem, System } from "./system"
+import StarSystem from "../util/starsystem"
+import { hasSystem } from "../util/functions"
+import { randomSystem } from "../util/randomSystem"
 
+// Create a single hex (parsec)
 export const Hex = (props: { id: string, possibleSystem?: boolean }) => {
   const x = props.id.substring(0, 2)
   const y = props.id.substring(2)
   let createSystem = false
   if (props.possibleSystem) createSystem = hasSystem()
-  let system: System | undefined
+  let system: StarSystem | undefined
   //@ts-ignore
   if (createSystem) system = randomSystem("", Number(x), Number(y))
   let water = system ? system.hydro != 0 : false
@@ -22,6 +25,7 @@ export const Hex = (props: { id: string, possibleSystem?: boolean }) => {
   )
 }
 
+// Create a column of 10 hexes (height of a subsector)
 export const HexCol = (props: { id: string, start: number, style?: string, possibleSystem?: boolean }) => {
   const { id, start, style } = props
   // Create an array of Hexes of specified amount
@@ -42,6 +46,8 @@ export const HexCol = (props: { id: string, start: number, style?: string, possi
   )
 }
 
+// Create a double column of 10 hexes, second column is offset for use in a larger scale grid
+// id and start determines x,y label of the initial hex
 export const HexColDouble = (props: { id: number, start: number, possibleSystem?: boolean }) => {
   const { id, start } = props
   // parse first 2 digits of hex id for both columns
@@ -56,11 +62,10 @@ export const HexColDouble = (props: { id: number, start: number, possibleSystem?
   )
 }
 
-export const SubSector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31 }) => {
+// Create a hex grid, 8 x 10 hexes
+// startX and startY determines the x,y label for the first hex. All other hexes are based on that. Values are truncated to work within sector dimensions.
+export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31 }) => {
   const { startX, startY } = props
-  // Determine subsector offset by column (startX)
-  const offset = startX == 1 ? .18 : startX == 9 ? .18 : startX == 17 ? .18 : .18;
-
   return (
     <div className="flex relative">
       <HexColDouble id={startX} start={startY} possibleSystem={true} />
@@ -72,32 +77,33 @@ export const SubSector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
   )
 }
 
+// Create a full sector, 32 x 40 hex grid
 export const Sector = () => {
   return (
     <div className="p-4">
       <div className="flex" id="row1">
-        <SubSector startX={1} startY={1} />
-        <SubSector startX={9} startY={1} />
-        <SubSector startX={17} startY={1} />
-        <SubSector startX={25} startY={1} />
+        <Subsector startX={1} startY={1} />
+        <Subsector startX={9} startY={1} />
+        <Subsector startX={17} startY={1} />
+        <Subsector startX={25} startY={1} />
       </div>
       <div className="flex" id="row2">
-        <SubSector startX={1} startY={11} />
-        <SubSector startX={9} startY={11} />
-        <SubSector startX={17} startY={11} />
-        <SubSector startX={25} startY={11} />
+        <Subsector startX={1} startY={11} />
+        <Subsector startX={9} startY={11} />
+        <Subsector startX={17} startY={11} />
+        <Subsector startX={25} startY={11} />
       </div>
       <div className="flex" id="row3">
-        <SubSector startX={1} startY={21} />
-        <SubSector startX={9} startY={21} />
-        <SubSector startX={17} startY={21} />
-        <SubSector startX={25} startY={21} />
+        <Subsector startX={1} startY={21} />
+        <Subsector startX={9} startY={21} />
+        <Subsector startX={17} startY={21} />
+        <Subsector startX={25} startY={21} />
       </div>
       <div className="flex" id="row4">
-        <SubSector startX={1} startY={31} />
-        <SubSector startX={9} startY={31} />
-        <SubSector startX={17} startY={31} />
-        <SubSector startX={25} startY={31} />
+        <Subsector startX={1} startY={31} />
+        <Subsector startX={9} startY={31} />
+        <Subsector startX={17} startY={31} />
+        <Subsector startX={25} startY={31} />
       </div>
     </div>
   )

@@ -38,3 +38,7 @@ body {
   background-color: black;
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
+
+a {
+  @apply border-2 border-black py-1 px-3 rounded hover:cursor-pointer hover:bg-gray-200
+}
