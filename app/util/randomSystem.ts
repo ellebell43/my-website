@@ -1,6 +1,6 @@
 import { clampToDiceRange, clampToTechRange, clampToZero, hexify, roll1D3, roll2D6, rollD66 } from "./functions"
 import StarSystem from "./starsystem"
-import { faction, sizeRange, starportRange, travelCode, xRange, yRange } from "./types"
+import { facilityCode, faction, sizeRange, starportRange, travelCode, xRange, yRange } from "./types"
 
 // Create a random star system
 export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => {
@@ -124,6 +124,51 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
   // culture
   const culture = rollD66()
 
+  // facilities
+  let facArr: facilityCode[] = []
+  if (starport == "A") {
+    // Highport
+    const hDM = (tech >= 9 && tech <= 11 ? 1 : tech >= 12 ? 2 : 0) + (pop >= 9 ? 1 : pop <= 6 ? -1 : 0)
+    if (roll2D6() + hDM >= 6) facArr.push("H")
+    // Military
+    if (roll2D6() >= 8) facArr.push("M")
+    // Naval
+    if (roll2D6() >= 8) facArr.push("N")
+    // Scout
+    if (roll2D6() >= 10) facArr.push("S")
+  } else if (starport == "B") {
+    // Highport
+    const hDM = (tech >= 9 && tech <= 11 ? 1 : tech >= 12 ? 2 : 0) + (pop >= 9 ? 1 : pop <= 6 ? -1 : 0)
+    if (roll2D6() + hDM >= 8) facArr.push("H")
+    // Military
+    if (roll2D6() >= 8) facArr.push("M")
+    // Naval
+    if (roll2D6() >= 8) facArr.push("N")
+    // Scout
+    if (roll2D6() >= 9) facArr.push("S")
+  } else if (starport == "C") {
+    // Highport
+    const hDM = (tech >= 9 && tech <= 11 ? 1 : tech >= 12 ? 2 : 0) + (pop >= 9 ? 1 : pop <= 6 ? -1 : 0)
+    if (roll2D6() + hDM >= 10) facArr.push("H")
+    // Military
+    if (roll2D6() >= 10) facArr.push("M")
+    // Scout
+    if (roll2D6() >= 9) facArr.push("S")
+  } else if (starport == "D") {
+    // Highport
+    const hDM = (tech >= 9 && tech <= 11 ? 1 : tech >= 12 ? 2 : 0) + (pop >= 9 ? 1 : pop <= 6 ? -1 : 0)
+    if (roll2D6() + hDM >= 12) facArr.push("H")
+    // Scout
+    if (roll2D6() >= 8) facArr.push("S")
+    // Corsair
+    const cDM = law == 0 ? 2 : law >= 2 ? -2 : 0
+    if (roll2D6() + cDM >= 12) facArr.push("C")
+  }
+  else if (starport == "E" || starport == "X") {
+    const cDM = law == 0 ? 2 : law >= 2 ? -2 : 0
+    if (roll2D6() + cDM >= 10) facArr.push("C")
+  }
+
   // hexify values
   //@ts-ignore
   size = hexify(size)
@@ -155,6 +200,6 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
    */
 
   //@ts-expect-error
-  let newSys = new StarSystem(x, y, name, starport, size, atmos, hydro, pop, gov, law, tech, travelCode, temp, factions, culture)
+  let newSys = new StarSystem(x, y, name, starport, size, atmos, hydro, pop, gov, law, tech, travelCode, temp, factions, culture, facArr)
   return newSys
 }

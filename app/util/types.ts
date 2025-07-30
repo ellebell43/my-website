@@ -2,7 +2,7 @@
 export type numRange = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0
 export type letterRange = "A" | "B" | "C" | "D" | "E" | "F"
 export type fullRange = numRange | letterRange
-export type starportRange = "A" | "B" | "C" | "E" | "X"
+export type starportRange = "A" | "B" | "C" | "D" | "E" | "X"
 export type sizeRange = numRange | "A"
 export type popRange = numRange | "A" | "B" | "C"
 export type travelCode = "G" | "A" | "R"

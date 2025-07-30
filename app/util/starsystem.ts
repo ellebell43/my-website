@@ -1,5 +1,5 @@
-import { deHexify } from "./functions"
-import { xRange, yRange, starportRange, sizeRange, fullRange, popRange, numRange, faction, d66Range, travelCode, diceRange, tradeCode } from "./types"
+import { deHexify, roll1D6, roll2D6 } from "./functions"
+import { xRange, yRange, starportRange, sizeRange, fullRange, popRange, numRange, faction, d66Range, travelCode, diceRange, tradeCode, facilityCode } from "./types"
 
 export default class StarSystem {
   // Class property types
@@ -19,7 +19,18 @@ export default class StarSystem {
   factions?: faction[]
   culture?: d66Range
   tradeCodes?: tradeCode[]
+  facilities: facilityCode[]
   details?: string
+  governmentType: string
+  diameter: number
+  gravity: number
+  starportQuality: string
+  facilitiesVerbose: string[]
+  berthingCost: number
+  basesVerbose: string[]
+  fuelType: string
+  tradeCodesVerbose: string[]
+  gasGiant: boolean
 
   constructor(
     // constructor arguments
@@ -37,7 +48,8 @@ export default class StarSystem {
     travelCode?: travelCode,
     temp?: diceRange,
     factions?: faction[],
-    culture?: d66Range) {
+    culture?: d66Range,
+    facilities?: facilityCode[],) {
     // constructor body
     this.x = x;
     this.y = y
@@ -54,12 +66,21 @@ export default class StarSystem {
     this.temp = temp ? temp : undefined
     this.factions = factions ? factions : undefined
     this.culture = culture ? culture : undefined
+    this.facilities = facilities ? facilities : []
     this.#determineTradeCodes()
+    this.governmentType = this.#getGovernmentType()
+    this.diameter = this.#getDiameter()
+    this.gravity = this.#getGravity()
+    this.starportQuality = this.#getStarportQuality()
+    this.facilitiesVerbose = this.#getFacilitiesArrayVerbose()
+    this.berthingCost = this.#getBerthingCost()
+    this.basesVerbose = this.#getBasesArrayVerbose()
+    this.fuelType = this.#getFuelType()
+    this.tradeCodesVerbose = this.#getTradeCodesVerbose()
+    this.gasGiant = roll2D6() < 10
   }
   // Use system data to determine trade codes
   #determineTradeCodes() {
-    console.log("determining trade codes")
-    console.log("system info: " + Boolean(this.size))
     let arr: tradeCode[] = []
     const atmos = deHexify(this.atmos)
     const size = deHexify(this.size)
@@ -111,10 +132,157 @@ export default class StarSystem {
   // Condense system data to a UWP string
   getUWP(): string {
     const id = `${this.x < 10 ? "0" + String(this.x) : this.x}${this.y < 10 ? "0" + String(this.y) : this.y}`
-    return `${this.name} ${id} ${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech}`
+    return `${this.name} ${id} ${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech} ${this.facilities.toString().replaceAll(",", " ")} ${this.tradeCodes?.toString().replaceAll(",", " ")} ${this.travelCode}`
   }
+  // Condense system to UWP string, shorthand for hex maps
   getUWPSmall(): string {
     return `${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech}`
+  }
+  // Get grid ID via x,y values
+  getGridID(): string {
+    return `${this.x < 10 ? "0" + String(this.x) : this.x}${this.y < 10 ? "0" + String(this.y) : this.y}`
+  }
+  // Get verbose government data
+  #getGovernmentType(): string {
+    switch (this.gov) {
+      case (0): return "None";
+      case (1): return "Corporation";
+      case (2): return "Participating Democracy";
+      case (3): return "Self-Perpetuating Oligarchy";
+      case (4): return "Representative Democracy";
+      case (5): return "Feudal Technocracy";
+      case (6): return "Captive Government";
+      case (7): return "Balkanisation";
+      case (8): return "Civil Service Bureaucracy";
+      case (9): return "Impersonal Bureaucracy";
+      case ("A"): return "Charismatic Dictator";
+      case ("B"): return "Non-Charismatic Leader";
+      case ("C"): return "Charismatic Oligarchy";
+      case ("D"): return "Religious Dictatorship";
+      case ("E"): return "Religious Autocracy";
+      case ("F"): return "Totalitarian Oligarchy";
+    }
+  }
 
+  #getDiameter(): number {
+    switch (this.size) {
+      case (0): return 1000;
+      case (1): return 1600;
+      case (2): return 3200;
+      case (3): return 4800;
+      case (4): return 6400;
+      case (5): return 8000;
+      case (6): return 9600;
+      case (7): return 11200;
+      case (8): return 12800;
+      case (9): return 14400;
+      case ("A"): return 16000;
+    }
+  }
+
+  #getGravity(): number {
+    switch (this.size) {
+      case (0): return 0;
+      case (1): return .05;
+      case (2): return .15;
+      case (3): return .25;
+      case (4): return .35;
+      case (5): return .45;
+      case (6): return .7;
+      case (7): return .9;
+      case (8): return 1;
+      case (9): return 1.25;
+      case ("A"): return 1.4;
+    }
+  }
+
+  #getStarportQuality(): string {
+    switch (this.starport) {
+      case ("A"): return "Excellent";
+      case ("B"): return "Good";
+      case ("C"): return "Routine";
+      case ("D"): return "Poor";
+      case ("E"): return "Frontier";
+      case ("X"): return "None";
+    }
+  }
+
+  #getFacilitiesArrayVerbose(): string[] {
+    let arr: string[] = []
+    this.facilities.forEach(e => {
+      switch (e) {
+        case ("H"): arr.push("Highport"); break;
+      }
+    })
+    switch (this.starport) {
+      case ("A"): arr.push("Shipyard (all)"); arr.push("Repair"); break;
+      case ("B"): arr.push("Shipyard (spacecraft)"); arr.push("Repair"); break;
+      case ("C"): arr.push("Shipyard (small craft)"); arr.push("Repair"); break;
+      case ("D"): arr.push("Limited Repair)"); arr.push("Limited Repair"); break;
+    }
+    return arr
+  }
+
+  #getBasesArrayVerbose(): string[] {
+    let arr: string[] = []
+    this.facilities.forEach(e => {
+      switch (e) {
+        case ("M"): arr.push("Military"); break;
+        case ("N"): arr.push("Naval"); break;
+        case ("S"): arr.push("Scout"); break;
+        case ("D"): arr.push("Depot"); break;
+        case ("C"): arr.push("Corsair"); break;
+      }
+    })
+    return arr
+  }
+
+  #getBerthingCost(): number {
+    switch (this.starport) {
+      case ("A"): return roll1D6() * 1000;
+      case ("B"): return roll1D6() * 500;
+      case ("C"): return roll1D6() * 100;
+      case ("D"): return roll1D6() * 10;
+      case ("E"): return 0;
+      case ("X"): return 0;
+    }
+  }
+
+  #getFuelType(): string {
+    switch (this.starport) {
+      case ("A"): return "Refined"
+      case ("B"): return "Refined"
+      case ("C"): return "Unrefined"
+      case ("D"): return "Unrefined"
+      case ("E"): return "None"
+      case ("X"): return "None"
+    }
+  }
+
+  #getTradeCodesVerbose(): string[] {
+    let tradeArr: string[] = []
+    this.tradeCodes?.forEach(e => {
+      switch (e) {
+        case ("Ag"): tradeArr.push("Agricultural"); break;
+        case ("As"): tradeArr.push("Asteroid"); break;
+        case ("Ba"): tradeArr.push("Barren"); break;
+        case ("De"): tradeArr.push("Desert"); break;
+        case ("Fl"): tradeArr.push("Fluid Oceans"); break;
+        case ("Ga"): tradeArr.push("Garden"); break;
+        case ("Hi"): tradeArr.push("High Population"); break;
+        case ("Ht"): tradeArr.push("High Technology"); break;
+        case ("Ic"): tradeArr.push("Ice-Capped"); break;
+        case ("In"): tradeArr.push("Industrial"); break;
+        case ("Lo"): tradeArr.push("Low Population"); break;
+        case ("Lt"): tradeArr.push("Low Technology"); break;
+        case ("Na"): tradeArr.push("Non-Agricultural"); break;
+        case ("Ni"): tradeArr.push("Non-Industrial"); break;
+        case ("Po"): tradeArr.push("Poor"); break;
+        case ("Ri"): tradeArr.push("Rich"); break;
+        case ("Va"): tradeArr.push("Vacuum"); break;
+        case ("Wa"): tradeArr.push("Water World"); break;
+      }
+    })
+    return tradeArr;
   }
 }

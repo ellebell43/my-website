@@ -25,3 +25,12 @@ export const Planet = (props: { water: boolean, asteroid: boolean }) => {
     )
   }
 }
+
+export const GasGiant = () => {
+  return (
+    <div className="absolute top-[.4in] right-[-.2in]">
+      <div className="bg-black rounded-full w-[15px] h-[15px]" />
+      <div className="border-2 rounded-[100%] w-[25px] h-[8px] absolute top-[4px] left-[-5px] rotate-12" />
+    </div>
+  )
+}

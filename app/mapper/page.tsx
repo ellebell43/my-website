@@ -9,6 +9,7 @@ export default function Page() {
   const [sector, setSector] = useState(false)
   const [prompt, setPrompt] = useState(true)
 
+  // Component for selecting grid size (subsector vs sector) and if systems are generated
   const InitPrompt = () => {
     return (
       <div className="bg-slate-100 shadow border rounded w-fit mx-auto my-24 p-6 flex flex-col gap-4">
@@ -33,7 +34,7 @@ export default function Page() {
   return (
     <div>
       <button className="button-link m-6" onClick={() => setPrompt(true)}>Regenerate</button>
-      {sector ? <Sector generateSystems={generateSystems} /> : <Subsector generateSystems={generateSystems} startX={1} startY={1} />}
+      {sector ? <Sector generateSystems={generateSystems} /> : <Subsector generateSystems={generateSystems} startX={1} startY={1} border={false} sector={false} />}
     </div>
   )
 }
