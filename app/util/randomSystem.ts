@@ -108,7 +108,19 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
 
   // Travel code
   let travelCode: travelCode = "G"
-  if (atmos >= 10 || gov == 0 || gov == 7 || gov == 10 || law == 0 || law >= 9) travelCode = "A"
+  if (atmos >= 10) {
+    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Atmosphere`)
+    // console.log(`Atmos ${atmos} is more than 10: ${atmos >= 10}`)
+    travelCode = "A"
+  } else if (gov === 0 || gov === 7 || gov === 10) {
+    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Government`)
+    // console.log(`Gov ${gov} is 0,7 or 10: ${gov === 0 || gov === 7 || gov === 10}`)
+    travelCode = "A"
+  } else if (law === 0 || law >= 9) {
+    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Law`)
+    // console.log(`Law ${law} is 0 or more than 9: ${law === 0 || law >= 9}`)
+    travelCode = "A"
+  }
 
   // Factions
   const factionCount = roll1D3()
@@ -154,6 +166,7 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
     if (roll2D6() >= 10) facArr.push("M")
     // Scout
     if (roll2D6() >= 9) facArr.push("S")
+    //@ts-expect-error
   } else if (starport == "D") {
     // Highport
     const hDM = (tech >= 9 && tech <= 11 ? 1 : tech >= 12 ? 2 : 0) + (pop >= 9 ? 1 : pop <= 6 ? -1 : 0)
@@ -180,6 +193,8 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
   pop = hexify(pop)
   //@ts-ignore
   gov = hexify(gov)
+  // @ts-ignore
+  law = hexify(law)
 
   /**
    * constructor(x: xRange,

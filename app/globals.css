@@ -26,15 +26,15 @@ body {
 }
 
 .hexagon-in {
-  width: 1.5in;
-  height: calc(1.5in * 0.866);
+  height: 145px;
+  aspect-ratio: 1/cos(30deg);
   background-color: white;
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
 
 .hexagon-out {
-  width: 1.55in;
-  height: calc(1.55in * 0.866);
+  height: 150px;
+  aspect-ratio: 1/cos(30deg);
   background-color: black;
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }

@@ -1,13 +1,13 @@
 'use client'
 
-import { GasGiant, Planet } from "./symbols"
+import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
 import StarSystem from "../util/starsystem"
 import { hasSystem } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 
 // Create a single hex (parsec)
-export const Hex = (props: { id: string, setDetails: Function, details: StarSystem | undefined, possibleSystem?: boolean }) => {
+export const Hex = (props: { id: string, setDetails: Function, details: StarSystem | undefined, possibleSystem?: boolean, style?: string }) => {
   const { id, possibleSystem } = props
   // split id into x,y values
   const x = id.substring(0, 2)
@@ -22,20 +22,29 @@ export const Hex = (props: { id: string, setDetails: Function, details: StarSyst
 
   return (
     <div
-      className="hexagon-out relative hover:pointer"
+      className={`hexagon-out relative flex justify-center items-center`}
       id={"hex" + props.id}
       onClick={() => { if (system) props.setDetails(system); }}
     >
-      <div className={`hexagon-in absolute top-[.025in] left-[.025in] flex flex-col items-center ${system ? "justify-between" : ""}`}>
+      <div className={`hexagon-in flex flex-col items-center ${system ? "justify-between hover: cursor-pointer" : ""}`}>
+        {/* Travel code ring */}
+        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 ${system?.travelCode == "A" ? "border-amber-300" : system?.travelCode == "R" ? "border-red-500" : "border-white"}`} />
+        {/* Content container */}
         <div className="text-center relative">
           <p className="text-center text-sms">{props.id}</p>
-          {system?.gasGiant ? <GasGiant /> : <></>}
-          {system ? <p className="text-md font-bold m-0">{system.starport}</p> : <></>}
-          {system ? <Planet water={water} asteroid={asteroid} /> : <></>}
+          {system ? <>
+            {system.gasGiant ? <GasGiant /> : <></>}
+            {system.facilities.includes("N") ? <NavalBase /> : <></>}
+            {system.facilities.includes("M") ? <MilitaryBase /> : <></>}
+            {system.facilities.includes("S") ? <ScoutBase /> : <></>}
+            <p className="text-md font-bold m-0">{system.starport}</p>
+            <Planet water={water} asteroid={asteroid} />
+          </> : <></>}
         </div>
-        {system ? <p className="font-bold">{system.name}</p> : <></>}
-        {system ? <p className="text-xs text center">{system.getUWPSmall()}</p> : <></>}
-        <div className="absolute top-0 left-0 w-full h-full" />
+        {system ? <>
+          <p className="font-bold">{system.name}</p>
+          <p className="text-xs text center z-10">{system.getUWPSmall()}</p>
+        </> : <></>}
       </div>
     </div>
   )
@@ -54,7 +63,7 @@ export const HexCol = (props: { id: string, start: number, details: StarSystem |
   }
   // Map the array out in a div container
   return (
-    <div className={style} id={"col" + id + start}>
+    <div className={`${style}`} id={"col" + id + start}>
       {arr.map((el, i) => {
         return el
       })}
@@ -71,9 +80,9 @@ export const HexColDouble = (props: { id: number, start: number, details: StarSy
   const id2 = id + 1 < 10 ? "0" + String(id + 1) : String(id + 1)
   // Create two hex columns, offset the second to create a tight grid
   return (
-    <div className="relative w-[2.3in]">
+    <div className="relative w-[255px]">
       <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} details={props.details} setDetails={props.setDetails} />
-      <HexCol id={id2} start={start} style="absolute top-[.67in] right-[-.4in]" possibleSystem={props.possibleSystem} details={props.details} setDetails={props.setDetails} />
+      <HexCol id={id2} start={start} style="absolute top-[75px] left-[127px]" possibleSystem={props.possibleSystem} details={props.details} setDetails={props.setDetails} />
     </div>
   )
 }
@@ -81,6 +90,7 @@ export const HexColDouble = (props: { id: number, start: number, details: StarSy
 // Create a hex grid, 8 x 10 hexes
 // startX and startY determines the x,y label for the first hex. All other hexes are based on that. Values are truncated to work within sector dimensions.
 export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean, border: boolean, sector?: boolean, details?: StarSystem | undefined, setDetails?: Function, }) => {
+  console.log("======================== CREATING SUBSECTOR ========================")
   const { startX, startY, generateSystems, border, sector } = props
   const [localDetails, setLocalDetails] = useState<StarSystem | undefined>()
   return (
