@@ -5,6 +5,8 @@ import StarSystem from "../util/starsystem"
 import { hasSystem } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faX } from "@fortawesome/free-solid-svg-icons"
 
 // Create a single hex (parsec)
 export const Hex = (props: { id: string, setDetails: Function, details: StarSystem | undefined, possibleSystem?: boolean, style?: string }) => {
@@ -139,11 +141,11 @@ export const Sector = (props: { generateSystems: boolean }) => {
 export const SystemDetails = (props: { details: StarSystem | undefined, setDetails: Function }) => {
   if (!props.details) return <></>
   return (
-    <div className="fixed bottom-6 right-6 bg-slate-200 border rounded shadow-lg w-[500px] p-4 z-50">
+    <div className="fixed top-0 md:bottom-4 md:top-auto right-0 md:right-4 w-screen md:w-[650px] h-screen md:h-[200px] overflow-scroll bg-slate-100 border rounded md:shadow-lg p-4 z-50">
       {/* title area */}
       <div className="flex justify-between">
         <p className="text-center w-full font-bold text-xl">{props.details.getUWP()}</p>
-        <button className="hover:pointer" onClick={() => props.setDetails(undefined)}>X</button>
+        <button className="hover:cursor-pointer hover:bg-slate-300 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200" onClick={() => props.setDetails(undefined)}><FontAwesomeIcon icon={faX} /></button>
       </div>
       <div className="border-b my-2 pb-2">
         <p><span className="font-bold">Starport</span>: {props.details.starportQuality} (Cr{props.details.berthingCost}; Fuel {props.details.fuelType})</p>

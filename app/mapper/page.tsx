@@ -33,7 +33,8 @@ export default function Page() {
   if (prompt) return <InitPrompt />
   return (
     <div>
-      <button className="button-link m-6" onClick={() => setPrompt(true)}>Regenerate</button>
+      {/* REGENERATE BUTTON */}
+      <button className="button-link fixed top-6 left-6 z-50 bg-white" onClick={() => setPrompt(true)}>Regenerate</button>
       {sector ? <Sector generateSystems={generateSystems} /> : <Subsector generateSystems={generateSystems} startX={1} startY={1} border={false} sector={false} />}
     </div>
   )

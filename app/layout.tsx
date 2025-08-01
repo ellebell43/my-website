@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Winky_Sans } from "next/font/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,6 +13,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <meta name="viewport" content="height=device-height, initial-scale=1, minimum-scale=1" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
       <body>
         {children}
       </body>
