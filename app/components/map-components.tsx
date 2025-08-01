@@ -153,9 +153,14 @@ export const SystemDetails = (props: { details: StarSystem | undefined, setDetai
         <p><span className="font-bold">Bases</span>: {props.details.basesVerbose.toString().replaceAll(",", ", ")}</p>
         <p><span className="font-bold">Trade Codes</span>: {props.details.tradeCodesVerbose.toString().replaceAll(",", ", ")}</p>
       </div>
-      <p><span className="font-bold">Size</span>: {props.details.diameter}km ({props.details.gravity}G)</p>
-      <p><span className="font-bold">Atmosphere</span>: {props.details.atmosphereType} ({props.details.tempType})</p>
-      <p><span className="font-bold">Government</span>: {props.details.governmentType}</p>
+      <div className="border-b my-2 pb-2">
+        <p><span className="font-bold">Size</span>: {props.details.diameter}km ({props.details.gravity}G)</p>
+        <p><span className="font-bold">Atmosphere</span>: {props.details.atmosphereType} ({props.details.tempType})</p>
+        <p><span className="font-bold">Hydrographics</span>: {props.details.hydroType}</p>
+      </div>
+      <div className="border-b my-2 pb-2">
+        <p><span className="font-bold">Government</span>: {props.details.governmentType}</p>
+      </div>
     </div>
   )
 }

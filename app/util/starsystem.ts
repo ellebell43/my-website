@@ -33,6 +33,7 @@ export default class StarSystem {
   gasGiant: boolean
   atmosphereType: string
   tempType: string
+  hydroType: string
 
   constructor(
     // constructor arguments
@@ -82,6 +83,7 @@ export default class StarSystem {
     this.gasGiant = roll2D6() < 10
     this.atmosphereType = this.#getAtmosphereType()
     this.tempType = this.#getTempType()
+    this.hydroType = this.#getHydroType()
   }
   // Use system data to determine trade codes
   #determineTradeCodes() {
@@ -327,5 +329,21 @@ export default class StarSystem {
     if (this.temp >= 5 && this.temp <= 9) return "Temperate, 0° to 30°"
     if (this.temp >= 10 && this.temp <= 11) return "Hot, 31° to 80°"
     return "Boiling, 81° or more"
+  }
+
+  #getHydroType(): string {
+    switch (this.hydro) {
+      case (0): return "Desert World (0 - 5%)"
+      case (1): return "Dry World (6 - 15%)"
+      case (2): return "Few Small Seas (16 - 25%)"
+      case (3): return "Small Seas and Oceans (26 - 35%)"
+      case (4): return "Wet World (36 - 45%)"
+      case (5): return "A Large Ocean (46 - 55%)"
+      case (6): return "Large Oceans (56 - 65%)"
+      case (7): return "Earth-like (66 - 75%)"
+      case (8): return "A Few Islands (76 - 85%)"
+      case (9): return "Almost Only Water (86 - 95%)"
+      case ("A"): return "Waterworld (96 - 100%)"
+    }
   }
 }
