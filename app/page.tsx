@@ -16,16 +16,16 @@ export default function Page() {
 
         <p className="text-xl my-2">I really enjoy self-hosting things, and all my projects (including this site) are self-hosted. I'm currently working on setting up an email server. I have a couple other projects that are usable, but not listed here due to having less secure connections.</p>
 
-
-
-        <h2 className="border-b-2 pb-">Projects</h2>
+        <h2 className="border-b-2 mt-12 mb-6 text-4xl pb-4">Projects</h2>
         <div className="flex flex-col gap-8">
           <ProjectCard href="/mapper" title="Traveller RPG Mapper" description="A fun little tool for randomly generating hex maps for the game Traveller (a TTRPG)" />
-          <ProjectCard href="https://recipes.ellebell.dev/g/the-council/" title="Mealie" description="A self hosted recipe manager. Got some recipes for me to add? DM me!" right={true} />
+          <ProjectCard href="https://recipes.ellebell.dev/g/the-council/" title="Mealie" description="My self hosted recipe manager. Got some recipes for me to add? DM me!" right={true} />
+          <ProjectCard href="https://movies.ellebell.dev/" title="Jellyfin" description="My media browser/player to host and stream all the movies that I own. You won't be able to access it without an account." />
+          <p className="text-xl">I'm also running servers locally for Joplin (notes and to-dos), reverse proxy, and dynamic DNS!</p>
         </div>
 
         <div className="flex justify-center gap-6 mt-12">
-          <Link href="https://dice.camp/@ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faMastodon} /></Link>
+          <Link rel="me" href="https://dice.camp/@ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faMastodon} /></Link>
           <Link href="https://github.com/ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faGithub} /></Link>
           <Link href="https://discord.com/users/ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faDiscord} /></Link>
         </div>
