@@ -8,6 +8,7 @@ export type popRange = numRange | "A" | "B" | "C"
 export type travelCode = "G" | "A" | "R"
 export type tradeCode = "Ag" | "As" | "Ba" | "De" | "Fl" | "Ga" | "Hi" | "Ht" | "Ic" | "In" | "Lo" | "Lt" | "Na" | "Ni" | "Po" | "Ri" | "Va" | "Wa"
 export type facilityCode = "H" | "M" | "N" | "S" | "C" | "D"
+export type lawRange = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 
 // Ranges for types of die rolls
 export type diceRange = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12

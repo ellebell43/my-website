@@ -1,4 +1,4 @@
-import { clampToDiceRange, clampToTechRange, clampToZero, hexify, roll1D3, roll2D6, rollD66 } from "./functions"
+import { clampToDiceRange, clampToLawRange, clampToTechRange, clampToZero, hexify, roll1D3, roll2D6, rollD66 } from "./functions"
 import StarSystem from "./starsystem"
 import { facilityCode, faction, sizeRange, starportRange, travelCode, xRange, yRange } from "./types"
 
@@ -37,7 +37,7 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
 
   // law
   let law = roll2D6() - 7 + gov
-  law = clampToZero(law)
+  law = clampToLawRange(law)
 
   // starport
   let num = roll2D6()
@@ -122,17 +122,6 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
     travelCode = "A"
   }
 
-  // Factions
-  const factionCount = roll1D3()
-  let factions: faction[] = []
-  for (let i = 0; i++; i < factionCount) {
-    let strength = roll2D6()
-    let factionGov = hexify(roll2D6() - 7 + gov)
-    //@ts-expect-error
-    let newFaction: faction = { strength, gov: factionGov }
-    factions.push(newFaction)
-  }
-
   // culture
   const culture = rollD66()
 
@@ -193,8 +182,6 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
   pop = hexify(pop)
   //@ts-ignore
   gov = hexify(gov)
-  // @ts-ignore
-  law = hexify(law)
 
   /**
    * constructor(x: xRange,
@@ -207,14 +194,10 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
        pop: popRange,
        gov: fullRange,
        law: fullRange,
-       tech: numRange | 10 | 11 | 12 | 13 | 14 | 15,
-       travelCode?: travelCode,
-       temp?: diceRange,
-       factions?: faction[],
-       culture?: d66Range) {
+       tech: numRange | 10 | 11 | 12 | 13 | 14 | 15 {
    */
 
   //@ts-expect-error
-  let newSys = new StarSystem(x, y, name, starport, size, atmos, hydro, pop, gov, law, tech, travelCode, temp, factions, culture, facArr)
+  let newSys = new StarSystem(x, y, name, starport, size, atmos, hydro, pop, gov, law, tech)
   return newSys
 }

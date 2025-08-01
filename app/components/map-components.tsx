@@ -6,7 +6,7 @@ import { hasSystem } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faX } from "@fortawesome/free-solid-svg-icons"
+import { faHippo, faX } from "@fortawesome/free-solid-svg-icons"
 
 // Create a single hex (parsec)
 export const Hex = (props: { id: string, setDetails: Function, details: StarSystem | undefined, possibleSystem?: boolean, style?: string }) => {
@@ -92,7 +92,6 @@ export const HexColDouble = (props: { id: number, start: number, details: StarSy
 // Create a hex grid, 8 x 10 hexes
 // startX and startY determines the x,y label for the first hex. All other hexes are based on that. Values are truncated to work within sector dimensions.
 export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean, border: boolean, sector?: boolean, details?: StarSystem | undefined, setDetails?: Function, }) => {
-  console.log("======================== CREATING SUBSECTOR ========================")
   const { startX, startY, generateSystems, border, sector } = props
   const [localDetails, setLocalDetails] = useState<StarSystem | undefined>()
   return (
@@ -151,23 +150,41 @@ export const SystemDetails = (props: { details: StarSystem | undefined, setDetai
 
       {/* Starport and Trade */}
       <div className="border-b my-2 pb-2">
-        <p><span className="font-bold">Starport</span>: {props.details.starportQuality} (Cr{props.details.berthingCost}; Fuel {props.details.fuelType})</p>
-        <p><span className="font-bold">Facilities</span>: {props.details.facilitiesVerbose.toString().replaceAll(",", ", ")}</p>
-        <p><span className="font-bold">Bases</span>: {props.details.basesVerbose.toString().replaceAll(",", ", ")}</p>
-        <p><span className="font-bold">Trade Codes</span>: {props.details.tradeCodesVerbose.toString().replaceAll(",", ", ")}</p>
+        <p><span className="font-bold">Starport</span>: {props.details.getStarportQuality()} (Cr{props.details.getRandomBerthingCost()}; Fuel {props.details.getFuelType()})</p>
+        <p><span className="font-bold">Facilities</span>: {props.details.getFacilitiesArrayVerbose().toString().replaceAll(",", ", ")}</p>
+        <p><span className="font-bold">Bases</span>: {props.details.getBasesArrayVerbose().toString().replaceAll(",", ", ")}</p>
+        <p><span className="font-bold">Trade Codes</span>: {props.details.getTradeCodesVerbose().toString().replaceAll(",", ", ")}</p>
       </div>
 
       {/* Physical Characteristics */}
       <div className="border-b my-2 pb-2">
-        <p><span className="font-bold">Size</span>: {props.details.diameter}km ({props.details.gravity}G)</p>
-        <p><span className="font-bold">Atmosphere</span>: {props.details.atmosphereType} ({props.details.tempType})</p>
-        <p><span className="font-bold">Hydrographics</span>: {props.details.hydroType}</p>
+        <p><span className="font-bold">Size</span>: {props.details.getDiameter()}km ({props.details.getGravity()}G)</p>
+        <p><span className="font-bold">Atmosphere</span>: {props.details.getAtmosphereType()} ({props.details.getTempType()})</p>
+        <p><span className="font-bold">Hydrographics</span>: {props.details.getHydroType()}</p>
       </div>
 
       {/* Social Characteristics */}
       <div className="border-b my-2 pb-2">
-        <p><span className="font-bold">Population</span>: {props.details.popType}</p>
-        <p><span className="font-bold">Government</span>: {props.details.governmentType}</p>
+        <p><span className="font-bold">Population</span>: {props.details.getPopType()}</p>
+        <p><span className="font-bold">Government</span>: {props.details.getGovernmentType(props.details.gov)}</p>
+        <p className="font-bold">Factions ({props.details.factions?.length})</p>
+        <ul className="list-disc list-outside pl-0">
+          {props.details.getFactionArrayVerbose().map((el, i) => {
+            return (
+              <li className="flex gap-2 ml-3" key={i}>
+                {/* <FontAwesomeIcon className="relative top-1" icon={faHippo} width={16} /> */}
+                {/* Bullet point. Can't get tailwind to work :( */}
+                <div className="bg-black w-[6px] h-[6px] rounded-full relative top-[9px]" />
+                <div>
+                  <p>{el.gov}, {el.strength} Group</p>
+                  {el.details ? <p>{el.details}</p> : <></>}
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+        <p><span className="font-bold">Cultural Quirk</span>: {props.details.getCultureType()}</p>
+        <p><span className="font-bold">Law</span>: Level {props.details.law}</p>
       </div>
     </div>
   )
