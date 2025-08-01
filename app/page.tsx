@@ -4,7 +4,7 @@ import ProjectCard from "./components/project-card"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDiscord, faGithub, faMastodon } from "@fortawesome/free-brands-svg-icons"
 
-const winkySans = Winky_Sans({ weight: "500" })
+const winkySans = Winky_Sans({ weight: "500", subsets: ["latin"] })
 
 
 export default function Page() {
