@@ -1,4 +1,4 @@
-import { deHexify, roll1D6, roll2D6 } from "./functions"
+import { clampToDiceRange, deHexify, roll1D6, roll2D6 } from "./functions"
 import { xRange, yRange, starportRange, sizeRange, fullRange, popRange, numRange, faction, d66Range, travelCode, diceRange, tradeCode, facilityCode } from "./types"
 
 export default class StarSystem {
@@ -15,7 +15,7 @@ export default class StarSystem {
   law: fullRange
   tech: numRange | 10 | 11 | 12 | 13 | 14 | 15
   travelCode: travelCode
-  temp?: diceRange
+  temp: diceRange
   factions?: faction[]
   culture?: d66Range
   tradeCodes?: tradeCode[]
@@ -31,6 +31,8 @@ export default class StarSystem {
   fuelType: string
   tradeCodesVerbose: string[]
   gasGiant: boolean
+  atmosphereType: string
+  tempType: string
 
   constructor(
     // constructor arguments
@@ -63,7 +65,7 @@ export default class StarSystem {
     this.law = law
     this.tech = tech
     this.travelCode = travelCode ? travelCode : "G"
-    this.temp = temp ? temp : undefined
+    this.temp = temp ? temp : this.#determineTemp()
     this.factions = factions ? factions : undefined
     this.culture = culture ? culture : undefined
     this.facilities = facilities ? facilities : []
@@ -78,6 +80,8 @@ export default class StarSystem {
     this.fuelType = this.#getFuelType()
     this.tradeCodesVerbose = this.#getTradeCodesVerbose()
     this.gasGiant = roll2D6() < 10
+    this.atmosphereType = this.#getAtmosphereType()
+    this.tempType = this.#getTempType()
   }
   // Use system data to determine trade codes
   #determineTradeCodes() {
@@ -284,5 +288,44 @@ export default class StarSystem {
       }
     })
     return tradeArr;
+  }
+
+  #getAtmosphereType(): string {
+    switch (this.atmos) {
+      case (0): return "None"
+      case (1): return "Trace"
+      case (2): return "Very Thin, Tainted"
+      case (3): return "Very Thin"
+      case (4): return "Thin, Tainted"
+      case (5): return "Thin"
+      case (6): return "Standard"
+      case (7): return "Standard, Tainted"
+      case (8): return "Dense"
+      case (9): return "Dense, Tainted"
+      case ("A"): return "Exotic"
+      case ("B"): return "Corrosive"
+      case ("C"): return "Insidious"
+      case ("D"): return "Very Dense"
+      case ("E"): return "Low"
+      case ("F"): return "Unusual"
+    }
+  }
+
+  #determineTemp(): diceRange {
+    let dm = 0
+    if (this.atmos === 2 || this.atmos === 3) dm = -2
+    else if (this.atmos === 4 || this.atmos === 5 || this.atmos === "E") dm = -1
+    else if (this.atmos === 8 || this.atmos === 9) dm = 1
+    else if (this.atmos === "A" || this.atmos === "D" || this.atmos === "F") dm = 2
+    else if (this.atmos === "B" || this.atmos === "C") dm = 6
+    return clampToDiceRange(roll2D6() + dm)
+  }
+
+  #getTempType(): string {
+    if (this.temp <= 2) return "Frozen, -51° or less"
+    if (this.temp >= 3 && this.temp <= 4) return "Cold, -51° to 0°"
+    if (this.temp >= 5 && this.temp <= 9) return "Temperate, 0° to 30°"
+    if (this.temp >= 10 && this.temp <= 11) return "Hot, 31° to 80°"
+    return "Boiling, 81° or more"
   }
 }

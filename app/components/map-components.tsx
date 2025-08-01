@@ -141,7 +141,7 @@ export const Sector = (props: { generateSystems: boolean }) => {
 export const SystemDetails = (props: { details: StarSystem | undefined, setDetails: Function }) => {
   if (!props.details) return <></>
   return (
-    <div className="fixed top-0 md:bottom-4 md:top-auto right-0 md:right-4 w-screen md:w-[650px] h-screen md:h-[200px] overflow-scroll bg-slate-100 border rounded md:shadow-lg p-4 z-50">
+    <div className="fixed top-0 md:bottom-4 md:top-auto right-0 md:right-4 w-screen md:w-[650px] h-screen md:h-[250px] overflow-scroll bg-slate-100 border rounded md:shadow-lg p-4 z-50">
       {/* title area */}
       <div className="flex justify-between">
         <p className="text-center w-full font-bold text-xl">{props.details.getUWP()}</p>
@@ -154,6 +154,7 @@ export const SystemDetails = (props: { details: StarSystem | undefined, setDetai
         <p><span className="font-bold">Trade Codes</span>: {props.details.tradeCodesVerbose.toString().replaceAll(",", ", ")}</p>
       </div>
       <p><span className="font-bold">Size</span>: {props.details.diameter}km ({props.details.gravity}G)</p>
+      <p><span className="font-bold">Atmosphere</span>: {props.details.atmosphereType} ({props.details.tempType})</p>
       <p><span className="font-bold">Government</span>: {props.details.governmentType}</p>
     </div>
   )
