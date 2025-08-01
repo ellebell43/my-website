@@ -34,6 +34,7 @@ export default class StarSystem {
   atmosphereType: string
   tempType: string
   hydroType: string
+  popType: string
 
   constructor(
     // constructor arguments
@@ -84,6 +85,7 @@ export default class StarSystem {
     this.atmosphereType = this.#getAtmosphereType()
     this.tempType = this.#getTempType()
     this.hydroType = this.#getHydroType()
+    this.popType = this.#getPopType()
   }
   // Use system data to determine trade codes
   #determineTradeCodes() {
@@ -344,6 +346,24 @@ export default class StarSystem {
       case (8): return "A Few Islands (76 - 85%)"
       case (9): return "Almost Only Water (86 - 95%)"
       case ("A"): return "Waterworld (96 - 100%)"
+    }
+  }
+
+  #getPopType(): string {
+    switch (this.pop) {
+      case (0): return "None"
+      case (1): return "A few"
+      case (2): return "Hundreds"
+      case (3): return "Thousands"
+      case (4): return "Tens of Thousands"
+      case (5): return "Hundreds of Thousands"
+      case (6): return "Millions"
+      case (7): return "Tens of Millions"
+      case (8): return "Hundreds of Millions"
+      case (9): return "Billions"
+      case ("A"): return "Tens of Billions"
+      case ("B"): return "Hundreds of Billions"
+      case ("C"): return "Trillions"
     }
   }
 }

@@ -29,7 +29,7 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
   hydro = clampToZero(hydro)
 
   // population
-  let pop = roll2D6()
+  let pop = roll2D6() - 2
 
   // government
   let gov = roll2D6() - 7 + pop

@@ -142,23 +142,31 @@ export const SystemDetails = (props: { details: StarSystem | undefined, setDetai
   if (!props.details) return <></>
   return (
     <div className="fixed top-0 md:bottom-4 md:top-auto right-0 md:right-4 w-screen md:w-[650px] h-screen md:h-[250px] overflow-scroll bg-slate-100 border rounded md:shadow-lg p-4 z-50">
-      {/* title area */}
+
+      {/* Title Area */}
       <div className="flex justify-between">
         <p className="text-center w-full font-bold text-xl">{props.details.getUWP()}</p>
         <button className="hover:cursor-pointer hover:bg-slate-300 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200" onClick={() => props.setDetails(undefined)}><FontAwesomeIcon icon={faX} /></button>
       </div>
+
+      {/* Starport and Trade */}
       <div className="border-b my-2 pb-2">
         <p><span className="font-bold">Starport</span>: {props.details.starportQuality} (Cr{props.details.berthingCost}; Fuel {props.details.fuelType})</p>
         <p><span className="font-bold">Facilities</span>: {props.details.facilitiesVerbose.toString().replaceAll(",", ", ")}</p>
         <p><span className="font-bold">Bases</span>: {props.details.basesVerbose.toString().replaceAll(",", ", ")}</p>
         <p><span className="font-bold">Trade Codes</span>: {props.details.tradeCodesVerbose.toString().replaceAll(",", ", ")}</p>
       </div>
+
+      {/* Physical Characteristics */}
       <div className="border-b my-2 pb-2">
         <p><span className="font-bold">Size</span>: {props.details.diameter}km ({props.details.gravity}G)</p>
         <p><span className="font-bold">Atmosphere</span>: {props.details.atmosphereType} ({props.details.tempType})</p>
         <p><span className="font-bold">Hydrographics</span>: {props.details.hydroType}</p>
       </div>
+
+      {/* Social Characteristics */}
       <div className="border-b my-2 pb-2">
+        <p><span className="font-bold">Population</span>: {props.details.popType}</p>
         <p><span className="font-bold">Government</span>: {props.details.governmentType}</p>
       </div>
     </div>
