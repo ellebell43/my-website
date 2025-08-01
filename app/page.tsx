@@ -20,7 +20,7 @@ export default function Page() {
         <div className="flex flex-col gap-8">
           <ProjectCard href="/mapper" title="(WIP) Traveller Mapper" description="A fun little tool for randomly generating hex maps for the game Traveller (a TTRPG)" />
           <ProjectCard href="https://recipes.ellebell.dev/g/the-council/" title="Mealie" description="My self hosted recipe manager. Got some recipes for me to add? DM me!" right={true} />
-          <ProjectCard href="https://movies.ellebell.dev/" title="Jellyfin" description="My media browser/player to host and stream all the movies that I own. You won't be able to access it without an account." />
+          <ProjectCard href="https://movies.ellebell.dev/" title="Jellyfin" description="My media server to host and stream all the movies that I own. You won't be able to access it without an account." />
           <p className="text-xl">I'm also running servers locally for Joplin (notes and to-dos), reverse proxy, and dynamic DNS!</p>
         </div>
 
