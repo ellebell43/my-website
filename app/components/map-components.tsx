@@ -6,7 +6,7 @@ import { hasSystem } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faHippo, faX } from "@fortawesome/free-solid-svg-icons"
+import { faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
 
 // Create a single hex (parsec)
 export const Hex = (props: { id: string, setDetails: Function, details: StarSystem | undefined, possibleSystem?: boolean, style?: string }) => {
@@ -126,13 +126,17 @@ export const Sector = (props: { generateSystems: boolean }) => {
   const [details, setDetails] = useState<StarSystem | undefined>()
   const { generateSystems } = props
   return (
-    <div className="p-4 relative">
-      <SubsectorRow row={1} generateSystems={generateSystems} details={details} setDetails={setDetails} />
-      <SubsectorRow row={2} generateSystems={generateSystems} details={details} setDetails={setDetails} />
-      <SubsectorRow row={3} generateSystems={generateSystems} details={details} setDetails={setDetails} />
-      <SubsectorRow row={4} generateSystems={generateSystems} details={details} setDetails={setDetails} />
+    <>
+      <Zoom>
+        <div className="p-4 relative">
+          <SubsectorRow row={1} generateSystems={generateSystems} details={details} setDetails={setDetails} />
+          <SubsectorRow row={2} generateSystems={generateSystems} details={details} setDetails={setDetails} />
+          <SubsectorRow row={3} generateSystems={generateSystems} details={details} setDetails={setDetails} />
+          <SubsectorRow row={4} generateSystems={generateSystems} details={details} setDetails={setDetails} />
+        </div>
+      </Zoom>
       <SystemDetails details={details} setDetails={setDetails} />
-    </div>
+    </>
   )
 }
 
@@ -140,11 +144,12 @@ export const Sector = (props: { generateSystems: boolean }) => {
 export const SystemDetails = (props: { details: StarSystem | undefined, setDetails: Function }) => {
   if (!props.details) return <></>
   return (
-    <div className="fixed top-0 md:bottom-4 md:top-auto right-0 md:right-4 w-screen md:w-[650px] h-screen md:h-[250px] overflow-scroll bg-slate-100 border rounded md:shadow-lg p-4 z-50">
+    <div className="fixed top-0 md:bottom-4 md:top-auto right-0 md:right-4 w-screen md:w-[650px] h-screen md:h-[250px] overflow-scroll bg-slate-100 border rounded md:shadow-lg p-4 z-50 scale-100">
 
       {/* Title Area */}
-      <div className="flex justify-between">
-        <p className="text-center w-full font-bold text-xl">{props.details.getUWP()}</p>
+      <div className="">
+        <p className="text-center w-full font-bold text-xl">{props.details.getUWPBroken()[0]}</p>
+        <p className="text-center w-full font-bold text-xl">{props.details.getUWPBroken()[1]}</p>
         <button className="hover:cursor-pointer hover:bg-slate-300 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200" onClick={() => props.setDetails(undefined)}><FontAwesomeIcon icon={faX} /></button>
       </div>
 
@@ -187,5 +192,41 @@ export const SystemDetails = (props: { details: StarSystem | undefined, setDetai
         <p><span className="font-bold">Law</span>: Level {props.details.law}</p>
       </div>
     </div>
+  )
+}
+
+export const Zoom = (props: { children: React.ReactNode }) => {
+  let [zoom, setZoom] = useState<1 | 2 | 3 | 4>(4)
+
+  const newZoom = (up: boolean) => {
+    let newZoom: 1 | 2 | 3 | 4 = zoom
+    if (up && zoom < 4) newZoom++
+    if (!up && zoom > 1) newZoom--
+    //@ts-expect-error
+    setZoom(newZoom)
+  }
+  return (
+    <>
+      <div className="fixed top-2 right-2 flex flex-col z-50">
+        <button
+          className={`border text-xs flex items-center justify-center ${zoom < 4 ? "bg-white" : "bg-gray-200"} h-[40px] w-[40px] hover:bg-gray-100 disabled:hover:bg-gray-200 hover:cursor-pointer disabled:hover:cursor-auto`}
+          onClick={() => newZoom(true)}
+          disabled={zoom === 4}
+        >
+          <FontAwesomeIcon icon={faPlus} />
+        </button>
+        <button
+          className={`border text-xs flex items-center justify-center ${zoom > 1 ? "bg-white" : "bg-gray-200"} h-[40px] w-[40px] hover:bg-gray-100 disabled:hover:bg-gray-200 hover:cursor-pointer disabled:hover:cursor-auto`}
+          onClick={() => newZoom(false)}
+          disabled={zoom === 1}
+        >
+          <FontAwesomeIcon icon={faMinus} />
+        </button>
+        <p className="border text-center text-xs bg-gray-200">{zoom}</p>
+      </div>
+      <div className={`origin-top-left`} style={{ transform: `scale(${zoom === 4 ? "1" : zoom === 3 ? ".75" : zoom === 2 ? ".50" : ".25"})` }}>
+        {props.children}
+      </div>
+    </>
   )
 }

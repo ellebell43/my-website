@@ -141,6 +141,13 @@ export default class StarSystem {
     const id = `${this.x < 10 ? "0" + String(this.x) : this.x}${this.y < 10 ? "0" + String(this.y) : this.y}`
     return `${this.name} ${id} ${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech} ${this.facilities.toString().replaceAll(",", " ")} ${this.getTradeCodes().toString().replaceAll(",", " ")} ${this.travelCode}`
   }
+  getUWPBroken(): string[] {
+    const id = `${this.x < 10 ? "0" + String(this.x) : this.x}${this.y < 10 ? "0" + String(this.y) : this.y}`
+    return [
+      `${this.name} ${id} ${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech}`,
+      `${this.facilities.toString().replaceAll(",", " ")} ${this.getTradeCodes().toString().replaceAll(",", " ")} ${this.travelCode}`
+    ]
+  }
   // Condense system to UWP string, shorthand for hex maps
   getUWPSmall(): string {
     return `${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech}`
