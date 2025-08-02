@@ -17,7 +17,7 @@ export default function Page() {
 
           <h1 className="md:text-7xl text-6xl text-right flex flex-col md:flex-row gap-2"><span><FontAwesomeIcon width={84} className="self-end inline relative bottom-4 -rotate-60" icon={faKiwiBird} /> Hi,</span><span> I'm Elle!</span></h1>
         </div>
-        <p className="text-xl my-3">Welcome to my little corner of the internet! I'm just some random transfem girl from PDX with a big interest in technology <FontAwesomeIcon className="inline" width={20} icon={faComputer} /> This is were you can find links to most of my projects and socials. I think I might get into blogging about what I do with my time. I won't bother with any kind of newsletter if I do, though, but I will post about it on Mastodon <FontAwesomeIcon width={18} className="inline relative bottom-1" icon={faSmile} /> So, be sure to just check there periodically!</p>
+        <p className="text-xl my-3">Welcome to my little corner of the internet! I'm just some random transfem girl from PDX with a big interest in technology <FontAwesomeIcon className="inline" width={20} icon={faComputer} /> This is were you can find links to most of my projects and socials. I think I might get into blogging about what I do with my time. I won't bother with any kind of newsletter if I do, though, but I will post about it on Mastodon <FontAwesomeIcon width={18} className="inline relative bottom-0.5" icon={faSmile} /> So, be sure to just check there periodically!</p>
 
         <p className="text-xl my-4">I really enjoy self-hosting things, and all my projects (including this site) are self-hosted. I'm currently working on setting up an email server. I have a couple other projects that are usable, but not listed here due to having less secure connections.</p>
 

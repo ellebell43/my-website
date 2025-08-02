@@ -95,14 +95,18 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
   const { startX, startY, generateSystems, border, sector } = props
   const [localDetails, setLocalDetails] = useState<StarSystem | undefined>()
   return (
-    <div className="flex relative w-fit">
-      <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
-      <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
-      <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
-      <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
-      {border ? <div className={`absolute top-0 left-[.2in] w-full h-full border pointer-events-none`} /> : <></>}
+    <>
+      <Zoom>
+        <div className="flex relative w-fit">
+          <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+          <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+          <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+          <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+          {border ? <div className={`absolute top-0 left-[.2in] w-full h-full border pointer-events-none`} /> : <></>}
+        </div>
+      </Zoom>
       {sector ? <></> : <SystemDetails details={localDetails} setDetails={setLocalDetails} />}
-    </div>
+    </>
   )
 }
 
@@ -148,7 +152,7 @@ export const SystemDetails = (props: { details: StarSystem | undefined, setDetai
 
       {/* Title Area */}
       <div className="">
-        <p className="text-center w-full font-bold text-xl">{props.details.getUWPBroken()[0]}</p>
+        <h2 className="text-center w-full font-bold text-xl">{props.details.getUWPBroken()[0]}</h2>
         <p className="text-center w-full font-bold text-xl">{props.details.getUWPBroken()[1]}</p>
         <button className="hover:cursor-pointer hover:bg-slate-300 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200" onClick={() => props.setDetails(undefined)}><FontAwesomeIcon icon={faX} /></button>
       </div>
