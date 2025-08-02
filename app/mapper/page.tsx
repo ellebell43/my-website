@@ -38,7 +38,7 @@ export default function Page() {
       {/* REGENERATE BUTTON */}
       <button className="button-link fixed top-6 left-6 z-50 bg-white" onClick={() => setPrompt(true)}>Regenerate</button>
       <div className="overflow-scroll">
-        {sector ? <Sector generateSystems={generateSystems} /> : <Subsector generateSystems={generateSystems} startX={1} startY={1} border={false} sector={false} />}
+        {sector ? <Sector generateSystems={generateSystems} /> : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} />}
       </div>
     </div>
   )
