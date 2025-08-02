@@ -91,23 +91,37 @@ export const HexColDouble = (props: { id: number, start: number, details: StarSy
 
 // Create a hex grid, 8 x 10 hexes
 // startX and startY determines the x,y label for the first hex. All other hexes are based on that. Values are truncated to work within sector dimensions.
-export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean, border: boolean, sector?: boolean, details?: StarSystem | undefined, setDetails?: Function, }) => {
-  const { startX, startY, generateSystems, border, sector } = props
+export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean, sector?: boolean, details?: StarSystem | undefined, setDetails?: Function, }) => {
+  const { startX, startY, generateSystems, sector } = props
   const [localDetails, setLocalDetails] = useState<StarSystem | undefined>()
-  return (
-    <>
-      <Zoom>
-        <div className="flex relative w-fit">
-          <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
-          <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
-          <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
-          <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
-          {border ? <div className={`absolute top-0 left-[.2in] w-full h-full border pointer-events-none`} /> : <></>}
-        </div>
-      </Zoom>
-      {sector ? <></> : <SystemDetails details={localDetails} setDetails={setLocalDetails} />}
-    </>
-  )
+  if (sector) {
+    return (
+      <div className="flex relative w-fit">
+        <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+        <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+        <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+        <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+        {/* Border */}
+        <div className={`absolute top-0 left-[.2in] w-full h-full border pointer-events-none`} />
+      </div>
+    )
+  } else {
+    return (
+      <>
+        <Zoom>
+          <div className="flex relative w-fit">
+            <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+            <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+            <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+            <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} details={sector ? props.details : localDetails} setDetails={sector && props.setDetails ? props.setDetails : setLocalDetails} />
+            {/* Border */}
+            <div className={`absolute top-0 left-[.2in] w-full h-full border pointer-events-none`} />
+          </div>
+        </Zoom>
+        <SystemDetails details={localDetails} setDetails={setLocalDetails} />
+      </>
+    )
+  }
 }
 
 // Row of 4 subsectors
@@ -117,10 +131,10 @@ export const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boole
   const y: 1 | 11 | 21 | 31 = (row - 1) * 10 + 1
   return (
     <div className={`flex relative`} id={`row${row}`}>
-      <Subsector startX={1} startY={y} generateSystems={generateSystems} border={true} details={props.details} setDetails={props.setDetails} sector={true} />
-      <Subsector startX={9} startY={y} generateSystems={generateSystems} border={true} details={props.details} setDetails={props.setDetails} sector={true} />
-      <Subsector startX={17} startY={y} generateSystems={generateSystems} border={true} details={props.details} setDetails={props.setDetails} sector={true} />
-      <Subsector startX={25} startY={y} generateSystems={generateSystems} border={true} details={props.details} setDetails={props.setDetails} sector={true} />
+      <Subsector startX={1} startY={y} generateSystems={generateSystems} details={props.details} setDetails={props.setDetails} sector={true} />
+      <Subsector startX={9} startY={y} generateSystems={generateSystems} details={props.details} setDetails={props.setDetails} sector={true} />
+      <Subsector startX={17} startY={y} generateSystems={generateSystems} details={props.details} setDetails={props.setDetails} sector={true} />
+      <Subsector startX={25} startY={y} generateSystems={generateSystems} details={props.details} setDetails={props.setDetails} sector={true} />
     </div>
   )
 }
