@@ -227,11 +227,12 @@ export const Zoom = (props: { children: React.ReactNode }) => {
     <>
       <div className="fixed top-2 right-2 flex flex-col z-50">
         <button
-          className={`border text-xs flex items-center justify-center ${zoom<4> ? "bg-white dark:bg-gray-800" : "bg-gray-200 dark:bg-gray-600"} h-[40px] w-[40px] hover:bg-gray-100 dark:hover:bg-gray-600 disabled:hover:bg-gray-200 dark:disabled:bg-gray-600 hover:cursor-pointer disabled:hover:cursor-auto`}
+          className={`border text-xs flex items-center justify-center ${zoom < 4 ? "bg-white dark:bg-gray-800" : "bg-gray-200 dark:bg-gray-600"} h-[40px] w-[40px] hover:bg-gray-100 dark:hover:bg-gray-600 disabled:hover:bg-gray-200 dark:disabled:bg-gray-600 hover:cursor-pointer disabled:hover:cursor-auto`}
           onClick={() => newZoom(true)}
           disabled={zoom === 4}
         >
           <FontAwesomeIcon icon={faPlus} />
+          <p className="scale-0 absolute">Increase Zoom</p>
         </button>
         <button
           className={`border text-xs flex items-center justify-center ${zoom > 1 ? "bg-white dark:bg-gray-800" : "bg-gray-200 dark:bg-gray-600"} h-[40px] w-[40px] hover:bg-gray-100 dark:hover:bg-gray-600 disabled:hover:bg-gray-200 dark:disabled:bg-gray-600 hover:cursor-pointer disabled:hover:cursor-auto`}
@@ -239,8 +240,9 @@ export const Zoom = (props: { children: React.ReactNode }) => {
           disabled={zoom === 1}
         >
           <FontAwesomeIcon icon={faMinus} />
+          <p className="scale-0 absolute">Decrease Zoom</p>
         </button>
-        <p className="border text-center text-xs bg-gray-200 dark:bg-gray-700">{zoom}</p>
+        <p className="border text-center text-[8px] bg-gray-200 dark:bg-gray-700">Zoom {zoom}</p>
       </div>
       <div className={`origin-top-left`} style={{ transform: `scale(${zoom === 4 ? "1" : zoom === 3 ? ".75" : zoom === 2 ? ".50" : ".25"})` }}>
         {props.children}
