@@ -24,13 +24,13 @@ export const Hex = (props: { id: string, setDetails: Function, details: StarSyst
 
   return (
     <div
-      className={`hexagon-out relative flex justify-center items-center`}
+      className={`hexagon-out bg-black dark:bg-gray-100 relative flex justify-center items-center`}
       id={"hex" + props.id}
       onClick={() => { if (system) props.setDetails(system); }}
     >
-      <div className={`hexagon-in flex flex-col items-center ${system ? "justify-between hover: cursor-pointer" : ""}`}>
+      <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center ${system ? "justify-between hover: cursor-pointer" : ""}`}>
         {/* Travel code ring */}
-        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 ${system?.travelCode == "A" ? "border-amber-300" : system?.travelCode == "R" ? "border-red-500" : "border-white"}`} />
+        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 dark:border-gray-800 ${system?.travelCode == "A" ? "border-amber-300" : system?.travelCode == "R" ? "border-red-500" : "border-white"}`} />
         {/* Content container */}
         <div className="text-center relative">
           <p className="text-center text-sms">{props.id}</p>
@@ -162,13 +162,13 @@ export const Sector = (props: { generateSystems: boolean }) => {
 export const SystemDetails = (props: { details: StarSystem | undefined, setDetails: Function }) => {
   if (!props.details) return <></>
   return (
-    <div className="fixed top-0 md:bottom-4 md:top-auto right-0 md:right-4 w-screen md:w-[650px] h-screen md:h-[250px] overflow-scroll bg-slate-100 border rounded md:shadow-lg p-4 z-50 scale-100">
+    <div className="fixed top-0 md:bottom-4 md:top-auto right-0 md:right-4 w-screen md:w-[650px] h-screen md:h-[250px] overflow-scroll bg-slate-100 dark:bg-slate-800 border rounded md:shadow-lg p-4 z-50 scale-100">
 
       {/* Title Area */}
       <div className="">
         <h2 className="text-center w-full font-bold text-xl">{props.details.getUWPBroken()[0]}</h2>
         <p className="text-center w-full font-bold text-xl">{props.details.getUWPBroken()[1]}</p>
-        <button className="hover:cursor-pointer hover:bg-slate-300 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200" onClick={() => props.setDetails(undefined)}><FontAwesomeIcon icon={faX} /></button>
+        <button className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700" onClick={() => props.setDetails(undefined)}><FontAwesomeIcon icon={faX} /></button>
       </div>
 
       {/* Starport and Trade */}
@@ -197,7 +197,7 @@ export const SystemDetails = (props: { details: StarSystem | undefined, setDetai
               <li className="flex gap-2 ml-3" key={i}>
                 {/* <FontAwesomeIcon className="relative top-1" icon={faHippo} width={16} /> */}
                 {/* Bullet point. Can't get tailwind to work :( */}
-                <div className="bg-black w-[6px] h-[6px] rounded-full relative top-[9px]" />
+                <div className="bg-black dark:bg-white w-[6px] h-[6px] rounded-full relative top-[9px]" />
                 <div>
                   <p>{el.gov}, {el.strength} Group</p>
                   {el.details ? <p>{el.details}</p> : <></>}
@@ -227,20 +227,20 @@ export const Zoom = (props: { children: React.ReactNode }) => {
     <>
       <div className="fixed top-2 right-2 flex flex-col z-50">
         <button
-          className={`border text-xs flex items-center justify-center ${zoom < 4 ? "bg-white" : "bg-gray-200"} h-[40px] w-[40px] hover:bg-gray-100 disabled:hover:bg-gray-200 hover:cursor-pointer disabled:hover:cursor-auto`}
+          className={`border text-xs flex items-center justify-center ${zoom<4> ? "bg-white dark:bg-gray-800" : "bg-gray-200 dark:bg-gray-600"} h-[40px] w-[40px] hover:bg-gray-100 dark:hover:bg-gray-600 disabled:hover:bg-gray-200 dark:disabled:bg-gray-600 hover:cursor-pointer disabled:hover:cursor-auto`}
           onClick={() => newZoom(true)}
           disabled={zoom === 4}
         >
           <FontAwesomeIcon icon={faPlus} />
         </button>
         <button
-          className={`border text-xs flex items-center justify-center ${zoom > 1 ? "bg-white" : "bg-gray-200"} h-[40px] w-[40px] hover:bg-gray-100 disabled:hover:bg-gray-200 hover:cursor-pointer disabled:hover:cursor-auto`}
+          className={`border text-xs flex items-center justify-center ${zoom > 1 ? "bg-white dark:bg-gray-800" : "bg-gray-200 dark:bg-gray-600"} h-[40px] w-[40px] hover:bg-gray-100 dark:hover:bg-gray-600 disabled:hover:bg-gray-200 dark:disabled:bg-gray-600 hover:cursor-pointer disabled:hover:cursor-auto`}
           onClick={() => newZoom(false)}
           disabled={zoom === 1}
         >
           <FontAwesomeIcon icon={faMinus} />
         </button>
-        <p className="border text-center text-xs bg-gray-200">{zoom}</p>
+        <p className="border text-center text-xs bg-gray-200 dark:bg-gray-700">{zoom}</p>
       </div>
       <div className={`origin-top-left`} style={{ transform: `scale(${zoom === 4 ? "1" : zoom === 3 ? ".75" : zoom === 2 ? ".50" : ".25"})` }}>
         {props.children}

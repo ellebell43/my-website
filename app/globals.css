@@ -28,17 +28,15 @@ body {
 .hexagon-in {
   height: 145px;
   aspect-ratio: 1/cos(30deg);
-  background-color: white;
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
 
 .hexagon-out {
   height: 150px;
   aspect-ratio: 1/cos(30deg);
-  background-color: black;
   clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
 
 .button-link {
-  @apply border border-black py-2 px-4 rounded hover:cursor-pointer hover:bg-gray-200 shadow transition-all bg-white m-2
+  @apply border border-black dark:border-white py-2 px-4 rounded hover:cursor-pointer dark:hover:bg-gray-700 hover:bg-gray-200 shadow transition-all bg-white dark:bg-gray-800 m-2
 }
