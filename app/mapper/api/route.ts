@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
     // On uncaught error from the try block, throw error
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return NextResponse.json(error, { status: 500 })
   }
 }
