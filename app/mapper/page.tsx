@@ -7,6 +7,7 @@ export default function Page() {
   const [generateSystems, setGenerateSystems] = useState(true)
   const [sector, setSector] = useState(false)
   const [prompt, setPrompt] = useState(true)
+  const [screenReader, setScreenReader] = useState(false)
 
   // Component for selecting grid size (subsector vs sector) and if systems are generated
   const InitPrompt = () => {
@@ -17,6 +18,10 @@ export default function Page() {
           <div className="flex gap-4 items-center justify-start">
             <input type="checkbox" id="generate-systems" name="generate-systems" onChange={() => { setGenerateSystems(!generateSystems) }} checked={generateSystems} />
             <label htmlFor="generate-systems">Generate Systems</label>
+          </div>
+          <div className="flex gap-4 items-center justify-start">
+            <input type="checkbox" id="screen-reader" name="screen-reader" onChange={() => { setScreenReader(!screenReader) }} checked={screenReader} />
+            <label htmlFor="screen-reader">Screen Reader</label>
           </div>
           <div className="flex gap-4 justify-start items-center">
             <input type="radio" id="subsector" name="sector" onChange={() => { setSector(false) }} checked={!sector} />
@@ -37,8 +42,8 @@ export default function Page() {
     <div>
       {/* REGENERATE BUTTON */}
       <button className="button-link fixed top-6 left-6 z-50" onClick={() => setPrompt(true)}>Regenerate</button>
-      <div className="overflow-scroll">
-        {sector ? <Sector generateSystems={generateSystems} /> : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} />}
+      <div className="overflow-y-scroll overflow-x-scroll">
+        {sector ? <Sector generateSystems={generateSystems} screenReader={screenReader} /> : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} />}
       </div>
     </div>
   )
