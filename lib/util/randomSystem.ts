@@ -1,4 +1,4 @@
-import { clampToDiceRange, clampToLawRange, clampToTechRange, clampToZero, hexify, roll1D3, roll2D6, rollD66 } from "./functions"
+import { clampToDiceRange, clampToLawRange, clampToTechRange, clampToZero, hexify, roll1D3, roll1D6, roll2D6, rollD66 } from "./functions"
 import StarSystem from "./starsystem"
 import { facilityCode, faction, sizeRange, starportRange, travelCode, xRange, yRange } from "./types"
 
@@ -68,7 +68,7 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
   }
 
   // Tech level
-  let tech: number = roll1D3()
+  let tech: number = roll1D6()
   // Figure out modifiers based on other UWP values
   switch (starport) {
     case ("A"): tech += 6; break;
