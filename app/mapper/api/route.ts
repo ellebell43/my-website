@@ -1,4 +1,4 @@
-import { dbClient } from "@/app/util/dbClient";
+import { dbClient } from "@/lib/util/dbClient";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {

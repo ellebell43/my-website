@@ -1,4 +1,4 @@
-import { letterRange, diceRange, d3Range, d66Range, d6Range, fullRange } from "./types"
+import { letterRange, diceRange, d3Range, d66Range, d6Range, fullRange, xRange, yRange, EmptyParsec } from "./types"
 
 // Dice rolling
 //@ts-ignore
@@ -41,7 +41,7 @@ export function clampToLawRange(num: number) {
 }
 
 // 50/50 chance for a parsec to contain a star system
-export const hasSystem = (): boolean => {
+export const determineIfSystem = (): boolean => {
   const num = roll1D6()
   if (num > 3) { return true } else { return false }
 }
@@ -72,3 +72,5 @@ export const deHexify = (item: fullRange): number => {
   }
   return newItem
 }
+
+export const createGridIDString = (x: xRange, y: yRange): string => `${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y}`

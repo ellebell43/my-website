@@ -1,13 +1,17 @@
 'use client'
 
 import { useState } from "react"
-import { Sector, Subsector } from "../components/map-components"
+import { DetailsPanel, Sector, Subsector } from "../../lib/components/map-components"
+import { map } from "../../lib/util/types"
+import StarSystem from "@/lib/util/starsystem"
 
 export default function Page() {
   const [generateSystems, setGenerateSystems] = useState(true)
-  const [sector, setSector] = useState(false)
+  const [isSector, setIsSector] = useState(false)
   const [prompt, setPrompt] = useState(true)
   const [screenReader, setScreenReader] = useState(false)
+  const [map, setMap] = useState<map>({ systems: [] })
+  const [details, setDetails] = useState<StarSystem | undefined>(undefined)
 
   // Component for selecting grid size (subsector vs sector) and if systems are generated
   const InitPrompt = () => {
@@ -24,11 +28,11 @@ export default function Page() {
             <label htmlFor="screen-reader">Screen Reader</label>
           </div>
           <div className="flex gap-4 justify-start items-center">
-            <input type="radio" id="subsector" name="sector" onChange={() => { setSector(false) }} checked={!sector} />
+            <input type="radio" id="subsector" name="sector" onChange={() => { setIsSector(false) }} checked={!isSector} />
             <label htmlFor="subsector">Subsector (8 x 10)</label>
           </div>
           <div className="flex gap-4 justify-start items-center">
-            <input type="radio" id="sector" name="sector" onChange={() => { setSector(true) }} checked={sector} />
+            <input type="radio" id="sector" name="sector" onChange={() => { setIsSector(true) }} checked={isSector} />
             <label htmlFor="sector">Sector (32 x 40)</label>
           </div>
           <button type="submit" className="border shadow rounded py-2 dark:bg-slate-800 dark:hover:bg-slate-700 bg-slate-200 hover:bg-gray-100 transition-all hover:cursor-pointer">Generate Map</button>
@@ -43,8 +47,12 @@ export default function Page() {
       {/* REGENERATE BUTTON */}
       <button className="button-link fixed top-6 left-6 z-50" onClick={() => setPrompt(true)}>Regenerate</button>
       <div className="overflow-y-scroll overflow-x-scroll">
-        {sector ? <Sector generateSystems={generateSystems} screenReader={screenReader} /> : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} />}
+        {isSector ?
+          <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} setDetails={setDetails} />
+          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} setDetails={setDetails} />
+        }
       </div>
+      {details ? <DetailsPanel system={details} setShowDetails={setDetails} /> : <></>}
     </div>
   )
 }

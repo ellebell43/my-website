@@ -2,36 +2,46 @@
 
 import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
 import StarSystem from "../util/starsystem"
-import { hasSystem } from "../util/functions"
+import { determineIfSystem } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
-import { useContext, useState } from "react"
+import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
+import { EmptyParsec, map } from "../util/types"
 
 // Create a single hex (parsec)
-export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string }) => {
+export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function, setDetails: Function }) => {
   const { id, possibleSystem, screenReader } = props
-  let [showDetails, setShowDetails] = useState(false)
   // split id into x,y values
-  const x = id.substring(0, 2)
-  const y = id.substring(2)
+  const x = Number(id.substring(0, 2))
+  const y = Number(id.substring(2))
   // If a system might be generated, 50/50 on if one is created
-  //@ts-expect-error
-  const [system, setSystem] = useState(possibleSystem && hasSystem() ? randomSystem("", Number(x), Number(y)) : undefined)
+  let system: StarSystem | EmptyParsec
+  let hasSystem = determineIfSystem()
+  const alreadyMapped = props.map.systems.find(el => el.x === x && el.y === y)
+  if (!alreadyMapped) {
+    let newMap = { ...props.map }
+    //@ts-expect-error
+    const newEntry: StarSystem | emptyParsec = possibleSystem && hasSystem ? randomSystem("", x, y) : new EmptyParsec(x, y)
+    newMap.systems.push(newEntry)
+    props.setMap(newMap)
+    system = newEntry
+  } else {
+    system = alreadyMapped
+  }
 
   // determine if system POI has water or is asteroid to determine icon
-  let water = system ? system.hydro != 0 : false
-  let asteroid = system ? system.size == 0 : false
+  let water = system instanceof StarSystem ? system.hydro != 0 : false
+  let asteroid = system instanceof StarSystem ? system.size == 0 : false
 
   // screen reader "hex"
   const ScreenReaderHex = () =>
-    <tr className="border hover:cursor-pointer" onClick={() => { if (system) setShowDetails(true); }}>
+    <tr className="border hover:cursor-pointer" onClick={() => { if (system instanceof StarSystem) props.setDetails(system); }}>
       <td>{id}</td>
-      <td>{system ? system.name : ""}</td>
-      <td>{system ? system.getUWPSmall() : ""}</td>
-      <td>{system ? String(system.gasGiant) : ""}</td>
-      <td>{system ? system.getBasesArrayVerbose().toString().replace(",", ", ") : ""}</td>
-      {/* <td>{system ? <DetailsPanel system={system} setShowDetails={setShowDetails} showDetails={showDetails} /> : ""}</td> */}
+      <td>{system instanceof StarSystem ? system.name : ""}</td>
+      <td>{system instanceof StarSystem ? system.getUWPSmall() : ""}</td>
+      <td>{system instanceof StarSystem ? String(system.gasGiant) : ""}</td>
+      <td>{system instanceof StarSystem ? system.getBasesArrayVerbose().toString().replace(",", ", ") : ""}</td>
     </tr>
 
 
@@ -40,15 +50,15 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
     <div
       className={`hexagon-out bg-black dark:bg-gray-100 relative flex justify-center items-center`}
       id={"hex" + props.id}
-      onClick={() => { if (system) setShowDetails(true); }}
+      onClick={() => { if (system instanceof StarSystem) props.setDetails(system); }}
     >
       <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center ${system ? "justify-between hover: cursor-pointer" : ""}`}>
         {/* Travel code ring */}
-        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 dark:border-gray-800 ${system?.travelCode == "A" ? "border-amber-300" : system?.travelCode == "R" ? "border-red-500" : "border-white"}`} />
+        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 dark:border-gray-800 ${system instanceof StarSystem && system.travelCode == "A" ? "border-amber-300" : system instanceof StarSystem && system.travelCode == "R" ? "border-red-500" : "border-white"}`} />
         {/* Content container */}
         <div className="text-center relative">
           <p className="text-center text-sms">{props.id}</p>
-          {system ? <>
+          {system instanceof StarSystem ? <>
             {system.gasGiant ? <GasGiant /> : <></>}
             {system.facilities.includes("N") ? <NavalBase /> : <></>}
             {system.facilities.includes("M") ? <MilitaryBase /> : <></>}
@@ -57,7 +67,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
             <Planet water={water} asteroid={asteroid} />
           </> : <></>}
         </div>
-        {system ? <>
+        {system instanceof StarSystem ? <>
           <p className="font-bold">{system.name}</p>
           <p className="text-xs text center z-10">{system.getUWPSmall()}</p>
         </> : <></>}
@@ -68,13 +78,12 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
   return (
     <>
       {screenReader ? <ScreenReaderHex /> : <VisualHex />}
-      {system ? <DetailsPanel system={system} setShowDetails={setShowDetails} showDetails={showDetails} /> : <></>}
     </>
   )
 }
 
 // Create a column of 10 hexes (height of a subsector)
-export const HexCol = (props: { id: string, start: number, screenReader: boolean, style?: string, possibleSystem?: boolean }) => {
+export const HexCol = (props: { id: string, start: number, screenReader: boolean, style?: string, possibleSystem?: boolean, map: map, setMap: Function, setDetails: Function }) => {
   const { id, start, style } = props
   // Create an array of Hexes of specified amount
   // start and stop are used to determine length and for the first 2 digits of the Hex id
@@ -82,7 +91,7 @@ export const HexCol = (props: { id: string, start: number, screenReader: boolean
   // @ts-ignore
   for (let i = start; i < start + 10; i++) {
     const hexId = i < 10 ? "0" + String(i) : String(i)
-    arr.push(<Hex key={id + hexId} id={id + hexId} possibleSystem={props.possibleSystem} screenReader={props.screenReader} />)
+    arr.push(<Hex key={id + hexId} id={id + hexId} possibleSystem={props.possibleSystem} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />)
   }
   // Map the array out in a div container
   if (props.screenReader) return (
@@ -103,7 +112,7 @@ export const HexCol = (props: { id: string, start: number, screenReader: boolean
 
 // Create a double column of 10 hexes, second column is offset for use in a larger scale grid
 // id and start determines x,y label of the initial hex
-export const HexColDouble = (props: { id: number, start: number, screenReader: boolean, possibleSystem?: boolean }) => {
+export const HexColDouble = (props: { id: number, start: number, screenReader: boolean, possibleSystem?: boolean, map: map, setMap: Function, setDetails: Function }) => {
   const { id, start } = props
   // parse first 2 digits of hex id for both columns
   const id1 = id < 10 ? "0" + String(id) : String(id)
@@ -113,30 +122,30 @@ export const HexColDouble = (props: { id: number, start: number, screenReader: b
   if (props.screenReader) {
     return (
       <>
-        <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} screenReader={true} />
-        <HexCol id={id2} start={start} possibleSystem={props.possibleSystem} screenReader={true} />
+        <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+        <HexCol id={id2} start={start} possibleSystem={props.possibleSystem} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
       </>
     )
   }
   return (
     <div className="relative w-[255px]">
-      <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} screenReader={false} />
-      <HexCol id={id2} start={start} style="absolute top-[75px] left-[127px]" possibleSystem={props.possibleSystem} screenReader={false} />
+      <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <HexCol id={id2} start={start} possibleSystem={props.possibleSystem} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} style="absolute top-[75px] left-[127px]" />
     </div>
   )
 }
 
 // Create a hex grid, 8 x 10 hexes
 // startX and startY determines the x,y label for the first hex. All other hexes are based on that. Values are truncated to work within sector dimensions.
-export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean, screenReader: boolean, sector?: boolean }) => {
+export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean, screenReader: boolean, sector?: boolean, map: map, setMap: Function, setDetails: Function }) => {
   const { startX, startY, generateSystems, sector } = props
 
   const Map = () => (
     <div className="flex relative w-fit mx-auto">
-      <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} screenReader={false} />
-      <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} screenReader={false} />
-      <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} screenReader={false} />
-      <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} screenReader={false} />
+      <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
       {/* Border */}
       <div className={`absolute top-0 left-[.2in] w-full h-full border pointer-events-none`} />
     </div>
@@ -154,10 +163,10 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
         </tr>
       </thead>
       <tbody>
-        <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} screenReader={true} />
-        <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} screenReader={true} />
-        <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} screenReader={true} />
-        <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} screenReader={true} />
+        <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+        <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+        <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+        <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
       </tbody>
     </table>
   )
@@ -187,31 +196,31 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
 }
 
 // Row of 4 subsectors
-export const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean, screenReader: boolean }) => {
+export const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean, screenReader: boolean, map: map, setMap: Function, setDetails: Function }) => {
   const { row, generateSystems } = props
   //@ts-expect-error
   const y: 1 | 11 | 21 | 31 = (row - 1) * 10 + 1
   return (
     <div className={`flex relative`} id={`row${row}`}>
-      <Subsector startX={1} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} />
-      <Subsector startX={9} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} />
-      <Subsector startX={17} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} />
-      <Subsector startX={25} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} />
+      <Subsector startX={1} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <Subsector startX={9} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <Subsector startX={17} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <Subsector startX={25} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
     </div>
   )
 }
 
 // Create a full sector, 32 x 40 hex grid
-export const Sector = (props: { generateSystems: boolean, screenReader: boolean }) => {
+export const Sector = (props: { generateSystems: boolean, screenReader: boolean, map: map, setMap: Function, setDetails: Function }) => {
   const { generateSystems } = props
   return (
     <>
       <Zoom>
         <div className="p-4 relative max-w-screen max-h-screen overflow-scroll">
-          <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} />
-          <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} />
-          <SubsectorRow row={3} generateSystems={generateSystems} screenReader={props.screenReader} />
-          <SubsectorRow row={4} generateSystems={generateSystems} screenReader={props.screenReader} />
+          <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+          <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+          <SubsectorRow row={3} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+          <SubsectorRow row={4} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
         </div>
       </Zoom>
     </>
@@ -219,9 +228,9 @@ export const Sector = (props: { generateSystems: boolean, screenReader: boolean 
 }
 
 // Details panel
-export const DetailsPanel = (props: { system: StarSystem, setShowDetails: Function, showDetails: boolean }) => {
+export const DetailsPanel = (props: { system: StarSystem, setShowDetails: Function }) => {
   let { system } = props
-  if (!props.showDetails) return <></>
+  if (!props.system) return <></>
   else return (
     <>
       <div className="fixed top-0 left-0 w-screen h-screen bg-white dark:bg-slate-800 opacity-75 z-50" />
@@ -233,7 +242,7 @@ export const DetailsPanel = (props: { system: StarSystem, setShowDetails: Functi
             <h2 className="text-center w-full font-bold text-xl">{system.getUWPBroken()[0]}</h2>
             <p className="text-center w-full font-bold text-xl">{system.getUWPBroken()[1]}</p>
             {/* Close panel button */}
-            <button className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700" onClick={() => { props.setShowDetails(!props.showDetails) }}            >
+            <button className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700" onClick={() => { props.setShowDetails(undefined) }}            >
               <FontAwesomeIcon icon={faX} />
               <p className="absolute scale-0">Close details panel for {system.getGridID()}</p>
             </button>

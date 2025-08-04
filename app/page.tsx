@@ -1,6 +1,6 @@
 import { Winky_Sans } from "next/font/google"
 import Link from "next/link"
-import ProjectCard from "./components/project-card"
+import ProjectCard from "../lib/components/project-card"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDiscord, faGithub, faMastodon } from "@fortawesome/free-brands-svg-icons"
 import { faComputer, faFaceGrin, faFish, faHippo, faKiwiBird, faSmile } from "@fortawesome/free-solid-svg-icons"

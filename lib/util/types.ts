@@ -1,3 +1,6 @@
+import { ObjectId } from "mongodb"
+import StarSystem from "./starsystem"
+
 // Basic ranges for star system UWP values
 export type numRange = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0
 export type letterRange = "A" | "B" | "C" | "D" | "E" | "F"
@@ -30,4 +33,15 @@ export type faction = {
   strength: diceRange,
   gov: fullRange,
   details?: string
+}
+
+export class EmptyParsec {
+  x: xRange
+  y: yRange
+  constructor(x: xRange, y: yRange) { this.x = x; this.y = y }
+}
+
+export type map = {
+  _id?: ObjectId
+  systems: (StarSystem | EmptyParsec)[]
 }
