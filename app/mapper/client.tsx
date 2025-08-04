@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react"
-import { DetailsPanel, Sector, Subsector } from "../../lib/components/map-components"
+import { DetailsPanel, SaveMapButton, Sector, Subsector } from "../../lib/components/map-components"
 import { map } from "../../lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
 
@@ -53,6 +53,7 @@ export default function MapperClient() {
         }
       </div>
       {details ? <DetailsPanel system={details} setShowDetails={setDetails} /> : <></>}
+      <SaveMapButton map={map} new={true} />
     </div>
   )
 }

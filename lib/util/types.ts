@@ -42,6 +42,7 @@ export class EmptyParsec {
 }
 
 export type map = {
-  _id?: ObjectId
+  _id?: ObjectId,
+  pass?: string,
   systems: (StarSystem | EmptyParsec)[]
 }

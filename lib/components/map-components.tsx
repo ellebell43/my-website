@@ -8,6 +8,8 @@ import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
 import { EmptyParsec, map } from "../util/types"
+import crypto from "crypto"
+import { useRouter } from "next/navigation"
 
 // Create a single hex (parsec)
 export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function, setDetails: Function }) => {
@@ -329,3 +331,63 @@ export const Zoom = (props: { children: React.ReactNode }) => {
     </>
   )
 }
+
+export const SaveMapButton = (props: { map: map, new: boolean }) => {
+  let [error, setError] = useState<string>()
+  let [pass, setPass] = useState<string>()
+  let router = useRouter()
+
+  // const router = useRouter()
+
+  async function saveMap() {
+    let hashedPass = crypto.createHash("sha256").update(String(pass)).digest("hex")
+    try {
+      if (props.new) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "POST", headers: { map: JSON.stringify(props.map), pass: hashedPass }, credentials: "include" })
+        if (!res.ok) {
+          setError(`Failed to save. Error ${res.status}.`)
+          return
+        } else {
+          const response: { _id: string } = await res.json()
+          router.push(`/mapper/${response._id}?saved=true&pass=${pass}`)
+        }
+      } else {
+        // const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "PATCH", headers: { map: JSON.stringify(props.map), pass: hashedPass }, credentials: "include" })
+        // if (!res.ok) {
+        //   setError(`Failed to save. Error ${res.status}.`)
+        //   return
+        // } else {
+        //   const response: { _id: string } = await res.json()
+        //   // router.push(`/mapper/${response._id}?saved=true`)
+        // }
+      }
+    } catch (error) {
+      setError(String(error))
+    }
+  }
+
+  return (
+    <form className="fixed bottom-4 md:bottom-6 right-4 md:right-6 flex flex-col max-w-[175] ">
+      {/* If API error occurs, cover form with error message */}
+      {error ?
+        <div className="absolute top-0 left-0 bg-red-300 dark:bg-red-800 w-full h-full flex items-center justify-center overflow-y-scroll pt-4">
+          <p className="text-center">{error}</p>
+          {/* Dismiss error */}
+          <button onClick={() => setError(undefined)} className="absolute top-0 right-0"><FontAwesomeIcon icon={faX} /><span className="absolute scale-0">Dismiss error</span></button>
+        </div> : <></>}
+      <h2 className="absolute scale-0">Save map</h2>
+      {/* New password input. Used to GET map from database */}
+      <input id="password " disabled={!(error === undefined || error === "")} onChange={e => setPass(e.target.value)} className="bg-white dark:bg-slate-700  disabled:bg-gray-100 disabled:dark:bg-slate-600 disabled:text-gray-500 disabled:dark:text-gray-400 border rounded-t-md px-2 py-1" placeholder="New password" type="text" />
+      <label htmlFor="password" className="absolute scale-0">New password</label>
+      {/* Submit map to database */}
+      <button
+        className="border rounded-b-md bg-white dark:bg-slate-700 px-4 py-2 text-lg shadow transition-all hover:cursor-pointer disabled:bg-gray-100 disabled:dark:bg-slate-600 disabled:text-gray-500 disabled:dark:text-gray-400 disabled:hover:cursor-auto hover:bg-gray-100 dark:hover:bg-slate-800"
+        onClick={() => saveMap()}
+        type="button"
+        disabled={pass === undefined || pass === "" || !(error === undefined || error === "")}
+      >
+        {props.new ? "Save new map" : "Save"}
+      </button>
+    </form>
+  )
+} 
