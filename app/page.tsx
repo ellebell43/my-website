@@ -3,10 +3,15 @@ import Link from "next/link"
 import ProjectCard from "../lib/components/project-card"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDiscord, faGithub, faMastodon } from "@fortawesome/free-brands-svg-icons"
-import { faComputer, faFaceGrin, faFish, faHippo, faKiwiBird, faSmile } from "@fortawesome/free-solid-svg-icons"
-import Image from "next/image"
+import { faComputer, faKiwiBird, faSmile } from "@fortawesome/free-solid-svg-icons"
+import { Metadata } from "next"
 
 const winkySans = Winky_Sans({ weight: "500", subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "ellebell.dev",
+  description: "Hi 👋 I'm Elle. Welcome to my little corner of the internet."
+}
 
 
 export default function Page() {
