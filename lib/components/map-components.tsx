@@ -41,7 +41,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
       <td>{system instanceof StarSystem ? system.name : ""}</td>
       <td>{system instanceof StarSystem ? system.getUWPSmall() : ""}</td>
       <td>{system instanceof StarSystem ? String(system.gasGiant) : ""}</td>
-      <td>{system instanceof StarSystem ? system.getBasesArrayVerbose().toString().replace(",", ", ") : ""}</td>
+      <td>{system instanceof StarSystem ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : ""}</td>
     </tr>
 
 
