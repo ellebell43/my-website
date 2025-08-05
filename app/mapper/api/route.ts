@@ -4,6 +4,20 @@ import { ObjectId } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+  const id = req.headers.get("id")
+  if (!id) return NextResponse.json({ message: "no map id provided" }, { status: 400 })
+  try {
+    let client = await dbClient()
+    const maps = client.collection("maps")
+    let result = await maps.findOne({ _id: new ObjectId(id) })
+    // 404 NOT FOUND if no map matching the provided id is found
+    if (!result) return NextResponse.json({ message: "no map found with provided id" }, { status: 404 })
+    // 200 on map id match and send map to client
+    return NextResponse.json(result)
+  } catch (error) {
+    console.log(error)
+    return NextResponse.json(error, { status: 500 })
+  }
 
 }
 
@@ -12,7 +26,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const map = req.headers.get("map")
   const pass = req.headers.get("pass")
-  // Ensure required headers were provided
+  // 400 BAD REQUEST on missing map id or password
   if (!map || !pass) return NextResponse.json({ message: "missing map or password data" }, { status: 400 })
   let mapObject: map = JSON.parse(map)
   mapObject.pass = pass
@@ -26,11 +40,16 @@ export async function POST(req: NextRequest) {
     // If map is new, create new db document, otherwise update db document
     if (newItem) {
       let result = await maps.insertOne(mapObject)
+      // 200 on successful insertions
       if (result.insertedId) return NextResponse.json({ _id: String(mapObject._id) })
+      // 500 INTERNAL ERROR on failure to insert to db
       else return NextResponse.json({ message: "failed to insert to db" }, { status: 500 })
     } else {
+      // ======== this block should be moved to a PATCH endpoint ========
       let result = await maps.updateOne({ _id: mapObject._id, pass: pass }, mapObject)
+      // 200 on successful update of map object in the db
       if (result.matchedCount) return NextResponse.json({ _id: String(mapObject._id) })
+      // 404 NOT FOUND on no match with both password and map id
       else return NextResponse.json({ message: `no object found with id ${mapObject._id} or incorrect password` }, { status: 404 })
     }
     // On uncaught error from the try block, throw error

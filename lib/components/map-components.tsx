@@ -29,7 +29,12 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
     props.setMap(newMap)
     system = newEntry
   } else {
-    system = alreadyMapped
+    //@ts-expect-error
+    if (!(alreadyMapped.name === undefined)) {
+      // @ts-expect-error
+      system = new StarSystem(alreadyMapped.x, alreadyMapped.y, alreadyMapped.name, alreadyMapped.starport, alreadyMapped.size, alreadyMapped.atmos, alreadyMapped.hydro, alreadyMapped.pop, alreadyMapped.gov, alreadyMapped.law, alreadyMapped.tech, alreadyMapped.travelCode, alreadyMapped.temp, alreadyMapped.factions, alreadyMapped.culture, alreadyMapped.facilities, alreadyMapped.details, alreadyMapped.gasGiant)
+    }
+    else system = alreadyMapped
   }
 
   // determine if system POI has water or is asteroid to determine icon
@@ -38,7 +43,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
 
   // screen reader "hex"
   const ScreenReaderHex = () =>
-    <tr className="border hover:cursor-pointer" onClick={() => { if (system instanceof StarSystem) props.setDetails(system); }}>
+    <tr className={`border ${system instanceof StarSystem ? "hover:cursor-pointer" : ""}`} onClick={() => { if (system instanceof StarSystem) props.setDetails(system); }}>
       <td>{id}</td>
       <td>{system instanceof StarSystem ? system.name : ""}</td>
       <td>{system instanceof StarSystem ? system.getUWPSmall() : ""}</td>
@@ -54,7 +59,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
       id={"hex" + props.id}
       onClick={() => { if (system instanceof StarSystem) props.setDetails(system); }}
     >
-      <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center ${system ? "justify-between hover: cursor-pointer" : ""}`}>
+      <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center ${system instanceof StarSystem ? "justify-between hover: cursor-pointer" : ""}`}>
         {/* Travel code ring */}
         <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 dark:border-gray-800 ${system instanceof StarSystem && system.travelCode == "A" ? "border-amber-300" : system instanceof StarSystem && system.travelCode == "R" ? "border-red-500" : "border-white"}`} />
         {/* Content container */}

@@ -40,7 +40,8 @@ export default class StarSystem {
     factions?: faction[],
     culture?: d66Range,
     facilities?: facilityCode[],
-    details?: string) {
+    details?: string,
+    gasGiant?: boolean) {
     // constructor body
     this.x = x;
     this.y = y
@@ -59,7 +60,7 @@ export default class StarSystem {
     this.culture = culture ? culture : rollD66()
     this.facilities = facilities ? facilities : this.#determineFacilities()
     this.details = details
-    this.gasGiant = roll2D6() < 10
+    this.gasGiant = gasGiant !== undefined ? gasGiant : roll2D6() < 10
   }
 
   // === PRIVATE FUNCTIONS FOR DETERMINING OBJECT PROPERTIES ===
