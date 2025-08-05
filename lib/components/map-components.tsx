@@ -337,7 +337,7 @@ export const Zoom = (props: { children: React.ReactNode }) => {
   )
 }
 
-export const SaveMapButton = (props: { map: map, new: boolean }) => {
+export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: Function }) => {
   let [error, setError] = useState<string>()
   let [pass, setPass] = useState<string>()
   let router = useRouter()
@@ -357,14 +357,16 @@ export const SaveMapButton = (props: { map: map, new: boolean }) => {
           router.push(`/mapper/${response._id}?saved=true&pass=${pass}`)
         }
       } else {
-        // const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "PATCH", headers: { map: JSON.stringify(props.map), pass: hashedPass }, credentials: "include" })
-        // if (!res.ok) {
-        //   setError(`Failed to save. Error ${res.status}.`)
-        //   return
-        // } else {
-        //   const response: { _id: string } = await res.json()
-        //   // router.push(`/mapper/${response._id}?saved=true`)
-        // }
+        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "PATCH", headers: { map: JSON.stringify(props.map), pass: hashedPass }, credentials: "include" })
+        if (!res.ok) {
+          if (res.status == 404) setError("Not saved. Incorrect Password")
+          else setError(`Failed to save. Error ${res.status}.`)
+          return
+        } else {
+          const response: { _id: string } = await res.json()
+          if (props.setSaveSuccess) props.setSaveSuccess(true)
+          else setError("Map saved!")
+        }
       }
     } catch (error) {
       setError(String(error))
