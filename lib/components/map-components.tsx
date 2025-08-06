@@ -222,16 +222,14 @@ const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean, scr
 export const Sector = (props: { generateSystems: boolean, screenReader: boolean, map: map, setMap: Function, setDetails: Function, setShowDetails: Function }) => {
   const { generateSystems } = props
   return (
-    <>
+    <div className="p-4 relative max-w-screen max-h-screen overflow-scroll">
       <Zoom>
-        <div className="p-4 relative max-w-screen max-h-screen overflow-scroll">
-          <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
-          <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
-          <SubsectorRow row={3} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
-          <SubsectorRow row={4} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
-        </div>
+        <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+        <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+        <SubsectorRow row={3} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+        <SubsectorRow row={4} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
       </Zoom>
-    </>
+    </div>
   )
 }
 
