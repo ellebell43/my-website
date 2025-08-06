@@ -2,17 +2,17 @@
 
 import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
 import StarSystem from "../util/starsystem"
-import { determineIfSystem } from "../util/functions"
+import { clampToDiceRange, clampToFullRange, createGridIDString, deHexify, determineIfSystem, hexify, roll2D6 } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
+import { faDice, faEdit, faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
 import { EmptyParsec, map } from "../util/types"
 import crypto from "crypto"
 import { useRouter } from "next/navigation"
 
 // Create a single hex (parsec)
-export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function, setDetails: Function }) => {
+export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function, setDetails: Function, setShowDetails: Function }) => {
   const { id, possibleSystem, screenReader } = props
   // split id into x,y values
   const x = Number(id.substring(0, 2))
@@ -40,15 +40,16 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
   // determine if system POI has water or is asteroid to determine icon
   let water = system instanceof StarSystem ? system.hydro != 0 : false
   let asteroid = system instanceof StarSystem ? system.size == 0 : false
+  let basesVerbose = system instanceof StarSystem && system.getBasesArrayVerbose().length > 0 ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"
 
   // screen reader "hex"
   const ScreenReaderHex = () =>
-    <tr className={`border ${system instanceof StarSystem ? "hover:cursor-pointer" : ""}`} onClick={() => { if (system instanceof StarSystem) props.setDetails(system); }}>
+    <tr className={`border ${system instanceof StarSystem ? "hover:cursor-pointer" : ""}`} onClick={() => { if (system instanceof StarSystem) { props.setDetails(system); props.setShowDetails(true); } }}>
       <td>{id}</td>
       <td>{system instanceof StarSystem ? system.name : ""}</td>
       <td>{system instanceof StarSystem ? system.getUWPSmall() : ""}</td>
       <td>{system instanceof StarSystem ? String(system.gasGiant) : ""}</td>
-      <td>{system instanceof StarSystem ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : ""}</td>
+      <td>{system instanceof StarSystem ? basesVerbose : "/A"}</td>
     </tr>
 
 
@@ -57,7 +58,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
     <div
       className={`hexagon-out bg-black dark:bg-gray-100 relative flex justify-center items-center`}
       id={"hex" + props.id}
-      onClick={() => { if (system instanceof StarSystem) props.setDetails(system); }}
+      onClick={() => { if (system instanceof StarSystem) { props.setDetails(system); props.setShowDetails(true); } }}
     >
       <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center ${system instanceof StarSystem ? "justify-between hover: cursor-pointer" : ""}`}>
         {/* Travel code ring */}
@@ -90,7 +91,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
 }
 
 // Create a column of 10 hexes (height of a subsector)
-export const HexCol = (props: { id: string, start: number, screenReader: boolean, style?: string, possibleSystem?: boolean, map: map, setMap: Function, setDetails: Function }) => {
+const HexCol = (props: { id: string, start: number, screenReader: boolean, style?: string, possibleSystem?: boolean, map: map, setMap: Function, setDetails: Function, setShowDetails: Function }) => {
   const { id, start, style } = props
   // Create an array of Hexes of specified amount
   // start and stop are used to determine length and for the first 2 digits of the Hex id
@@ -98,7 +99,7 @@ export const HexCol = (props: { id: string, start: number, screenReader: boolean
   // @ts-ignore
   for (let i = start; i < start + 10; i++) {
     const hexId = i < 10 ? "0" + String(i) : String(i)
-    arr.push(<Hex key={id + hexId} id={id + hexId} possibleSystem={props.possibleSystem} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />)
+    arr.push(<Hex key={id + hexId} id={id + hexId} possibleSystem={props.possibleSystem} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />)
   }
   // Map the array out in a div container
   if (props.screenReader) return (
@@ -119,7 +120,7 @@ export const HexCol = (props: { id: string, start: number, screenReader: boolean
 
 // Create a double column of 10 hexes, second column is offset for use in a larger scale grid
 // id and start determines x,y label of the initial hex
-export const HexColDouble = (props: { id: number, start: number, screenReader: boolean, possibleSystem?: boolean, map: map, setMap: Function, setDetails: Function }) => {
+const HexColDouble = (props: { id: number, start: number, screenReader: boolean, possibleSystem?: boolean, map: map, setMap: Function, setDetails: Function, setShowDetails: Function }) => {
   const { id, start } = props
   // parse first 2 digits of hex id for both columns
   const id1 = id < 10 ? "0" + String(id) : String(id)
@@ -129,30 +130,30 @@ export const HexColDouble = (props: { id: number, start: number, screenReader: b
   if (props.screenReader) {
     return (
       <>
-        <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-        <HexCol id={id2} start={start} possibleSystem={props.possibleSystem} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+        <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+        <HexCol id={id2} start={start} possibleSystem={props.possibleSystem} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
       </>
     )
   }
   return (
     <div className="relative w-[255px]">
-      <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-      <HexCol id={id2} start={start} possibleSystem={props.possibleSystem} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} style="absolute top-[75px] left-[127px]" />
+      <HexCol id={id1} start={start} possibleSystem={props.possibleSystem} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+      <HexCol id={id2} start={start} possibleSystem={props.possibleSystem} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} style="absolute top-[75px] left-[127px]" />
     </div>
   )
 }
 
 // Create a hex grid, 8 x 10 hexes
 // startX and startY determines the x,y label for the first hex. All other hexes are based on that. Values are truncated to work within sector dimensions.
-export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean, screenReader: boolean, sector?: boolean, map: map, setMap: Function, setDetails: Function }) => {
+export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 | 31, generateSystems: boolean, screenReader: boolean, sector?: boolean, map: map, setMap: Function, setDetails: Function, setShowDetails: Function }) => {
   const { startX, startY, generateSystems, sector } = props
 
   const Map = () => (
     <div className="flex relative w-fit mx-auto">
-      <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-      <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-      <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-      <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+      <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+      <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+      <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} screenReader={false} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
       {/* Border */}
       <div className={`absolute top-0 left-[.2in] w-full h-full border pointer-events-none`} />
     </div>
@@ -170,10 +171,10 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
         </tr>
       </thead>
       <tbody>
-        <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-        <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-        <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-        <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+        <HexColDouble id={startX} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+        <HexColDouble id={startX + 2} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+        <HexColDouble id={startX + 4} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+        <HexColDouble id={startX + 6} start={startY} possibleSystem={generateSystems} screenReader={true} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
       </tbody>
     </table>
   )
@@ -203,31 +204,31 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
 }
 
 // Row of 4 subsectors
-export const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean, screenReader: boolean, map: map, setMap: Function, setDetails: Function }) => {
+const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean, screenReader: boolean, map: map, setMap: Function, setDetails: Function, setShowDetails: Function }) => {
   const { row, generateSystems } = props
   //@ts-expect-error
   const y: 1 | 11 | 21 | 31 = (row - 1) * 10 + 1
   return (
     <div className={`flex relative`} id={`row${row}`}>
-      <Subsector startX={1} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-      <Subsector startX={9} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-      <Subsector startX={17} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-      <Subsector startX={25} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+      <Subsector startX={1} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+      <Subsector startX={9} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+      <Subsector startX={17} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+      <Subsector startX={25} startY={y} generateSystems={generateSystems} sector={true} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
     </div>
   )
 }
 
 // Create a full sector, 32 x 40 hex grid
-export const Sector = (props: { generateSystems: boolean, screenReader: boolean, map: map, setMap: Function, setDetails: Function }) => {
+export const Sector = (props: { generateSystems: boolean, screenReader: boolean, map: map, setMap: Function, setDetails: Function, setShowDetails: Function }) => {
   const { generateSystems } = props
   return (
     <>
       <Zoom>
         <div className="p-4 relative max-w-screen max-h-screen overflow-scroll">
-          <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-          <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-          <SubsectorRow row={3} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
-          <SubsectorRow row={4} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} />
+          <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+          <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+          <SubsectorRow row={3} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
+          <SubsectorRow row={4} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} setDetails={props.setDetails} setShowDetails={props.setShowDetails} />
         </div>
       </Zoom>
     </>
@@ -235,71 +236,82 @@ export const Sector = (props: { generateSystems: boolean, screenReader: boolean,
 }
 
 // Details panel
-export const DetailsPanel = (props: { system: StarSystem, setShowDetails: Function }) => {
-  let { system } = props
-  if (!props.system) return <></>
+export const DetailsPanel = (props: { system: StarSystem | undefined, setSystem: Function, setShowDetails: Function, editable: boolean }) => {
+  let { system, setSystem, setShowDetails, editable } = props
+  let [editMode, setEditMode] = useState(false)
+  if (!system) return <></>
   else return (
     <>
       <div className="fixed top-0 left-0 w-screen h-screen bg-white dark:bg-slate-800 opacity-75 z-50" />
       <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-50">
         <div className="md:w-[650px] h-screen md:h-[850px] overflow-scroll opacity-100 bg-slate-100 dark:bg-slate-800 border rounded md:shadow-lg p-4 z-50 scale-100">
 
-          {/* Title Area */}
-          <div className="">
-            <h2 className="text-center w-full font-bold text-xl">{system.getUWPBroken()[0]}</h2>
-            <p className="text-center w-full font-bold text-xl">{system.getUWPBroken()[1]}</p>
-            {/* Close panel button */}
-            <button className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700" onClick={() => { props.setShowDetails(undefined) }}            >
-              <FontAwesomeIcon icon={faX} />
-              <p className="absolute scale-0">Close details panel for {system.getGridID()}</p>
-            </button>
-          </div>
+          {/* ========== DISPLAY MODE ========== */}
 
-          {/* Starport and Trade */}
-          <div className="border-b my-2 pb-2">
-            <p><span className="font-bold">Starport</span>: {system.getStarportQuality()} (Cr{system.getRandomBerthingCost()}; Fuel {system.getFuelType()})</p>
-            <p><span className="font-bold">Facilities</span>: {system.getFacilitiesArrayVerbose().toString().replaceAll(",", ", ")}</p>
-            <p><span className="font-bold">Bases</span>: {system.getBasesArrayVerbose().toString().replaceAll(",", ", ")}</p>
-            <p><span className="font-bold">Trade Codes</span>: {system.getTradeCodesVerbose().toString().replaceAll(",", ", ")}</p>
-          </div>
+          {!editMode ? <>
+            {/* Title Area */}
+            <div className="">
+              <h2 className="text-center w-full font-bold text-xl">{system.getUWPBroken()[0]}</h2>
+              <p className="text-center w-full font-bold text-xl">{system.getUWPBroken()[1]}</p>
+              {/* Close panel button */}
+              <button className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700" onClick={() => { setShowDetails(false) }}            >
+                <FontAwesomeIcon icon={faX} />
+                <p className="absolute scale-0">Close details panel for {system.getGridID()}</p>
+              </button>
+            </div>
 
-          {/* Physical Characteristics */}
-          <div className="border-b my-2 pb-2">
-            <p><span className="font-bold">Size</span>: {system.getDiameter()}km ({system.getGravity()}G)</p>
-            <p><span className="font-bold">Atmosphere</span>: {system.getAtmosphereType()} ({system.getTempType()})</p>
-            <p><span className="font-bold">Hydrographics</span>: {system.getHydroType()}</p>
-          </div>
+            {/* Starport and Trade */}
+            <div className="border-b my-2 pb-2">
+              <p><span className="font-bold">Starport</span>: {system.getStarportQuality()} (Cr{system.getRandomBerthingCost()}; Fuel {system.getFuelType()})</p>
+              <p><span className="font-bold">Facilities</span>: {system.getFacilitiesArrayVerbose().length > 0 ? system.getFacilitiesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+              <p><span className="font-bold">Bases</span>: {system.getBasesArrayVerbose().length > 0 ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+              <p><span className="font-bold">Trade Codes</span>: {system.getTradeCodesVerbose().length > 0 ? system.getTradeCodesVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+            </div>
 
-          {/* Social Characteristics */}
-          <div className="border-b my-2 pb-2">
-            <p><span className="font-bold">Population</span>: {system.getPopType()}</p>
-            <p><span className="font-bold">Government</span>: {system.getGovernmentType(system.gov)}</p>
-            <p className="font-bold">Factions ({system.factions?.length})</p>
-            <ul className="list-disc list-outside pl-0">
-              {system.getFactionArrayVerbose().map((el, i) => {
-                return (
-                  <li className="flex gap-2 ml-3" key={i}>
-                    {/* <FontAwesomeIcon className="relative top-1" icon={faHippo} width={16} /> */}
-                    {/* Bullet point. Can't get tailwind to work :( */}
-                    <div className="bg-black dark:bg-white w-[6px] h-[6px] rounded-full relative top-[9px]" />
-                    <div>
-                      <p>{el.gov}, {el.strength} Group</p>
-                      {el.details ? <p>{el.details}</p> : <></>}
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-            <p><span className="font-bold">Cultural Quirk</span>: {system.getCultureType()}</p>
-            <p><span className="font-bold">Law</span>: Level {system.law}</p>
-          </div>
+            {/* Physical Characteristics */}
+            <div className="border-b my-2 pb-2">
+              <p><span className="font-bold">Size</span>: {system.getDiameter()}km ({system.getGravity()}G)</p>
+              <p><span className="font-bold">Atmosphere</span>: {system.getAtmosphereType()} ({system.getTempType()})</p>
+              <p><span className="font-bold">Hydrographics</span>: {system.getHydroType()}</p>
+            </div>
+
+            {/* Social Characteristics */}
+            <div className="border-b my-2 pb-2">
+              <p><span className="font-bold">Population</span>: {system.getPopType()}</p>
+              <p><span className="font-bold">Government</span>: {system.getGovernmentType(system.gov)}</p>
+              <p className="font-bold">Factions ({system.factions?.length})</p>
+              <ul className="list-disc list-outside pl-0">
+                {system.getFactionArrayVerbose().map((el, i) => {
+                  return (
+                    <li className="flex gap-2 ml-3" key={i}>
+                      {/* <FontAwesomeIcon className="relative top-1" icon={faHippo} width={16} /> */}
+                      {/* Bullet point. Can't get tailwind to work :( */}
+                      <div className="bg-black dark:bg-white w-[6px] h-[6px] rounded-full relative top-[9px]" />
+                      <div>
+                        <p>{el.gov}, {el.strength} Group</p>
+                        {el.details ? <p>{el.details}</p> : <></>}
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+              <p><span className="font-bold">Cultural Quirk</span>: {system.getCultureType()}</p>
+              <p><span className="font-bold">Law</span>: Level {system.law}</p>
+            </div>
+            <p>{system.details}</p>
+            {editable ? <button onClick={() => setEditMode(true)} className="absolute bottom-4 right-4 hover:scale-110 transition-all hover:cursor-pointer"><FontAwesomeIcon icon={faEdit} /><span className="absolute scale-0">Edit</span></button> : <></>} </> : <>
+
+            {/* ========== EDIT MODE ========== */}
+
+            <EditForm system={system} setSystem={setSystem} setEditMode={setEditMode} />
+          </>}
         </div>
       </div>
     </>
   )
 }
 
-export const Zoom = (props: { children: React.ReactNode }) => {
+const Zoom = (props: { children: React.ReactNode }) => {
   let [zoom, setZoom] = useState<1 | 2 | 3 | 4>(4)
 
   const newZoom = (up: boolean) => {
@@ -354,7 +366,7 @@ export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: 
           return
         } else {
           const response: { _id: string } = await res.json()
-          router.push(`/mapper/${response._id}?saved=true&pass=${pass}`)
+          router.push(`/mapper/new?id=${response._id}&pass=${pass}`)
         }
       } else {
         const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "PATCH", headers: { map: JSON.stringify(props.map), pass: hashedPass }, credentials: "include" })
@@ -397,4 +409,98 @@ export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: 
       </button>
     </form>
   )
-} 
+}
+
+const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function, setEditMode: Function }) => {
+  const { system, setSystem, setEditMode } = props
+  let [hasSystem, setHasSystem] = useState(system instanceof StarSystem)
+  let [name, setName] = useState(system instanceof StarSystem ? system.name : "")
+  let [size, setSize] = useState(system instanceof StarSystem ? deHexify(system.size) : 0)
+  let [atmos, setAtmos] = useState(system instanceof StarSystem ? deHexify(system.atmos) : 0)
+  let [hydro, setHydro] = useState(system instanceof StarSystem ? deHexify(system.hydro) : 0)
+  let [temp, setTemp] = useState<number>(system instanceof StarSystem ? system.temp : 7)
+  let [pop, setPop] = useState(system instanceof StarSystem ? deHexify(system.pop) : 0)
+  let [gov, setGov] = useState(system instanceof StarSystem ? deHexify(system.gov) : 0)
+
+  const generateHydro = () => {
+    let num = roll2D6() - 7 + atmos
+    if (size === 0 || size === 1) return 0
+    if (atmos <= 1 || atmos >= 10) num -= 4
+    if (temp >= 10 && temp < 12) num -= 2
+    if (temp >= 12) num -= 6
+    return clampToDiceRange(num)
+  }
+
+  const generateTemp = () => {
+    let num = roll2D6()
+    if (atmos === 2 || atmos === 3) return num -= 2
+    if (atmos === 4 || atmos === 5 || atmos === 15) return num -= 1
+    if (atmos === 8 || atmos === 9) return num += 1
+    if (atmos === 10 || atmos === 14 || atmos === 16) return num += 2
+    if (atmos === 11 || atmos === 12) return num += 6
+    return clampToDiceRange(num)
+  }
+
+  return (
+    <form onSubmit={e => e.preventDefault()}>
+      <h2 className="text-center text-2xl font-bold">Editing Parsec {createGridIDString(system.x, system.y)}</h2>
+      <p className="text-center my-2">Does this parsec contain a star system?</p>
+      <div className="flex gap-4 justify-center">
+        <div className="flex gap-2">
+          <input name="system" id="system" radioGroup="content" type="radio" checked={hasSystem} onChange={() => setHasSystem(!hasSystem)} />
+          <label htmlFor="system">Contains System</label>
+        </div>
+        <div className="flex gap-2">
+          <input name="empty" id="empty" radioGroup="content" type="radio" checked={!hasSystem} onChange={() => setHasSystem(!hasSystem)} />
+          <label htmlFor="empty">Empty Parsec</label>
+        </div>
+      </div>
+      {hasSystem ?
+        <div>
+          <h3 className="text-center my-2 border-b text-xl">System Details</h3>
+          <div className="grid grid-cols-4 gap-1">
+            {/* Name input */}
+            <label className="text-right" htmlFor="name">Name</label>
+            <input className="border rounded col-span-2" placeholder="Name" type="text" id="name" name="name" value={name} onChange={e => setName(e.target.value)} />
+            <div />
+
+            {/* Size input */}
+            <label className="text-right" htmlFor="size">Size</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="size" id="size" min={0} max={10} value={size} onChange={e => setSize(Number(e.target.value) > 10 ? 10 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setSize(roll2D6() - 2)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate size for me</span></button>
+
+            {/* Atmosphere input */}
+            <label className="text-right" htmlFor="atmosphere">Atmosphere</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="atmosphere" id="atmosphere" min={0} max={15} value={atmos} onChange={e => setAtmos(Number(e.target.value) > 15 ? 15 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setAtmos(clampToFullRange(roll2D6() - 7 + size))}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate atmosphere for me</span></button>
+
+            {/* Hydrographics Input */}
+            <label className="text-right" htmlFor="hydrographics">Hydrographics</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="hydrographics" id="hydrographics" min={0} max={10} value={hydro} onChange={e => setHydro(Number(e.target.value) > 10 ? 10 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setHydro(generateHydro())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate hydrographics for me</span></button>
+
+            {/* Temperature Input */}
+            <label className="text-right" htmlFor="temperature">Temperature</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="temperature" id="temperature" min={2} max={12} value={temp} onChange={e => setTemp(Number(e.target.value) > 12 ? 12 : Number(e.target.value) < 2 ? 2 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTemp(generateTemp())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate temperature for me</span></button>
+
+            {/* Population */}
+            <label className="text-right" htmlFor="population">Population</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="population" id="population" min={0} max={10} value={pop} onChange={e => setPop(Number(e.target.value) > 10 ? 10 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setPop(roll2D6() - 2)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate population for me</span></button>
+
+            {/* Government */}
+            <label className="text-right" htmlFor="government">Government</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="government" id="government" min={0} max={15} value={gov} onChange={e => setGov(Number(e.target.value) > 15 ? 15 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setPop(pop === 0 ? 0 : roll2D6() - 7 + pop)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate government for me</span></button>
+
+          </div>
+        </div> : <></>}
+      <p className="italic text-center my-2">UWP: {name} {createGridIDString(system.x, system.y)} {hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}</p>
+      <div className="flex justify-center gap-8">
+        <button onClick={() => setEditMode(false)} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer">Cancel</button>
+        <button onClick={() => setEditMode(false)} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer">Cancel</button>
+      </div>
+    </form>
+  )
+}

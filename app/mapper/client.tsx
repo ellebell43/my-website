@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { DetailsPanel, SaveMapButton, Sector, Subsector } from "../../lib/components/map-components"
 import { map } from "../../lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
@@ -11,7 +11,8 @@ export default function MapperClient() {
   const [prompt, setPrompt] = useState(true)
   const [screenReader, setScreenReader] = useState(false)
   const [map, setMap] = useState<map>({ systems: [] })
-  const [details, setDetails] = useState<StarSystem | undefined>(undefined)
+  const [systemDetails, setSystemDetails] = useState<StarSystem | undefined>(undefined)
+  const [showDetails, setShowDetails] = useState(false)
 
   // Component for selecting grid size (subsector vs sector) and if systems are generated
   const InitPrompt = () => {
@@ -48,11 +49,11 @@ export default function MapperClient() {
       <button className="button-link fixed top-6 left-6 z-50" onClick={() => setPrompt(true)}>Regenerate</button>
       <div className="overflow-y-scroll overflow-x-scroll">
         {isSector ?
-          <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} setDetails={setDetails} />
-          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} setDetails={setDetails} />
+          <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} setDetails={setSystemDetails} setShowDetails={setShowDetails} />
+          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} setDetails={setSystemDetails} setShowDetails={setShowDetails} />
         }
       </div>
-      {details ? <DetailsPanel system={details} setShowDetails={setDetails} /> : <></>}
+      {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={false} /> : <></>}
       <SaveMapButton map={map} new={true} />
     </div>
   )

@@ -39,6 +39,11 @@ export function clampToLawRange(num: number) {
   if (num > 9) return 9
   return num
 }
+export function clampToFullRange(num: number) {
+  if (num < 1) return 1
+  if (num > 15) return 15
+  return num
+}
 
 // 50/50 chance for a parsec to contain a star system
 export const determineIfSystem = (): boolean => {
