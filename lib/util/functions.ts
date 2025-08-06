@@ -1,4 +1,4 @@
-import { letterRange, diceRange, d3Range, d66Range, d6Range, fullRange, xRange, yRange, EmptyParsec } from "./types"
+import { letterRange, diceRange, d3Range, d66Range, d6Range, fullRange, xRange, yRange, EmptyParsec, lawRange } from "./types"
 
 // Dice rolling
 //@ts-ignore

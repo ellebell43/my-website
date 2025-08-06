@@ -2,12 +2,12 @@
 
 import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
 import StarSystem from "../util/starsystem"
-import { clampToDiceRange, clampToFullRange, createGridIDString, deHexify, determineIfSystem, hexify, roll2D6 } from "../util/functions"
+import { clampToDiceRange, clampToFullRange, clampToLawRange, createGridIDString, deHexify, determineIfSystem, hexify, roll2D6 } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDice, faEdit, faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
-import { EmptyParsec, map } from "../util/types"
+import { EmptyParsec, map, starportRange } from "../util/types"
 import crypto, { hash } from "crypto"
 import { useRouter } from "next/navigation"
 
@@ -242,7 +242,7 @@ export const DetailsPanel = (props: { system: StarSystem | undefined, setSystem:
     <>
       <div className="fixed top-0 left-0 w-screen h-screen bg-white dark:bg-slate-800 opacity-75 z-50" />
       <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-50">
-        <div className="md:w-[650px] h-screen md:h-[850px] overflow-scroll opacity-100 bg-slate-100 dark:bg-slate-800 border rounded md:shadow-lg p-4 z-50 scale-100">
+        <div className="w-screen md:w-[650px] h-screen md:h-[850px] overflow-scroll opacity-100 bg-slate-100 dark:bg-slate-800 border rounded md:shadow-lg p-4 z-50 scale-100">
 
           {/* ========== DISPLAY MODE ========== */}
 
@@ -419,6 +419,8 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
   let [temp, setTemp] = useState<number>(system instanceof StarSystem ? system.temp : 7)
   let [pop, setPop] = useState(system instanceof StarSystem ? deHexify(system.pop) : 0)
   let [gov, setGov] = useState(system instanceof StarSystem ? deHexify(system.gov) : 0)
+  let [law, setLaw] = useState<number>(system instanceof StarSystem ? system.law : 0)
+  let [starport, setStarport] = useState(system instanceof StarSystem ? system.starport : "X")
 
   const generateHydro = () => {
     let num = roll2D6() - 7 + atmos
@@ -439,6 +441,37 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
     return clampToDiceRange(num)
   }
 
+  const generateStarport = (): starportRange => {
+    // starport
+    let num = roll2D6()
+    //Determine modifier and adjust number rolled
+    if (pop <= 2) {
+      num -= 2
+    } else if (pop <= 4) {
+      num -= 1
+    } else if (pop >= 10) {
+      num += 2
+    } else if (pop >= 8) {
+      num += 1
+    }
+    // Determine starport class from number
+    let starport: starportRange
+    if (num >= 11) {
+      starport = "A"
+    } else if (num >= 9) {
+      starport = "B"
+    } else if (num >= 7) {
+      starport = "C"
+    } else if (num >= 5) {
+      starport = "E"
+    } else if (num >= 3) {
+      starport = "E"
+    } else {
+      starport = "X"
+    }
+    return starport
+  }
+
   return (
     <form onSubmit={e => e.preventDefault()}>
       <h2 className="text-center text-2xl font-bold">Editing Parsec {createGridIDString(system.x, system.y)}</h2>
@@ -455,12 +488,44 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
       </div>
       {hasSystem ?
         <div>
-          <h3 className="text-center my-2 border-b text-xl">System Details</h3>
           <div className="grid grid-cols-4 gap-1">
+            <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Base System Details</h3>
             {/* Name input */}
             <label className="text-right" htmlFor="name">Name</label>
             <input className="border rounded col-span-2" placeholder="Name" type="text" id="name" name="name" value={name} onChange={e => setName(e.target.value)} />
             <div />
+
+            {/* Starport input */}
+            <div className="col-span-4 grid grid-cols-3 md:px-42 px-32">
+              <div className="col-span-3 flex justify-center gap-2 ">
+                <p className="text-center underline">Starport Class</p>
+                <button className="hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setStarport(generateStarport())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">Generate starport for me</span></button>
+              </div>
+              <div className="flex gap-2 justify-center">
+                <label htmlFor="A">A</label>
+                <input type="radio" name="A" id="A" checked={starport === "A"} radioGroup="starport" onClick={e => setStarport("A")} />
+              </div>
+              <div className="flex gap-2 justify-center">
+                <label htmlFor="B">B</label>
+                <input type="radio" name="B" id="B" checked={starport === "B"} radioGroup="starport" onClick={e => setStarport("B")} />
+              </div>
+              <div className="flex gap-2 justify-center">
+                <label htmlFor="C">C</label>
+                <input type="radio" name="C" id="C" checked={starport === "C"} radioGroup="starport" onClick={e => setStarport("C")} />
+              </div>
+              <div className="flex gap-2 justify-center">
+                <label htmlFor="D">D</label>
+                <input type="radio" name="D" id="D" checked={starport === "D"} radioGroup="starport" onClick={e => setStarport("D")} />
+              </div>
+              <div className="flex gap-2 justify-center">
+                <label htmlFor="E">E</label>
+                <input type="radio" name="E" id="E" checked={starport === "E"} radioGroup="starport" onClick={e => setStarport("E")} />
+              </div>
+              <div className="flex gap-2 justify-center">
+                <label htmlFor="X">X</label>
+                <input type="radio" name="X" id="X" checked={starport === "X"} radioGroup="starport" onClick={e => setStarport("X")} />
+              </div>
+            </div>
 
             {/* Size input */}
             <label className="text-right" htmlFor="size">Size</label>
@@ -477,24 +542,32 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <input className="border rounded col-span-2 pl-1" type="number" name="hydrographics" id="hydrographics" min={0} max={10} value={hydro} onChange={e => setHydro(Number(e.target.value) > 10 ? 10 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setHydro(generateHydro())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate hydrographics for me</span></button>
 
-            {/* Temperature Input */}
-            <label className="text-right" htmlFor="temperature">Temperature</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="temperature" id="temperature" min={2} max={12} value={temp} onChange={e => setTemp(Number(e.target.value) > 12 ? 12 : Number(e.target.value) < 2 ? 2 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTemp(generateTemp())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate temperature for me</span></button>
-
-            {/* Population */}
+            {/* Population input */}
             <label className="text-right" htmlFor="population">Population</label>
             <input className="border rounded col-span-2 pl-1" type="number" name="population" id="population" min={0} max={10} value={pop} onChange={e => setPop(Number(e.target.value) > 10 ? 10 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setPop(roll2D6() - 2)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate population for me</span></button>
 
-            {/* Government */}
+            {/* Government input */}
             <label className="text-right" htmlFor="government">Government</label>
             <input className="border rounded col-span-2 pl-1" type="number" name="government" id="government" min={0} max={15} value={gov} onChange={e => setGov(Number(e.target.value) > 15 ? 15 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setPop(pop === 0 ? 0 : roll2D6() - 7 + pop)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate government for me</span></button>
 
+            {/* Law input */}
+            <label className="text-right" htmlFor="law">Law Level</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="law" id="law" min={0} max={9} value={law} onChange={e => setLaw(Number(e.target.value) > 9 ? 9 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setLaw(clampToLawRange(gov === 0 ? 0 : roll2D6() - 7 + gov))}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate law for me</span></button>
+
+            <p className="italic pt-2 text-center col-span-4">UWP: {name} {createGridIDString(system.x, system.y)} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}</p>
+          </div>
+
+          <div className="grid grid-cols-4 gap-1">
+            <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Additional System Details</h3>
+            {/* Temperature Input */}
+            <label className="text-right" htmlFor="temperature">Temperature</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="temperature" id="temperature" min={2} max={12} value={temp} onChange={e => setTemp(Number(e.target.value) > 12 ? 12 : Number(e.target.value) < 2 ? 2 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTemp(generateTemp())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate temperature for me</span></button>
           </div>
         </div> : <></>}
-      <p className="italic text-center my-2">UWP: {name} {createGridIDString(system.x, system.y)} {hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}</p>
       <div className="flex justify-center gap-8">
         <button onClick={() => setEditMode(false)} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer">Cancel</button>
         <button onClick={() => setEditMode(false)} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer">Cancel</button>
