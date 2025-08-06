@@ -1,6 +1,7 @@
 import { dbClient } from "@/lib/util/dbClient";
 import { map } from "@/lib/util/types";
 import { ObjectId } from "mongodb";
+import { NextApiRequest } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -24,24 +25,22 @@ export async function GET(req: NextRequest) {
 // POST or PATCH headers: { map: JSON.stringify(props.map), pass: String(pass) }
 // POST and PATCH are handled in this same component. For creating or updating maps, use POST on this API endpoint
 export async function POST(req: NextRequest) {
-  const map = req.headers.get("map")
-  const pass = req.headers.get("pass")
+  const data = await req.json()
+  const { map, pass } = data
   // 400 BAD REQUEST on missing map id or password
   if (!map || !pass) return NextResponse.json({ message: "missing map or password data" }, { status: 400 })
-  let mapObject: map = JSON.parse(map)
-  mapObject.pass = pass
   // If map has no ._id property, then it's a brand new map to be inserted instead of updated
   let newItem = false
-  if (!mapObject._id) { mapObject._id = new ObjectId(); newItem = true; }
+  if (!map._id) { map._id = new ObjectId(); newItem = true; }
   try {
     // connect to maps collection in the database
     const client = await dbClient()
     const maps = client.collection("maps")
     // If map is new, create new db document, otherwise update db document
     if (newItem) {
-      let result = await maps.insertOne(mapObject)
+      let result = await maps.insertOne(map)
       // 200 on successful insertions
-      if (result.insertedId) return NextResponse.json({ _id: String(mapObject._id) })
+      if (result.insertedId) return NextResponse.json({ _id: String(map._id) })
       // 500 INTERNAL ERROR on failure to insert to db
       else return NextResponse.json({ message: "failed to insert to db" }, { status: 500 })
     } else {

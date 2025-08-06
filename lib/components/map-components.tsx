@@ -8,7 +8,7 @@ import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDice, faEdit, faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
 import { EmptyParsec, map } from "../util/types"
-import crypto from "crypto"
+import crypto, { hash } from "crypto"
 import { useRouter } from "next/navigation"
 
 // Create a single hex (parsec)
@@ -49,7 +49,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
       <td>{system instanceof StarSystem ? system.name : ""}</td>
       <td>{system instanceof StarSystem ? system.getUWPSmall() : ""}</td>
       <td>{system instanceof StarSystem ? String(system.gasGiant) : ""}</td>
-      <td>{system instanceof StarSystem ? basesVerbose : "/A"}</td>
+      <td>{system instanceof StarSystem ? basesVerbose : ""}</td>
     </tr>
 
 
@@ -360,9 +360,10 @@ export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: 
     let hashedPass = crypto.createHash("sha256").update(String(pass)).digest("hex")
     try {
       if (props.new) {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "POST", headers: { map: JSON.stringify(props.map), pass: hashedPass }, credentials: "include" })
+        console.log("attempting to save new map")
+        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", credentials: "include", method: "POST", headers: { pass: hashedPass }, body: JSON.stringify({ map: props.map, pass: hashedPass }) })
         if (!res.ok) {
-          setError(`Failed to save. Error ${res.status}.`)
+          setError(`Failed to save. Error ${res.status}: ${res.statusText}`)
           return
         } else {
           const response: { _id: string } = await res.json()
@@ -372,10 +373,9 @@ export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: 
         const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "PATCH", headers: { map: JSON.stringify(props.map), pass: hashedPass }, credentials: "include" })
         if (!res.ok) {
           if (res.status == 404) setError("Not saved. Incorrect Password")
-          else setError(`Failed to save. Error ${res.status}.`)
+          else setError(`Failed to save. Error  ${res.status}: ${res.statusText}`)
           return
         } else {
-          const response: { _id: string } = await res.json()
           if (props.setSaveSuccess) props.setSaveSuccess(true)
           else setError("Map saved!")
         }
@@ -386,7 +386,7 @@ export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: 
   }
 
   return (
-    <form className="fixed bottom-4 md:bottom-6 right-4 md:right-6 flex flex-col max-w-[175] ">
+    <form className="fixed bottom-4 md:bottom-6 right-4 md:right-6 flex flex-col max-w-[175] " onSubmit={e => { e.preventDefault(); saveMap() }}>
       {/* If API error occurs, cover form with error message */}
       {error ?
         <div className="absolute top-0 left-0 bg-red-300 dark:bg-red-800 w-full h-full flex items-center justify-center overflow-y-scroll pt-4">
