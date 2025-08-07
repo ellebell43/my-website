@@ -10,6 +10,9 @@ import { faDice, faEdit, faHippo, faMinus, faPlus, faTrash, faX } from "@fortawe
 import { diceRange, EmptyParsec, facilityCode, faction, fullRange, map, starportRange } from "../util/types"
 import crypto, { hash } from "crypto"
 import { useRouter } from "next/navigation"
+import { remark } from "remark"
+import { MDXRemote } from "next-mdx-remote-client/rsc"
+import MDParse from "./md-parse"
 
 // Create a single hex (parsec)
 export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function, setDetails: Function, setShowDetails: Function }) => {
@@ -247,7 +250,7 @@ export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSyste
           {/* ========== DISPLAY MODE ========== */}
 
           {!editMode ?
-            <>
+            <div className="relative">
               {/* Title Area */}
               <div className="">
                 <h2 className="text-center w-full font-bold text-xl">{system instanceof StarSystem ? system.getUWPBroken()[0] : `${createGridIDString(system.x, system.y)} Empty Parsec`}</h2>
@@ -257,6 +260,7 @@ export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSyste
                   <FontAwesomeIcon icon={faX} />
                   <p className="absolute scale-0">Close details panel for {createGridIDString(system.x, system.y)}</p>
                 </button>
+                {editable ? <button onClick={() => setEditMode(true)} className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 left-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700"><FontAwesomeIcon icon={faEdit} /><span className="absolute scale-0">Edit</span></button> : <></>}
               </div>
 
               {system instanceof StarSystem ? <>
@@ -271,7 +275,8 @@ export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSyste
                 {/* Physical Characteristics */}
                 <div className="border-b my-2 pb-2">
                   <p><span className="font-bold">Size</span>: {system.getDiameter()}km ({system.getGravity()}G)</p>
-                  <p><span className="font-bold">Atmosphere</span>: {system.getAtmosphereType()} ({system.getTempType()})</p>
+                  <p><span className="font-bold">Atmosphere</span>: {system.getAtmosphereType()}</p>
+                  <p><strong>Temperature</strong>: {system.getTempType()}</p>
                   <p><span className="font-bold">Hydrographics</span>: {system.getHydroType()}</p>
                 </div>
 
@@ -280,29 +285,26 @@ export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSyste
                   <p><span className="font-bold">Population</span>: {system.getPopType()}</p>
                   <p><span className="font-bold">Government</span>: {system.getGovernmentType(system.gov)}</p>
                   <p className="font-bold">Factions ({system.factions?.length})</p>
-                  <ul className="list-disc list-outside pl-0">
-                    {system.getFactionArrayVerbose().map((el, i) => {
-                      return (
-                        <li className="flex gap-2 ml-3" key={i}>
-                          {/* <FontAwesomeIcon className="relative top-1" icon={faHippo} width={16} /> */}
-                          {/* Bullet point. Can't get tailwind to work :( */}
-                          <div className="bg-black dark:bg-white w-[6px] h-[6px] rounded-full relative top-[9px]" />
-                          <div>
-                            <p>{el.gov}, {el.strength} Group</p>
-                            {el.details ? <p>{el.details}</p> : <></>}
-                          </div>
-                        </li>
-                      )
-                    })}
-                  </ul>
                   <p><span className="font-bold">Cultural Quirk</span>: {system.getCultureType()}</p>
                   <p><span className="font-bold">Law</span>: Level {system.law}</p>
                 </div>
-                <p>{system.details}</p></> : <></>}
-              {editable ? <button onClick={() => setEditMode(true)} className="absolute bottom-4 right-4 hover:scale-110 transition-all hover:cursor-pointer"><FontAwesomeIcon icon={faEdit} /><span className="absolute scale-0">Edit</span></button> : <></>} </> : <>
-
+                {/* Factions */}
+                <h3 className="text-center text-xl font-bold">Factions</h3>
+                {system.getFactionArrayVerbose().map((el, i) => {
+                  return (
+                    <div key={`faction${i}`}>
+                      <h4>Faction {i + 1}{el.name ? ` - ${el.name}` : ""}</h4>
+                      <p className="text-sm italic">{el.strength}, {el.gov} Group</p>
+                      <MDParse content={el.details ? el.details : ""} />
+                    </div>
+                  )
+                })}
+                {/* System notes */}
+                <MDParse content={system.details ? system.details : ""} />
+              </> : <></>}
+            </div> :
+            <>
               {/* ========== EDIT MODE ========== */}
-
               <EditForm system={system} setSystem={setSystem} setEditMode={setEditMode} setMap={setMap} map={map} />
             </>}
         </div>
@@ -748,8 +750,9 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
           <h3 className="text-center col-span-4 text-xl border-b my-2">Factions</h3>
           <div className="col-span-4">
             {factions.map((el, i) => {
-              const updateStrength = (num: diceRange) => {
+              const updateStrength = (num: number) => {
                 let newArr = [...factions]
+                // @ts-expect-error
                 newArr[i].strength = num
                 setFactions(newArr)
               }
@@ -774,38 +777,52 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
                 setFactions(newArr)
               }
               return (
-                <div key={`faction${i}`} className="grid grid-cols-4">
+                <div key={`faction${i}`}>
 
-                  <div className="flex justify-center gap-4 col-span-4">
+                  <div className="flex justify-center gap-4">
                     <h3 className="text-center text-lg font-bold">Faction {i + 1}</h3>
                     <button onClick={() => removeFaction(i)} className="hover:scale-110 hover:cursor-pointer"><FontAwesomeIcon icon={faTrash} /><span className="absolute scale-0">Delete faction {i + 1}</span></button>
                   </div>
+
                   {/* Faction name input */}
-                  <input className="border w-[75%] md:w-[60%] mx-auto rounded col-span-4 px-2 my-2" placeholder="Faction name" type="text" id={`faction-${i}-name`} name={`faction-${i}-name`} value={el.name ? el.name : ""} onChange={e => updateName(e.target.value)} />
-                  <button></button>
+                  <input className="border block w-[75%] md:w-[75%] mx-auto rounded col-span-4 px-2 my-2" placeholder="Faction name" type="text" id={`faction-${i}-name`} name={`faction-${i}-name`} value={el.name ? el.name : ""} onChange={e => updateName(e.target.value)} />
+
                   {/* Faction Strength input */}
-                  <div className="col-span-4 flex justify-center">
+                  <div className="col-span-4 grid md:grid-cols-[25%_75%] grid-cols-[35%_65%] gap-1 w-[75%] md:w-[75%] mx-auto">
                     <label htmlFor={`faction-${i}-strength`} className="text-right pr-2">Strength</label>
-                    <input
-                      className="border rounded justify-self-start pl-2"
-                      type="number" name={`faction-${i}-strength`} id={`faction-${i}-strength`}
-                      min={2} max={12}
-                      value={el.strength}
-                      //  @ts-expect-error
-                      onChange={e => { updateStrength(Number(e.target.value) < 2 ? 2 : Number(e.target.value) > 12 ? 12 : Number(e.target.value)) }}
-                    />
+                    <select className="border rounded px-2" name={`faction-${i}-strength`} id={`faction-${i}-strength`} value={el.strength} onChange={e => updateStrength(Number(e.target.value))}>
+                      <option value="2">Obscure</option>
+                      <option value="4">Fringe</option>
+                      <option value="6">Minor</option>
+                      <option value="8">Notable</option>
+                      <option value="10">Significant</option>
+                      <option value="12">Overwhelming</option>
+                    </select>
+
                     {/* Faction Government input */}
                     <label htmlFor={`faction-${i}-government`} className="text-right px-2">Government</label>
-                    <input
-                      className="border rounded justify-self-start pl-2"
-                      type="number" name={`faction-${i}-government`} id={`faction-${i}-government`}
-                      min={0} max={15}
-                      value={deHexify(el.gov)}
-                      onChange={e => { updateGov(Number(e.target.value) < 0 ? 0 : Number(e.target.value) > 15 ? 15 : Number(e.target.value)) }}
-                    />
+                    <select className="border rounded px-2" name={`faction-${i}-government`} id={`faction-${i}-government`} value={deHexify(el.gov)} onChange={e => updateGov(Number(e.target.value))}>
+                      <option value="0">0 - None</option>
+                      <option value="1">1 - Corporation</option>
+                      <option value="2">2 - Participating Democracy</option>
+                      <option value="3">3 - Self-Perpetuating Oligarchy</option>
+                      <option value="4">4 - Representative Democracy</option>
+                      <option value="5">5 - Feudal Technocracy</option>
+                      <option value="6">6 - Captive Government</option>
+                      <option value="7">7 - Balkanisation</option>
+                      <option value="8">8 - Civil Service Bureaucracy</option>
+                      <option value="9">9 - Impersonal Bureaucracy</option>
+                      <option value="10">A - Charismatic Dictator</option>
+                      <option value="11">B - Non-Charismatic Leader</option>
+                      <option value="12">C - Charismatic Oligarchy</option>
+                      <option value="13">D - Religious Dictatorship</option>
+                      <option value="14">E - Religious Autocracy</option>
+                      <option value="15">F - Totalitarian Oligarchy</option>
+                    </select>
                   </div>
+
                   {/* faction details input */}
-                  <textarea onChange={e => updateDetails(e.target.value)} className="my-2 mx-auto col-span-4 border w-[75%] md:w-[60%] px-2 py-1" name={`faction-${i}-details`} placeholder="Faction summary" />
+                  <textarea onChange={e => updateDetails(e.target.value)} value={el.details} className="my-2 mx-auto col-span-4 border w-[75%] block px-2 py-1" name={`faction-${i}-details`} placeholder="Faction summary" />
                 </div>
               )
             })}
