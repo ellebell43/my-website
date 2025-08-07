@@ -828,9 +828,9 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             {factions.length < 3 ?
               <button onClick={() => createNewFaction()} className="border block mx-auto rounded px-4 py-2 hover:cursor-pointer dark:hover:bg-slate-700 hover:bg-gray-100">Create Faction</button> : <></>}
           </div>
+          <h3 className="text-center col-span-4 text-xl border-b my-2">System Notes</h3>
+          <textarea className="block my-2 mx-auto col-span-4 border w-[75%] md:w-[60%] px-2 py-1" placeholder="System Notes" value={details} onChange={(e) => setDetails(e.target.value)} />
         </div> : <></>}
-      <h3 className="text-center col-span-4 text-xl border-b my-2">System Notes</h3>
-      <textarea className="block my-2 mx-auto col-span-4 border w-[75%] md:w-[60%] px-2 py-1" placeholder="System Notes" value={details} onChange={(e) => setDetails(e.target.value)} />
       <div className="flex justify-center gap-8">
         <button onClick={() => { setEditMode(false); setSystem(system) }} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer bg-red-200 dark:bg-red-800">Cancel</button>
         <button onClick={() => { setEditMode(false); updateMap() }} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer bg-green-200 dark:bg-green-800">Done</button>
