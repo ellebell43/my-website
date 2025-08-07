@@ -1,7 +1,6 @@
 namespace NodeJS {
   interface ProcessEnv {
-    DB_HOST: string
-    DB_USER: string
-    DB_PASS: string
+    MAPPER_DB_STRING: string,
+    NEXT_PUBLIC_HOST: string,
   }
 }

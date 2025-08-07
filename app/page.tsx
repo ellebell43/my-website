@@ -3,10 +3,15 @@ import Link from "next/link"
 import ProjectCard from "../lib/components/project-card"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDiscord, faGithub, faMastodon } from "@fortawesome/free-brands-svg-icons"
-import { faComputer, faFaceGrin, faFish, faHippo, faKiwiBird, faSmile } from "@fortawesome/free-solid-svg-icons"
-import Image from "next/image"
+import { faComputer, faKiwiBird, faSmile } from "@fortawesome/free-solid-svg-icons"
+import { Metadata } from "next"
 
 const winkySans = Winky_Sans({ weight: "500", subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "ellebell.dev",
+  description: "Hi 👋 I'm Elle. Welcome to my little corner of the internet."
+}
 
 
 export default function Page() {
@@ -30,7 +35,7 @@ export default function Page() {
 
         <div className="flex justify-center gap-6 mt-12 text-5xl">
           <Link rel="me" href="https://dice.camp/@ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faMastodon} /></Link>
-          <Link href="https://github.com/ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faGithub} /></Link>
+          <Link href="https://github.com/ellebell43/my-website"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faGithub} /></Link>
           <Link href="https://discord.com/users/ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faDiscord} /></Link>
         </div>
       </div>

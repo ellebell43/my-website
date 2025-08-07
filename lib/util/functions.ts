@@ -1,4 +1,4 @@
-import { letterRange, diceRange, d3Range, d66Range, d6Range, fullRange, xRange, yRange, EmptyParsec } from "./types"
+import { letterRange, diceRange, d3Range, d66Range, d6Range, fullRange, xRange, yRange, EmptyParsec, lawRange } from "./types"
 
 // Dice rolling
 //@ts-ignore
@@ -37,6 +37,11 @@ export function clampToTechRange(num: number) {
 export function clampToLawRange(num: number) {
   if (num < 1) return 1
   if (num > 9) return 9
+  return num
+}
+export function clampToFullRange(num: number) {
+  if (num < 1) return 1
+  if (num > 15) return 15
   return num
 }
 

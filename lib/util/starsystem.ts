@@ -40,7 +40,8 @@ export default class StarSystem {
     factions?: faction[],
     culture?: d66Range,
     facilities?: facilityCode[],
-    details?: string) {
+    details?: string,
+    gasGiant?: boolean) {
     // constructor body
     this.x = x;
     this.y = y
@@ -59,7 +60,7 @@ export default class StarSystem {
     this.culture = culture ? culture : rollD66()
     this.facilities = facilities ? facilities : this.#determineFacilities()
     this.details = details
-    this.gasGiant = roll2D6() < 10
+    this.gasGiant = gasGiant !== undefined ? gasGiant : roll2D6() < 10
   }
 
   // === PRIVATE FUNCTIONS FOR DETERMINING OBJECT PROPERTIES ===
@@ -69,7 +70,7 @@ export default class StarSystem {
     let factions: faction[] = []
     for (let i = 0; i < factionCount; i++) {
       let strength = roll2D6()
-      let factionGov = hexify(roll2D6() - 7 + deHexify(this.gov))
+      let factionGov = hexify(clampToDiceRange(roll2D6() - 7 + deHexify(this.gov)))
       //@ts-expect-error
       let newFaction: faction = { strength, gov: factionGov }
       factions.push(newFaction)
@@ -431,11 +432,11 @@ export default class StarSystem {
     }
   }
 
-  getFactionArrayVerbose(): { strength: string, gov: string, details?: string }[] {
+  getFactionArrayVerbose(): { strength: string, gov: string, details?: string, name?: string }[] {
     let arr: { strength: string, gov: string, details?: string }[] = []
     if (!this.factions) return arr
     for (let i = 0; i < this.factions.length; i++) {
-      let faction: { strength: string, gov: string, details?: string } = { strength: "", gov: "", details: undefined }
+      let faction: { strength: string, gov: string, details?: string, name?: string } = { strength: "", gov: "", details: undefined, name: undefined }
       switch (this.factions[i].strength) {
         case (2): faction.strength = "Obscure"; break;
         case (3): faction.strength = "Obscure"; break;
@@ -451,6 +452,7 @@ export default class StarSystem {
       }
       faction.gov = this.getGovernmentType(this.factions[i].gov)
       faction.details = this.factions ? this.factions[i].details : undefined
+      faction.name = this.factions ? this.factions[i].name : undefined
       arr.push(faction)
     }
     return arr

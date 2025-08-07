@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Hello",
-  description: "",
-};
+  metadataBase: new URL("https://ellebell.dev"),
+  openGraph: { images: '/opengraph-image.jpg' }
+}
 
 export default function RootLayout({
   children,

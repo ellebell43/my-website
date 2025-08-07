@@ -1,4 +1,4 @@
-import { clampToDiceRange, clampToLawRange, clampToTechRange, clampToZero, hexify, roll1D3, roll2D6, rollD66 } from "./functions"
+import { clampToDiceRange, clampToLawRange, clampToTechRange, clampToZero, hexify, roll1D3, roll1D6, roll2D6, rollD66 } from "./functions"
 import StarSystem from "./starsystem"
 import { facilityCode, faction, sizeRange, starportRange, travelCode, xRange, yRange } from "./types"
 
@@ -68,7 +68,7 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
   }
 
   // Tech level
-  let tech: number = roll1D3()
+  let tech: number = roll1D6()
   // Figure out modifiers based on other UWP values
   switch (starport) {
     case ("A"): tech += 6; break;
@@ -76,49 +76,37 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
     case ("C"): tech += 2; break;
     case ("X"): tech -= 4; break;
   }
-  switch (size) {
-    case (0 || 1): tech += 2; break;
-    case (Number(2) || 3 || 4): tech += 1; break;
-  }
-  switch (atmos) {
-    case (1 || 2 || 3 || 10 || 11 | 12 | 13 | 14 | 15): tech += 1; break;
-  }
-  switch (hydro) {
-    case (0 || 9): tech += 1; break;
-    case (10): tech += 2; break;
-  }
-  switch (pop) {
-    case (1 | 2 | 3 | 4 | 5 | 8): tech += 1; break;
-    case (9): tech += 2; break;
-    case (10): tech += 4; break;
-  }
-  switch (gov) {
-    case (0 | 5): tech += 1; break;
-    case (7): tech += 2; break;
-    case (13 | 14): tech -= 2; break;
-  }
-  switch (atmos) {
-    case (0 | 1 | 10 | 15): if (tech < 8) tech = 8; break;
-    case (2 | 3 | 13 | 14): if (tech < 5) tech = 5; break;
-    case (4 | 7 | 9): if (tech < 3) tech = 3; break;
-    case (11): if (tech < 9) tech = 9; break;
-    case (12): if (tech < 10) tech = 10; break;
-  }
+
+  if (size <= 1) tech += 2
+  else if (size >= 2 || size <= 4) tech += 1
+
+  if (atmos >= 1 && atmos <= 3 || atmos >= 10) tech += 1
+
+  if (hydro === 0 || hydro === 9) tech += 1
+  else if (hydro >= 10) tech += 2
+
+  if (pop >= 1 && pop <= 5 || pop === 8) tech += 1
+  else if (pop === 9) tech += 2
+  else if (pop === 10) tech += 4
+
+  if (gov === 0 || gov === 5) tech += 1
+  else if (gov === 7) tech += 2
+  else if (gov === 13 || gov === 14) tech -= 2
+
+  if ((atmos <= 1 || atmos === 10 || atmos === 15) && tech < 8) tech = 8
+  if ((atmos == 2 || atmos == 3 || atmos === 13 || atmos === 14) && tech < 5) tech = 5
+  if ((atmos == 4 || atmos == 7 || atmos === 9) && tech < 3) tech = 3
+  if (atmos === 11 && tech < 9) tech = 9
+  if (atmos === 12 && tech < 10) tech = 10
   tech = clampToTechRange(tech)
 
   // Travel code
   let travelCode: travelCode = "G"
   if (atmos >= 10) {
-    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Atmosphere`)
-    // console.log(`Atmos ${atmos} is more than 10: ${atmos >= 10}`)
     travelCode = "A"
   } else if (gov === 0 || gov === 7 || gov === 10) {
-    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Government`)
-    // console.log(`Gov ${gov} is 0,7 or 10: ${gov === 0 || gov === 7 || gov === 10}`)
     travelCode = "A"
   } else if (law === 0 || law >= 9) {
-    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Law`)
-    // console.log(`Law ${law} is 0 or more than 9: ${law === 0 || law >= 9}`)
     travelCode = "A"
   }
 
@@ -198,6 +186,6 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
    */
 
   //@ts-expect-error
-  let newSys = new StarSystem(x, y, name, starport, size, atmos, hydro, pop, gov, law, tech)
+  let newSys = new StarSystem(x, y, name, starport, size, atmos, hydro, pop, gov, law, tech, travelCode)
   return newSys
 }
