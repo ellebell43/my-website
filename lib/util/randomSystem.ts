@@ -103,16 +103,10 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
   // Travel code
   let travelCode: travelCode = "G"
   if (atmos >= 10) {
-    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Atmosphere`)
-    // console.log(`Atmos ${atmos} is more than 10: ${atmos >= 10}`)
     travelCode = "A"
   } else if (gov === 0 || gov === 7 || gov === 10) {
-    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Government`)
-    // console.log(`Gov ${gov} is 0,7 or 10: ${gov === 0 || gov === 7 || gov === 10}`)
     travelCode = "A"
   } else if (law === 0 || law >= 9) {
-    // console.log(`${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y} Amber status from Law`)
-    // console.log(`Law ${law} is 0 or more than 9: ${law === 0 || law >= 9}`)
     travelCode = "A"
   }
 
@@ -192,6 +186,6 @@ export const randomSystem = (name: string, x: xRange, y: yRange): StarSystem => 
    */
 
   //@ts-expect-error
-  let newSys = new StarSystem(x, y, name, starport, size, atmos, hydro, pop, gov, law, tech)
+  let newSys = new StarSystem(x, y, name, starport, size, atmos, hydro, pop, gov, law, tech, travelCode)
   return newSys
 }

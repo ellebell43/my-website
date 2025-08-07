@@ -62,7 +62,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
     >
       <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center  justify-between hover: cursor-pointer`}>
         {/* Travel code ring */}
-        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 dark:border-gray-800 ${system instanceof StarSystem && system.travelCode == "A" ? "border-amber-300" : system instanceof StarSystem && system.travelCode == "R" ? "border-red-500" : "border-white"}`} />
+        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 ${system instanceof StarSystem && system.travelCode == "A" ? "border-amber-300 dark:border-amber-500" : system instanceof StarSystem && system.travelCode == "R" ? "border-red-500 dark:border-red-700" : "border-white dark:border-slate-800"}`} />
         {/* Content container */}
         <div className="text-center relative">
           <p className="text-center text-sms">{props.id}</p>
@@ -686,6 +686,17 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
               <option value={66}>66 - Unusual custom around conspiracy</option>
             </select>
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setCulture(rollD66())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate culture for me</span></button>
+
+            {/* Travel Code */}
+            <div className="col-span-4 grid grid-cols-6 md:px-42 px-32">
+              <p className="col-span-6 text-center">Travel Code</p>
+              <label className="text-right pr-2" htmlFor="G">G</label>
+              <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="G" name="G" id="G" checked={travelCode === "G"} onChange={() => setTravelCode("G")} />
+              <label className="text-right pr-2" htmlFor="A">A</label>
+              <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="A" name="A" id="A" checked={travelCode === String("A")} onChange={() => setTravelCode("A")} />
+              <label className="text-right pr-2" htmlFor="R">R</label>
+              <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="R" name="R" id="R" checked={travelCode === "R"} onChange={() => setTravelCode("R")} />
+            </div>
 
             {/* Gas giant input */}
             <div className="col-span-4 flex justify-center gap-4">
