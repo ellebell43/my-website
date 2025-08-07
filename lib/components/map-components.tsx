@@ -2,16 +2,14 @@
 
 import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
 import StarSystem from "../util/starsystem"
-import { clampToDiceRange, clampToFullRange, clampToLawRange, clampToTechRange, createGridIDString, deHexify, determineIfSystem, hexify, roll1D6, roll2D6, rollD66 } from "../util/functions"
+import { createGridIDString, deHexify, determineIfSystem, hexify } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faDice, faEdit, faHippo, faMinus, faPlus, faTrash, faX } from "@fortawesome/free-solid-svg-icons"
-import { diceRange, EmptyParsec, facilityCode, faction, fullRange, map, starportRange } from "../util/types"
-import crypto, { hash } from "crypto"
+import { faEdit, faMinus, faPlus, faTrash, faX } from "@fortawesome/free-solid-svg-icons"
+import { EmptyParsec, facilityCode, faction, fullRange, map } from "../util/types"
+import crypto from "crypto"
 import { useRouter } from "next/navigation"
-import { remark } from "remark"
-import { MDXRemote } from "next-mdx-remote-client/rsc"
 import MDParse from "./md-parse"
 
 // Create a single hex (parsec)
