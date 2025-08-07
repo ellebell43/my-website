@@ -2,11 +2,11 @@
 
 import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
 import StarSystem from "../util/starsystem"
-import { clampToDiceRange, clampToFullRange, clampToLawRange, createGridIDString, deHexify, determineIfSystem, hexify, roll2D6 } from "../util/functions"
+import { clampToDiceRange, clampToFullRange, clampToLawRange, clampToTechRange, createGridIDString, deHexify, determineIfSystem, hexify, roll1D6, roll2D6 } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faDice, faEdit, faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
+import { faC, faDice, faEdit, faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
 import { EmptyParsec, map, starportRange } from "../util/types"
 import crypto, { hash } from "crypto"
 import { useRouter } from "next/navigation"
@@ -76,8 +76,8 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
           </> : <></>}
         </div>
         {system instanceof StarSystem ? <>
-          <p className="font-bold">{system.name}</p>
-          <p className="text-xs text center z-10">{system.getUWPSmall()}</p>
+          <p className="font-bold truncate text-center w-[110px] z-10 bg-white dark:bg-slate-800">{system.name}</p>
+          <p className="text-xs text-center z-10">{system.getUWPSmall()}</p>
         </> : <></>}
       </div>
     </div>
@@ -234,8 +234,8 @@ export const Sector = (props: { generateSystems: boolean, screenReader: boolean,
 }
 
 // Details panel
-export const DetailsPanel = (props: { system: StarSystem | undefined, setSystem: Function, setShowDetails: Function, editable: boolean }) => {
-  let { system, setSystem, setShowDetails, editable } = props
+export const DetailsPanel = (props: { system: StarSystem | undefined, setSystem: Function, setShowDetails: Function, editable: boolean, setMap: Function, map: map }) => {
+  let { system, setSystem, setShowDetails, editable, setMap, map } = props
   let [editMode, setEditMode] = useState(false)
   if (!system) return <></>
   else return (
@@ -301,7 +301,7 @@ export const DetailsPanel = (props: { system: StarSystem | undefined, setSystem:
 
             {/* ========== EDIT MODE ========== */}
 
-            <EditForm system={system} setSystem={setSystem} setEditMode={setEditMode} />
+            <EditForm system={system} setSystem={setSystem} setEditMode={setEditMode} setMap={setMap} map={map} />
           </>}
         </div>
       </div>
@@ -359,7 +359,7 @@ export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: 
     try {
       if (props.new) {
         console.log("attempting to save new map")
-        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", credentials: "include", method: "POST", headers: { pass: hashedPass }, body: JSON.stringify({ map: props.map, pass: hashedPass }) })
+        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", credentials: "include", method: "POST", body: JSON.stringify({ map: props.map, pass: hashedPass }) })
         if (!res.ok) {
           setError(`Failed to save. Error ${res.status}: ${res.statusText}`)
           return
@@ -368,7 +368,7 @@ export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: 
           router.push(`/mapper/new?id=${response._id}&pass=${pass}`)
         }
       } else {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "PATCH", headers: { map: JSON.stringify(props.map), pass: hashedPass }, credentials: "include" })
+        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "PATCH", body: JSON.stringify({ map: props.map, pass: hashedPass }), credentials: "include" })
         if (!res.ok) {
           if (res.status == 404) setError("Not saved. Incorrect Password")
           else setError(`Failed to save. Error  ${res.status}: ${res.statusText}`)
@@ -409,8 +409,8 @@ export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: 
   )
 }
 
-const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function, setEditMode: Function }) => {
-  const { system, setSystem, setEditMode } = props
+const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function, setEditMode: Function, setMap: Function, map: map }) => {
+  const { system, setSystem, setEditMode, map, setMap } = props
   let [hasSystem, setHasSystem] = useState(system instanceof StarSystem)
   let [name, setName] = useState(system instanceof StarSystem ? system.name : "")
   let [size, setSize] = useState(system instanceof StarSystem ? deHexify(system.size) : 0)
@@ -421,6 +421,23 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
   let [gov, setGov] = useState(system instanceof StarSystem ? deHexify(system.gov) : 0)
   let [law, setLaw] = useState<number>(system instanceof StarSystem ? system.law : 0)
   let [starport, setStarport] = useState(system instanceof StarSystem ? system.starport : "X")
+  let [tech, setTech] = useState<number>(system instanceof StarSystem ? system.tech : 0)
+  let [travelCode, setTravelCode] = useState(system instanceof StarSystem ? system.travelCode : "G")
+  let [factions, setFactions] = useState(system instanceof StarSystem ? system.factions : [])
+  let [culture, setCulture] = useState(system instanceof StarSystem ? system.culture : 11)
+  let [facilities, setFacilities] = useState(system instanceof StarSystem ? system.facilities : [])
+  let [details, setDetails] = useState(system instanceof StarSystem ? system.details : "")
+  let [gasGiant, setGasGiant] = useState(system instanceof StarSystem ? system.gasGiant : false)
+
+  const updateMap = () => {
+    //@ts-expect-error
+    const newSystem = new StarSystem(system.x, system.y, name, starport, hexify(size), hexify(atmos), hexify(hydro), hexify(pop), hexify(gov), law, tech, travelCode, temp, factions, culture, facilities, details, gasGiant)
+    const newMap = { ...map }
+    const i = map.systems.findIndex(e => e.x === system.x && e.y === system.y)
+    newMap.systems[i] = hasSystem ? newSystem : new EmptyParsec(system.x, system.y)
+    setMap(newMap)
+    setSystem(hasSystem ? newSystem : undefined)
+  }
 
   const generateHydro = () => {
     let num = roll2D6() - 7 + atmos
@@ -472,6 +489,47 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
     return starport
   }
 
+  const generateTech = () => {
+    // Tech level
+    let tech: number = roll1D6()
+    // Figure out modifiers based on other UWP values
+    switch (starport) {
+      case ("A"): tech += 6; break;
+      case ("B"): tech += 4; break;
+      case ("C"): tech += 2; break;
+      case ("X"): tech -= 4; break;
+    }
+    switch (size) {
+      case (0 || 1): tech += 2; break;
+      case (Number(2) || 3 || 4): tech += 1; break;
+    }
+    switch (atmos) {
+      case (1 || 2 || 3 || 10 || 11 | 12 | 13 | 14 | 15): tech += 1; break;
+    }
+    switch (hydro) {
+      case (0 || 9): tech += 1; break;
+      case (10): tech += 2; break;
+    }
+    switch (pop) {
+      case (1 | 2 | 3 | 4 | 5 | 8): tech += 1; break;
+      case (9): tech += 2; break;
+      case (10): tech += 4; break;
+    }
+    switch (gov) {
+      case (0 | 5): tech += 1; break;
+      case (7): tech += 2; break;
+      case (13 | 14): tech -= 2; break;
+    }
+    switch (atmos) {
+      case (0 | 1 | 10 | 15): if (tech < 8) tech = 8; break;
+      case (2 | 3 | 13 | 14): if (tech < 5) tech = 5; break;
+      case (4 | 7 | 9): if (tech < 3) tech = 3; break;
+      case (11): if (tech < 9) tech = 9; break;
+      case (12): if (tech < 10) tech = 10; break;
+    }
+    return clampToTechRange(tech)
+  }
+
   return (
     <form onSubmit={e => e.preventDefault()}>
       <h2 className="text-center text-2xl font-bold">Editing Parsec {createGridIDString(system.x, system.y)}</h2>
@@ -503,27 +561,27 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
               </div>
               <div className="flex gap-2 justify-center">
                 <label htmlFor="A">A</label>
-                <input type="radio" name="A" id="A" checked={starport === "A"} radioGroup="starport" onClick={e => setStarport("A")} />
+                <input type="radio" name="A" id="A" checked={starport === "A"} radioGroup="starport" onChange={e => setStarport("A")} />
               </div>
               <div className="flex gap-2 justify-center">
                 <label htmlFor="B">B</label>
-                <input type="radio" name="B" id="B" checked={starport === "B"} radioGroup="starport" onClick={e => setStarport("B")} />
+                <input type="radio" name="B" id="B" checked={starport === "B"} radioGroup="starport" onChange={e => setStarport("B")} />
               </div>
               <div className="flex gap-2 justify-center">
                 <label htmlFor="C">C</label>
-                <input type="radio" name="C" id="C" checked={starport === "C"} radioGroup="starport" onClick={e => setStarport("C")} />
+                <input type="radio" name="C" id="C" checked={starport === "C"} radioGroup="starport" onChange={e => setStarport("C")} />
               </div>
               <div className="flex gap-2 justify-center">
                 <label htmlFor="D">D</label>
-                <input type="radio" name="D" id="D" checked={starport === "D"} radioGroup="starport" onClick={e => setStarport("D")} />
+                <input type="radio" name="D" id="D" checked={starport === "D"} radioGroup="starport" onChange={e => setStarport("D")} />
               </div>
               <div className="flex gap-2 justify-center">
                 <label htmlFor="E">E</label>
-                <input type="radio" name="E" id="E" checked={starport === "E"} radioGroup="starport" onClick={e => setStarport("E")} />
+                <input type="radio" name="E" id="E" checked={starport === "E"} radioGroup="starport" onChange={e => setStarport("E")} />
               </div>
               <div className="flex gap-2 justify-center">
                 <label htmlFor="X">X</label>
-                <input type="radio" name="X" id="X" checked={starport === "X"} radioGroup="starport" onClick={e => setStarport("X")} />
+                <input type="radio" name="X" id="X" checked={starport === "X"} radioGroup="starport" onChange={e => setStarport("X")} />
               </div>
             </div>
 
@@ -557,7 +615,12 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <input className="border rounded col-span-2 pl-1" type="number" name="law" id="law" min={0} max={9} value={law} onChange={e => setLaw(Number(e.target.value) > 9 ? 9 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setLaw(clampToLawRange(gov === 0 ? 0 : roll2D6() - 7 + gov))}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate law for me</span></button>
 
-            <p className="italic pt-2 text-center col-span-4">UWP: {name} {createGridIDString(system.x, system.y)} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}</p>
+            {/* tech level input */}
+            <label className="text-right" htmlFor="technology">Technology</label>
+            <input className="border rounded col-span-2 pl-1" type="number" name="technology" id="technology" min={0} max={15} value={tech} onChange={e => setTech(Number(e.target.value) > 15 ? 15 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTech(generateTech())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate technology for me</span></button>
+
+            <p className="italic pt-2 text-center col-span-4">UWP: {name} {createGridIDString(system.x, system.y)} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}-{tech}</p>
           </div>
 
           <div className="grid grid-cols-4 gap-1">
@@ -569,8 +632,8 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
           </div>
         </div> : <></>}
       <div className="flex justify-center gap-8">
-        <button onClick={() => setEditMode(false)} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer">Cancel</button>
-        <button onClick={() => setEditMode(false)} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer">Cancel</button>
+        <button onClick={() => setEditMode(false)} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer bg-red-200 dark:bg-red-800">Cancel</button>
+        <button onClick={() => { setEditMode(false); updateMap() }} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer bg-green-200 dark:bg-green-800">Done</button>
       </div>
     </form>
   )

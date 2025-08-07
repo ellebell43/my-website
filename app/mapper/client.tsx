@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { DetailsPanel, SaveMapButton, Sector, Subsector } from "../../lib/components/map-components"
 import { map } from "../../lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
@@ -53,7 +53,7 @@ export default function MapperClient() {
           : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} setDetails={setSystemDetails} setShowDetails={setShowDetails} />
         }
       </div>
-      {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={false} /> : <></>}
+      {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={false} map={map} setMap={setMap} /> : <></>}
       <SaveMapButton map={map} new={true} />
     </div>
   )

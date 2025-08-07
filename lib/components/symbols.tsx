@@ -36,18 +36,18 @@ export const GasGiant = () => {
 
 export const NavalBase = () => {
   return (
-    <FontAwesomeIcon className="absolute top-[40px] left-[-15px] text-xs text-black dark:text-gray-100" icon={faStar} />
+    <FontAwesomeIcon className="absolute top-[40px] left-[-15px] text-xs text-black dark:text-gray-100 w-3 h-3" icon={faStar} />
   )
 }
 
 export const MilitaryBase = () => {
   return (
-    <FontAwesomeIcon className="absolute top-[60px] left-[-20px] text-xs text-black  dark:text-gray-100" icon={faPentagon} />
+    <FontAwesomeIcon className="absolute top-[60px] left-[-20px] text-xs text-black  dark:text-gray-100 w-3 h-3" icon={faPentagon} />
   )
 }
 
 export const ScoutBase = () => {
   return (
-    <FontAwesomeIcon className="absolute top-[80px] left-[-15px] text-xs text-black  dark:text-gray-100 -rotate-90" icon={faPlay} />
+    <FontAwesomeIcon className="absolute top-[80px] left-[-15px] text-xs text-black  dark:text-gray-100 -rotate-90 w-3 h-3" icon={faPlay} />
   )
 }
