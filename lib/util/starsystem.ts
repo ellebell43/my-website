@@ -70,7 +70,7 @@ export default class StarSystem {
     let factions: faction[] = []
     for (let i = 0; i < factionCount; i++) {
       let strength = roll2D6()
-      let factionGov = hexify(roll2D6() - 7 + deHexify(this.gov))
+      let factionGov = hexify(clampToDiceRange(roll2D6() - 7 + deHexify(this.gov)))
       //@ts-expect-error
       let newFaction: faction = { strength, gov: factionGov }
       factions.push(newFaction)

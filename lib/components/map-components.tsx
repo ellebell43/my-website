@@ -441,89 +441,22 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
     setSystem(hasSystem ? newSystem : undefined)
   }
 
-  const generateHydro = () => {
-    let num = roll2D6() - 7 + atmos
-    if (size === 0 || size === 1) return 0
-    if (atmos <= 1 || atmos >= 10) num -= 4
-    if (temp >= 10 && temp < 12) num -= 2
-    if (temp >= 12) num -= 6
-    return clampToDiceRange(num)
-  }
-
-  const generateTemp = () => {
-    let num = roll2D6()
-    if (atmos === 2 || atmos === 3) return num -= 2
-    if (atmos === 4 || atmos === 5 || atmos === 15) return num -= 1
-    if (atmos === 8 || atmos === 9) return num += 1
-    if (atmos === 10 || atmos === 14 || atmos === 16) return num += 2
-    if (atmos === 11 || atmos === 12) return num += 6
-    return clampToDiceRange(num)
-  }
-
-  const generateStarport = (): starportRange => {
-    // starport
-    let num = roll2D6()
-    //Determine modifier and adjust number rolled
-    if (pop <= 2) {
-      num -= 2
-    } else if (pop <= 4) {
-      num -= 1
-    } else if (pop >= 10) {
-      num += 2
-    } else if (pop >= 8) {
-      num += 1
-    }
-    // Determine starport class from number
-    let starport: starportRange
-    if (num >= 11) {
-      starport = "A"
-    } else if (num >= 9) {
-      starport = "B"
-    } else if (num >= 7) {
-      starport = "C"
-    } else if (num >= 5) {
-      starport = "E"
-    } else if (num >= 3) {
-      starport = "E"
-    } else {
-      starport = "X"
-    }
-    return starport
-  }
-
-  const generateTech = () => {
-    // Tech level
-    let tech: number = roll1D6()
-    // Figure out modifiers based on other UWP values
-    switch (starport) {
-      case ("A"): tech += 6; break;
-      case ("B"): tech += 4; break;
-      case ("C"): tech += 2; break;
-      case ("X"): tech -= 4; break;
-    }
-
-    if (size <= 1) tech += 2
-    else if (size >= 2 || size <= 4) tech += 1
-
-    if (atmos >= 1 && atmos <= 3 || atmos >= 10) tech += 1
-
-    if (hydro === 0 || hydro === 9) tech += 1
-    else if (hydro >= 10) tech += 2
-
-    if (pop >= 1 && pop <= 5 || pop === 8) tech += 1
-    else if (pop === 9) tech += 2
-    else if (pop === 10) tech += 4
-
-    if (gov === 0 || gov === 5) tech += 1
-    else if (gov === 7) tech += 2
-    else if (gov === 13 || gov === 14) tech -= 2
-
-    if ((atmos <= 1 || atmos === 10 || atmos === 15) && tech < 8) tech = 8
-    if ((atmos == 2 || atmos == 3 || atmos === 13 || atmos === 14) && tech < 5) tech = 5
-    if ((atmos == 4 || atmos == 7 || atmos === 9) && tech < 3) tech = 3
-    if (atmos === 11 && tech < 9) tech = 9
-    if (atmos === 12 && tech < 10) tech = 10
-    return clampToTechRange(tech)
+  const randomize = () => {
+    let newSystem: StarSystem = randomSystem(name, system.x, system.y)
+    setSize(deHexify(newSystem.size))
+    setHydro(deHexify(newSystem.hydro))
+    setAtmos(deHexify(newSystem.atmos))
+    setStarport(newSystem.starport)
+    setPop(deHexify(newSystem.pop))
+    setGov(deHexify(newSystem.gov))
+    setLaw(deHexify(newSystem.law))
+    setTech(newSystem.tech)
+    setFactions(newSystem.factions)
+    setTemp(newSystem.temp)
+    setTravelCode(newSystem.travelCode)
+    setCulture(newSystem.culture)
+    setFacilities(newSystem.facilities)
+    setDetails("")
   }
 
   const createNewFaction = () => {
@@ -565,95 +498,173 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
       </div>
       {hasSystem ?
         <div>
-          <div className="grid grid-cols-4 gap-1">
-            <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Base System Details</h3>
+          <button onClick={() => randomize()} className="block mx-auto border rounded px-4 py-1 my-4 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 hover:dark:bg-slate-700 hover:cursor-pointer transition-all">Randomize</button>
+          <h3 className="text-center mb-2 border-b text-xl col-span-2">Base System Details</h3>
+          <div className="grid md:grid-cols-[20%_80%] grid-cols-[35%_65%] gap-1">
             {/* Name input */}
-            <label className="text-right" htmlFor="name">Name</label>
-            <input className="border rounded col-span-2" placeholder="Name" type="text" id="name" name="name" value={name} onChange={e => setName(e.target.value)} />
-            <div />
+            <label className="text-right pr-1" htmlFor="name">Name</label>
+            <input className="border rounded px-2" placeholder="Name" type="text" id="name" name="name" value={name} onChange={e => setName(e.target.value)} />
 
             {/* Starport input */}
-            <div className="col-span-4 grid grid-cols-3 md:px-42 px-16">
-              <div className="col-span-3 flex justify-center gap-2 ">
-                <p className="text-center underline">Starport Class</p>
-                <button className="hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setStarport(generateStarport())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">Generate starport for me</span></button>
-              </div>
-              <div className="flex gap-2 justify-center">
-                <label htmlFor="A">A</label>
-                <input type="radio" name="A" id="A" checked={starport === "A"} radioGroup="starport" onChange={e => setStarport("A")} />
-              </div>
-              <div className="flex gap-2 justify-center">
-                <label htmlFor="B">B</label>
-                <input type="radio" name="B" id="B" checked={starport === "B"} radioGroup="starport" onChange={e => setStarport("B")} />
-              </div>
-              <div className="flex gap-2 justify-center">
-                <label htmlFor="C">C</label>
-                <input type="radio" name="C" id="C" checked={starport === "C"} radioGroup="starport" onChange={e => setStarport("C")} />
-              </div>
-              <div className="flex gap-2 justify-center">
-                <label htmlFor="D">D</label>
-                <input type="radio" name="D" id="D" checked={starport === "D"} radioGroup="starport" onChange={e => setStarport("D")} />
-              </div>
-              <div className="flex gap-2 justify-center">
-                <label htmlFor="E">E</label>
-                <input type="radio" name="E" id="E" checked={starport === "E"} radioGroup="starport" onChange={e => setStarport("E")} />
-              </div>
-              <div className="flex gap-2 justify-center">
-                <label htmlFor="X">X</label>
-                <input type="radio" name="X" id="X" checked={starport === "X"} radioGroup="starport" onChange={e => setStarport("X")} />
-              </div>
-            </div>
+            <label htmlFor="starport" className="text-right pr-1">Starport</label>
+            {/* @ts-expect-error */}
+            <select className=" border rounded px-2" value={starport} name="starport" id="starport" onChange={e => setStarport(e.target.value)}>
+              <option value="A">A - Excellent</option>
+              <option value="B">B - Good</option>
+              <option value="C">C - Routine</option>
+              <option value="D">D - Poor</option>
+              <option value="E">E - Frontier</option>
+              <option value="X">X - None</option>
+            </select>
 
             {/* Size input */}
-            <label className="text-right" htmlFor="size">Size</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="size" id="size" min={0} max={10} value={size} onChange={e => setSize(Number(e.target.value) > 10 ? 10 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setSize(roll2D6() - 2)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate size for me</span></button>
+            <label htmlFor="size" className="text-right pr-1">Size</label>
+            <select className="border rounded px-2" value={size} name="size" id="size" onChange={e => setSize(Number(e.target.value))}>
+              <option value="0">0 - &lt; 1,000km, 0G</option>
+              <option value="1">1 - 1,600km, .05G</option>
+              <option value="2">2 - 3,200km, .15G</option>
+              <option value="3">3 - 4,800km, .25G</option>
+              <option value="4">4 - 6,400km, .35G</option>
+              <option value="5">5 - 8,000km, .45G</option>
+              <option value="6">6 - 9,600km, .7G</option>
+              <option value="7">7 - 11,200km, .9G</option>
+              <option value="8">8 - 12,800km, 1G</option>
+              <option value="9">9 - 14,400km, 1.25G</option>
+              <option value="10">A - 16,000km, 1.4G</option>
+            </select>
 
-            {/* Atmosphere input */}
-            <label className="text-right" htmlFor="atmosphere">Atmosphere</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="atmosphere" id="atmosphere" min={0} max={15} value={atmos} onChange={e => setAtmos(Number(e.target.value) > 15 ? 15 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setAtmos(clampToFullRange(roll2D6() - 7 + size))}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate atmosphere for me</span></button>
+            {/* atmosphere input */}
+            <label htmlFor="atmos" className="text-right pr-1">Atmosphere</label>
+            <select className="border rounded px-2" value={atmos} name="atmos" id="atmos" onChange={e => setAtmos(Number(e.target.value))}>
+              <option value="0">0 - None</option>
+              <option value="1">1 - Trace</option>
+              <option value="2">2 - Very thin, tainted</option>
+              <option value="3">3 - Very thin</option>
+              <option value="4">4 - Thin, tainted</option>
+              <option value="5">5 - Thin</option>
+              <option value="6">6 - Standard</option>
+              <option value="7">7 - Standard, tainted</option>
+              <option value="8">8 - Dense</option>
+              <option value="9">9 - Dense, tainted</option>
+              <option value="10">A - Exotic</option>
+              <option value="11">B - Corrosive</option>
+              <option value="12">C - Insidious</option>
+              <option value="13">D - Very dense</option>
+              <option value="14">E - Low</option>
+              <option value="15">F - Unusual</option>
+            </select>
 
-            {/* Hydrographics Input */}
-            <label className="text-right" htmlFor="hydrographics">Hydrographics</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="hydrographics" id="hydrographics" min={0} max={10} value={hydro} onChange={e => setHydro(Number(e.target.value) > 10 ? 10 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setHydro(generateHydro())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate hydrographics for me</span></button>
+            {/* Hydrographics input */}
+            <label htmlFor="hydro" className="text-right pr-1">Hydrographics</label>
+            <select className="border rounded px-2" value={hydro} name="hydro" id="hydro" onChange={e => setHydro(Number(e.target.value))}>
+              <option value="0">0 - Desert world</option>
+              <option value="1">1 - Dry world</option>
+              <option value="2">2 - A few small seas</option>
+              <option value="3">3 - Small seas and oceans</option>
+              <option value="4">4 - Wet world</option>
+              <option value="5">5 - A large ocean</option>
+              <option value="6">6 - Large oceans</option>
+              <option value="7">7 - Earth-like</option>
+              <option value="8">8 - A few islands</option>
+              <option value="9">9 - Almost entirely water</option>
+              <option value="10">A - Waterworld</option>
+            </select>
 
             {/* Population input */}
-            <label className="text-right" htmlFor="population">Population</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="population" id="population" min={0} max={10} value={pop} onChange={e => setPop(Number(e.target.value) > 10 ? 10 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setPop(roll2D6() - 2)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate population for me</span></button>
+            <label htmlFor="pop" className="text-right pr-1">Population</label>
+            <select className="border rounded px-2" value={pop} name="pop" id="pop" onChange={e => setPop(Number(e.target.value))}>
+              <option value="0">0 - None</option>
+              <option value="1">1 - A few</option>
+              <option value="2">2 - Hundreds</option>
+              <option value="3">3 - Thousands</option>
+              <option value="4">4 - Tens of thousands</option>
+              <option value="5">5 - Hundreds of thousands</option>
+              <option value="6">6 - Millions</option>
+              <option value="7">7 - Tens of millions</option>
+              <option value="8">8 - Hundreds of millions</option>
+              <option value="9">9 - Billions</option>
+              <option value="10">A - Tens of billions</option>
+            </select>
 
             {/* Government input */}
-            <label className="text-right" htmlFor="government">Government</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="government" id="government" min={0} max={15} value={gov} onChange={e => setGov(Number(e.target.value) > 15 ? 15 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setGov(pop === 0 ? 0 : roll2D6() - 7 + pop)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate government for me</span></button>
+            <label htmlFor="gov" className="text-right pr-1">Government</label>
+            <select className="border rounded px-2" value={gov} name="gov" id="gov" onChange={e => setGov(Number(e.target.value))}>
+              <option value="0">0 - None</option>
+              <option value="1">1 - Corporation</option>
+              <option value="2">2 - Participating Democracy</option>
+              <option value="3">3 - Self-Perpetuating Oligarchy</option>
+              <option value="4">4 - Representative Democracy</option>
+              <option value="5">5 - Feudal Technocracy</option>
+              <option value="6">6 - Captive Government</option>
+              <option value="7">7 - Balkanisation</option>
+              <option value="8">8 - Civil Service Bureaucracy</option>
+              <option value="9">9 - Impersonal Bureaucracy</option>
+              <option value="10">A - Charismatic Dictator</option>
+              <option value="11">B - Non-Charismatic Leader</option>
+              <option value="12">C - Charismatic Oligarchy</option>
+              <option value="13">D - Religious Dictatorship</option>
+              <option value="14">E - Religious Autocracy</option>
+              <option value="15">F - Totalitarian Oligarchy</option>
+            </select>
 
             {/* Law input */}
-            <label className="text-right" htmlFor="law">Law Level</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="law" id="law" min={0} max={9} value={law} onChange={e => setLaw(Number(e.target.value) > 9 ? 9 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setLaw(clampToLawRange(gov === 0 ? 0 : roll2D6() - 7 + gov))}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate law for me</span></button>
+            <label htmlFor="law" className="text-right pr-1">Law</label>
+            <select className="border rounded px-2" value={law} name="law" id="law" onChange={e => setLaw(Number(e.target.value))}>
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
 
-            {/* tech level input */}
-            <label className="text-right" htmlFor="technology">Technology</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="technology" id="technology" min={0} max={15} value={tech} onChange={e => setTech(Number(e.target.value) > 15 ? 15 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTech(generateTech())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate technology for me</span></button>
-
-            <p className="italic pt-2 text-center col-span-4">UWP: {name} {createGridIDString(system.x, system.y)} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}-{tech}</p>
+            {/* Technology input */}
+            <label htmlFor="tech" className="text-right pr-1">Technology</label>
+            <select className="border rounded px-2" value={tech} name="tech" id="tech" onChange={e => setTech(Number(e.target.value))}>
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+            </select>
           </div>
 
-          <div className="grid grid-cols-4 gap-1">
-            <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Additional System Details</h3>
+          <p className="italic pt-2 text-center col-span-4">UWP: {name} {createGridIDString(system.x, system.y)} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}-{tech}</p>
+
+          <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Additional System Details</h3>
+
+          <div className="grid md:grid-cols-[20%_80%] grid-cols-[35%_65%] gap-1">
+            {/* Temperature input */}
+            <label htmlFor="temp" className="text-right pr-1">Temperature</label>
+            <select className="border rounded px-2" value={temp} name="temp" id="temp" onChange={e => setTemp(Number(e.target.value))}>
+              <option value="2">Frozen (&lt; -50°)</option>
+              <option value="4">Cold (-50° to 0°)</option>
+              <option value="7">Temperate (0° to 30°)</option>
+              <option value="11">Hot (30° to 80°)</option>
+              <option value="12">Boiling (&gt; 80°)</option>
+            </select>
 
             {/* Temperature Input */}
-            <label className="text-right" htmlFor="temperature">Temp.</label>
-            <input className="border rounded col-span-2 pl-1" type="number" name="temperature" id="temperature" min={2} max={12} value={temp} onChange={e => setTemp(Number(e.target.value) > 12 ? 12 : Number(e.target.value) < 2 ? 2 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTemp(generateTemp())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate temperature for me</span></button>
 
             {/* culture Input */}
             <label className="text-right" htmlFor="culture">Culture</label>
             {/* @ts-expect-error */}
-            <select className="border rounded col-span-2 pl-1" value={culture} onChange={(e) => setCulture(Number(e.target.value))} name="culture" id="culture" >
+            <select className="border rounded px-2" value={culture} onChange={(e) => setCulture(Number(e.target.value))} name="culture" id="culture" >
               <option value={11}>11 - Sexist</option>
               <option value={12}>12 - Religious</option>
               <option value={13}>13 - Artistic</option>
@@ -696,114 +707,114 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
               <option value={65}>65 - Unusual custom around travel</option>
               <option value={66}>66 - Unusual custom around conspiracy</option>
             </select>
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setCulture(rollD66())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate culture for me</span></button>
+          </div>
 
-            {/* Travel Code */}
-            <div className="col-span-4 grid grid-cols-6 md:px-42 px-18">
-              <p className="col-span-6 text-center">Travel Code</p>
-              <label className="text-right pr-2" htmlFor="G">G</label>
-              <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="G" name="G" id="G" checked={travelCode === "G"} onChange={() => setTravelCode("G")} />
-              <label className="text-right pr-2" htmlFor="A">A</label>
-              <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="A" name="A" id="A" checked={travelCode === String("A")} onChange={() => setTravelCode("A")} />
-              <label className="text-right pr-2" htmlFor="R">R</label>
-              <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="R" name="R" id="R" checked={travelCode === "R"} onChange={() => setTravelCode("R")} />
-            </div>
+          {/* Travel Code */}
+          <p className="text-center underline mt-2">Travel Code</p>
+          <div className="grid grid-cols-6 md:px-42 px-18">
+            <label className="text-right pr-2" htmlFor="G">G</label>
+            <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="G" name="G" id="G" checked={travelCode === "G"} onChange={() => setTravelCode("G")} />
+            <label className="text-right pr-2" htmlFor="A">A</label>
+            <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="A" name="A" id="A" checked={travelCode === String("A")} onChange={() => setTravelCode("A")} />
+            <label className="text-right pr-2" htmlFor="R">R</label>
+            <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="R" name="R" id="R" checked={travelCode === "R"} onChange={() => setTravelCode("R")} />
+          </div>
 
-            {/* Gas giant input */}
-            <div className="col-span-4 flex justify-center gap-4">
-              <label className="text-right" htmlFor="gas-giant">Gas Giant</label>
-              <input type="checkbox" name="gas-giant" id="gas-giant" checked={gasGiant} onChange={() => setGasGiant(!gasGiant)} />
-              <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setGasGiant(roll2D6() < 10)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate gas giant for me</span></button>
-            </div>
+          {/* Gas giant input */}
+          <div className="flex justify-center gap-4 mt-2">
+            <label className="text-right" htmlFor="gas-giant">Gas Giant</label>
+            <input type="checkbox" name="gas-giant" id="gas-giant" checked={gasGiant} onChange={() => setGasGiant(!gasGiant)} />
+          </div>
 
-            <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Facilities & Bases</h3>
+          <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Facilities & Bases</h3>
 
-            {/* Bases and Highport */}
-            <div className="col-span-4 grid grid-cols-4 md:px-42 px-8">
-              <label className="text-right pr-2" htmlFor="H">Highport</label>
-              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="H" name="H" id="H" checked={facilities.findIndex(e => e === "H") !== -1} onChange={() => updateFacilities("H")} />
-              <label className="text-right pr-2" htmlFor="M">Military</label>
-              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="M" name="M" id="M" checked={facilities.findIndex(e => e === "M") !== -1} onChange={() => updateFacilities("M")} />
-              <label className="text-right pr-2" htmlFor="N">Naval</label>
-              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="N" name="N" id="N" checked={facilities.findIndex(e => e === "N") !== -1} onChange={() => updateFacilities("N")} />
-              <label className="text-right pr-2" htmlFor="S">Scout</label>
-              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="S" name="S" id="S" checked={facilities.findIndex(e => e === "S") !== -1} onChange={() => updateFacilities("S")} />
-              <label className="text-right pr-2" htmlFor="C">Corsair</label>
-              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="C" name="C" id="C" checked={facilities.findIndex(e => e === "C") !== -1} onChange={() => updateFacilities("C")} />
-            </div>
-
+          {/* Bases and Highport */}
+          <div className="col-span-4 grid grid-cols-4 md:px-42 px-8">
+            <label className="text-right pr-2" htmlFor="H">Highport</label>
+            <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="H" name="H" id="H" checked={facilities.findIndex(e => e === "H") !== -1} onChange={() => updateFacilities("H")} />
+            <label className="text-right pr-2" htmlFor="M">Military</label>
+            <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="M" name="M" id="M" checked={facilities.findIndex(e => e === "M") !== -1} onChange={() => updateFacilities("M")} />
+            <label className="text-right pr-2" htmlFor="N">Naval</label>
+            <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="N" name="N" id="N" checked={facilities.findIndex(e => e === "N") !== -1} onChange={() => updateFacilities("N")} />
+            <label className="text-right pr-2" htmlFor="S">Scout</label>
+            <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="S" name="S" id="S" checked={facilities.findIndex(e => e === "S") !== -1} onChange={() => updateFacilities("S")} />
+            <label className="text-right pr-2" htmlFor="C">Corsair</label>
+            <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="C" name="C" id="C" checked={facilities.findIndex(e => e === "C") !== -1} onChange={() => updateFacilities("C")} />
+          </div>
 
 
-            {/* Factions Input */}
-            <h3 className="text-center col-span-4 text-xl border-b my-2">Factions</h3>
-            <div className="col-span-4">
-              {factions.map((el, i) => {
-                const updateStrength = (num: diceRange) => {
-                  let newArr = [...factions]
-                  newArr[i].strength = num
-                  setFactions(newArr)
-                }
 
-                const updateGov = (num: number) => {
-                  //@ts-expect-error
-                  const newGov: fullRange = hexify(num)
-                  let newArr = [...factions]
-                  newArr[i].gov = newGov
-                  setFactions(newArr)
-                }
+          {/* Factions Input */}
+          <h3 className="text-center col-span-4 text-xl border-b my-2">Factions</h3>
+          <div className="col-span-4">
+            {factions.map((el, i) => {
+              const updateStrength = (num: diceRange) => {
+                let newArr = [...factions]
+                newArr[i].strength = num
+                setFactions(newArr)
+              }
 
-                const updateName = (name: string) => {
-                  let newArr = [...factions]
-                  newArr[i].name = name
-                  setFactions(newArr)
-                }
+              const updateGov = (num: number) => {
+                //@ts-expect-error
+                const newGov: fullRange = hexify(num)
+                let newArr = [...factions]
+                newArr[i].gov = newGov
+                setFactions(newArr)
+              }
 
-                const updateDetails = (body: string) => {
-                  let newArr = [...factions]
-                  newArr[i].details = body
-                  setFactions(newArr)
-                }
-                return (
-                  <div key={`faction${i}`} className="grid grid-cols-4">
+              const updateName = (name: string) => {
+                let newArr = [...factions]
+                newArr[i].name = name
+                setFactions(newArr)
+              }
 
-                    <div className="flex justify-center gap-4 col-span-4">
-                      <h3 className="text-center text-lg font-bold">Faction {i + 1}</h3>
-                      <button onClick={() => removeFaction(i)} className="hover:scale-110 hover:cursor-pointer"><FontAwesomeIcon icon={faTrash} /><span className="absolute scale-0">Delete faction {i + 1}</span></button>
-                    </div>
-                    {/* Faction name input */}
-                    <input className="border w-[75%] md:w-[60%] mx-auto rounded col-span-4 px-2 my-2" placeholder="Faction name" type="text" id={`faction-${i}-name`} name={`faction-${i}-name`} value={el.name ? el.name : ""} onChange={e => updateName(e.target.value)} />
-                    <button></button>
-                    {/* Faction Strength input */}
-                    <div className="col-span-4 flex justify-center">
-                      <label htmlFor={`faction-${i}-strength`} className="text-right pr-2">Strength</label>
-                      <input
-                        className="border rounded justify-self-start pl-2"
-                        type="number" name={`faction-${i}-strength`} id={`faction-${i}-strength`}
-                        min={2} max={12}
-                        value={el.strength}
-                        //  @ts-expect-error
-                        onChange={e => { updateStrength(Number(e.target.value) < 2 ? 2 : Number(e.target.value) > 12 ? 12 : Number(e.target.value)) }}
-                      />
-                      {/* Faction Government input */}
-                      <label htmlFor={`faction-${i}-government`} className="text-right px-2">Government</label>
-                      <input
-                        className="border rounded justify-self-start pl-2"
-                        type="number" name={`faction-${i}-government`} id={`faction-${i}-government`}
-                        min={0} max={15}
-                        value={deHexify(el.gov)}
-                        onChange={e => { updateGov(Number(e.target.value) < 0 ? 0 : Number(e.target.value) > 15 ? 15 : Number(e.target.value)) }}
-                      />
-                    </div>
-                    {/* faction details input */}
-                    <textarea onChange={e => updateDetails(e.target.value)} className="my-2 mx-auto col-span-4 border w-[75%] md:w-[60%] px-2 py-1" name={`faction-${i}-details`} placeholder="Faction summary" />
+              const updateDetails = (body: string) => {
+                let newArr = [...factions]
+                newArr[i].details = body
+                setFactions(newArr)
+              }
+              return (
+                <div key={`faction${i}`} className="grid grid-cols-4">
+
+                  <div className="flex justify-center gap-4 col-span-4">
+                    <h3 className="text-center text-lg font-bold">Faction {i + 1}</h3>
+                    <button onClick={() => removeFaction(i)} className="hover:scale-110 hover:cursor-pointer"><FontAwesomeIcon icon={faTrash} /><span className="absolute scale-0">Delete faction {i + 1}</span></button>
                   </div>
-                )
-              })}
-              {factions.length < 3 ?
-                <button onClick={() => createNewFaction()} className="border block mx-auto rounded px-4 py-2 hover:cursor-pointer dark:hover:bg-slate-700 hover:bg-gray-100">Create Faction</button> : <></>}
-            </div>
+                  {/* Faction name input */}
+                  <input className="border w-[75%] md:w-[60%] mx-auto rounded col-span-4 px-2 my-2" placeholder="Faction name" type="text" id={`faction-${i}-name`} name={`faction-${i}-name`} value={el.name ? el.name : ""} onChange={e => updateName(e.target.value)} />
+                  <button></button>
+                  {/* Faction Strength input */}
+                  <div className="col-span-4 flex justify-center">
+                    <label htmlFor={`faction-${i}-strength`} className="text-right pr-2">Strength</label>
+                    <input
+                      className="border rounded justify-self-start pl-2"
+                      type="number" name={`faction-${i}-strength`} id={`faction-${i}-strength`}
+                      min={2} max={12}
+                      value={el.strength}
+                      //  @ts-expect-error
+                      onChange={e => { updateStrength(Number(e.target.value) < 2 ? 2 : Number(e.target.value) > 12 ? 12 : Number(e.target.value)) }}
+                    />
+                    {/* Faction Government input */}
+                    <label htmlFor={`faction-${i}-government`} className="text-right px-2">Government</label>
+                    <input
+                      className="border rounded justify-self-start pl-2"
+                      type="number" name={`faction-${i}-government`} id={`faction-${i}-government`}
+                      min={0} max={15}
+                      value={deHexify(el.gov)}
+                      onChange={e => { updateGov(Number(e.target.value) < 0 ? 0 : Number(e.target.value) > 15 ? 15 : Number(e.target.value)) }}
+                    />
+                  </div>
+                  {/* faction details input */}
+                  <textarea onChange={e => updateDetails(e.target.value)} className="my-2 mx-auto col-span-4 border w-[75%] md:w-[60%] px-2 py-1" name={`faction-${i}-details`} placeholder="Faction summary" />
+                </div>
+              )
+            })}
+            {factions.length < 3 ?
+              <button onClick={() => createNewFaction()} className="border block mx-auto rounded px-4 py-2 hover:cursor-pointer dark:hover:bg-slate-700 hover:bg-gray-100">Create Faction</button> : <></>}
           </div>
         </div> : <></>}
+      <h3 className="text-center col-span-4 text-xl border-b my-2">System Notes</h3>
+      <textarea className="block my-2 mx-auto col-span-4 border w-[75%] md:w-[60%] px-2 py-1" placeholder="System Notes" value={details} onChange={(e) => setDetails(e.target.value)} />
       <div className="flex justify-center gap-8">
         <button onClick={() => { setEditMode(false); setSystem(system) }} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer bg-red-200 dark:bg-red-800">Cancel</button>
         <button onClick={() => { setEditMode(false); updateMap() }} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer bg-green-200 dark:bg-green-800">Done</button>
