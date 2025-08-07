@@ -501,34 +501,28 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
       case ("C"): tech += 2; break;
       case ("X"): tech -= 4; break;
     }
-    switch (size) {
-      case (0 || 1): tech += 2; break;
-      case (Number(2) || 3 || 4): tech += 1; break;
-    }
-    switch (atmos) {
-      case (1 || 2 || 3 || 10 || 11 | 12 | 13 | 14 | 15): tech += 1; break;
-    }
-    switch (hydro) {
-      case (0 || 9): tech += 1; break;
-      case (10): tech += 2; break;
-    }
-    switch (pop) {
-      case (1 | 2 | 3 | 4 | 5 | 8): tech += 1; break;
-      case (9): tech += 2; break;
-      case (10): tech += 4; break;
-    }
-    switch (gov) {
-      case (0 | 5): tech += 1; break;
-      case (7): tech += 2; break;
-      case (13 | 14): tech -= 2; break;
-    }
-    switch (atmos) {
-      case (0 | 1 | 10 | 15): if (tech < 8) tech = 8; break;
-      case (2 | 3 | 13 | 14): if (tech < 5) tech = 5; break;
-      case (4 | 7 | 9): if (tech < 3) tech = 3; break;
-      case (11): if (tech < 9) tech = 9; break;
-      case (12): if (tech < 10) tech = 10; break;
-    }
+
+    if (size <= 1) tech += 2
+    else if (size >= 2 || size <= 4) tech += 1
+
+    if (atmos >= 1 && atmos <= 3 || atmos >= 10) tech += 1
+
+    if (hydro === 0 || hydro === 9) tech += 1
+    else if (hydro >= 10) tech += 2
+
+    if (pop >= 1 && pop <= 5 || pop === 8) tech += 1
+    else if (pop === 9) tech += 2
+    else if (pop === 10) tech += 4
+
+    if (gov === 0 || gov === 5) tech += 1
+    else if (gov === 7) tech += 2
+    else if (gov === 13 || gov === 14) tech -= 2
+
+    if ((atmos <= 1 || atmos === 10 || atmos === 15) && tech < 8) tech = 8
+    if ((atmos == 2 || atmos == 3 || atmos === 13 || atmos === 14) && tech < 5) tech = 5
+    if ((atmos == 4 || atmos == 7 || atmos === 9) && tech < 3) tech = 3
+    if (atmos === 11 && tech < 9) tech = 9
+    if (atmos === 12 && tech < 10) tech = 10
     return clampToTechRange(tech)
   }
 
