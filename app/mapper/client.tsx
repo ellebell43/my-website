@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { DetailsPanel, SaveMapButton, Sector, Subsector } from "../../lib/components/map-components"
-import { map } from "../../lib/util/types"
+import { EmptyParsec, map } from "../../lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
 
 export default function MapperClient() {
@@ -11,7 +11,7 @@ export default function MapperClient() {
   const [prompt, setPrompt] = useState(true)
   const [screenReader, setScreenReader] = useState(false)
   const [map, setMap] = useState<map>({ systems: [] })
-  const [systemDetails, setSystemDetails] = useState<StarSystem | undefined>(undefined)
+  const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec>(map.systems[0])
   const [showDetails, setShowDetails] = useState(false)
 
   // Component for selecting grid size (subsector vs sector) and if systems are generated
@@ -50,10 +50,10 @@ export default function MapperClient() {
       <div className="overflow-y-scroll overflow-x-scroll">
         {isSector ?
           <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} setDetails={setSystemDetails} setShowDetails={setShowDetails} />
-          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} setDetails={setSystemDetails} setShowDetails={setShowDetails} />
+          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={true} screenReader={screenReader} map={map} setMap={setMap} setDetails={setSystemDetails} setShowDetails={setShowDetails} />
         }
       </div>
-      {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={false} map={map} setMap={setMap} /> : <></>}
+      {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
       <SaveMapButton map={map} new={true} />
     </div>
   )

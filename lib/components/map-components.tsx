@@ -6,7 +6,7 @@ import { clampToDiceRange, clampToFullRange, clampToLawRange, clampToTechRange, 
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faC, faDice, faEdit, faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
+import { faDice, faEdit, faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
 import { EmptyParsec, map, starportRange } from "../util/types"
 import crypto, { hash } from "crypto"
 import { useRouter } from "next/navigation"
@@ -44,7 +44,7 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
 
   // screen reader "hex"
   const ScreenReaderHex = () =>
-    <tr className={`border ${system instanceof StarSystem ? "hover:cursor-pointer" : ""}`} onClick={() => { if (system instanceof StarSystem) { props.setDetails(system); props.setShowDetails(true); } }}>
+    <tr className={`border hover:cursor-pointer`} onClick={() => { props.setDetails(system); props.setShowDetails(true); }}>
       <td>{id}</td>
       <td>{system instanceof StarSystem ? system.name : ""}</td>
       <td>{system instanceof StarSystem ? system.getUWPSmall() : ""}</td>
@@ -58,9 +58,9 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
     <div
       className={`hexagon-out bg-black dark:bg-gray-100 relative flex justify-center items-center`}
       id={"hex" + props.id}
-      onClick={() => { if (system instanceof StarSystem) { props.setDetails(system); props.setShowDetails(true); } }}
+      onClick={() => { props.setDetails(system); props.setShowDetails(true); }}
     >
-      <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center ${system instanceof StarSystem ? "justify-between hover: cursor-pointer" : ""}`}>
+      <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center  justify-between hover: cursor-pointer`}>
         {/* Travel code ring */}
         <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 dark:border-gray-800 ${system instanceof StarSystem && system.travelCode == "A" ? "border-amber-300" : system instanceof StarSystem && system.travelCode == "R" ? "border-red-500" : "border-white"}`} />
         {/* Content container */}
@@ -234,11 +234,11 @@ export const Sector = (props: { generateSystems: boolean, screenReader: boolean,
 }
 
 // Details panel
-export const DetailsPanel = (props: { system: StarSystem | undefined, setSystem: Function, setShowDetails: Function, editable: boolean, setMap: Function, map: map }) => {
+export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSystem: Function, setShowDetails: Function, editable: boolean, setMap: Function, map: map }) => {
   let { system, setSystem, setShowDetails, editable, setMap, map } = props
   let [editMode, setEditMode] = useState(false)
-  if (!system) return <></>
-  else return (
+  // if (!system) return <></>
+  return (
     <>
       <div className="fixed top-0 left-0 w-screen h-screen bg-white dark:bg-slate-800 opacity-75 z-50" />
       <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center z-50">
@@ -246,63 +246,65 @@ export const DetailsPanel = (props: { system: StarSystem | undefined, setSystem:
 
           {/* ========== DISPLAY MODE ========== */}
 
-          {!editMode ? <>
-            {/* Title Area */}
-            <div className="">
-              <h2 className="text-center w-full font-bold text-xl">{system.getUWPBroken()[0]}</h2>
-              <p className="text-center w-full font-bold text-xl">{system.getUWPBroken()[1]}</p>
-              {/* Close panel button */}
-              <button className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700" onClick={() => { setShowDetails(false) }}            >
-                <FontAwesomeIcon icon={faX} />
-                <p className="absolute scale-0">Close details panel for {system.getGridID()}</p>
-              </button>
-            </div>
+          {!editMode ?
+            <>
+              {/* Title Area */}
+              <div className="">
+                <h2 className="text-center w-full font-bold text-xl">{system instanceof StarSystem ? system.getUWPBroken()[0] : `${createGridIDString(system.x, system.y)} Empty Parsec`}</h2>
+                {system instanceof StarSystem ? <p className="text-center w-full font-bold text-xl">{system.getUWPBroken()[1]}</p> : <></>}
+                {/* Close panel button */}
+                <button className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700" onClick={() => { setShowDetails(false) }}            >
+                  <FontAwesomeIcon icon={faX} />
+                  <p className="absolute scale-0">Close details panel for {createGridIDString(system.x, system.y)}</p>
+                </button>
+              </div>
 
-            {/* Starport and Trade */}
-            <div className="border-b my-2 pb-2">
-              <p><span className="font-bold">Starport</span>: {system.getStarportQuality()} (Cr{system.getRandomBerthingCost()}; Fuel {system.getFuelType()})</p>
-              <p><span className="font-bold">Facilities</span>: {system.getFacilitiesArrayVerbose().length > 0 ? system.getFacilitiesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
-              <p><span className="font-bold">Bases</span>: {system.getBasesArrayVerbose().length > 0 ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
-              <p><span className="font-bold">Trade Codes</span>: {system.getTradeCodesVerbose().length > 0 ? system.getTradeCodesVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
-            </div>
+              {system instanceof StarSystem ? <>
+                {/* Starport and Trade */}
+                <div className="border-b my-2 pb-2">
+                  <p><span className="font-bold">Starport</span>: {system.getStarportQuality()} (Cr{system.getRandomBerthingCost()}; Fuel {system.getFuelType()})</p>
+                  <p><span className="font-bold">Facilities</span>: {system.getFacilitiesArrayVerbose().length > 0 ? system.getFacilitiesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+                  <p><span className="font-bold">Bases</span>: {system.getBasesArrayVerbose().length > 0 ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+                  <p><span className="font-bold">Trade Codes</span>: {system.getTradeCodesVerbose().length > 0 ? system.getTradeCodesVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+                </div>
 
-            {/* Physical Characteristics */}
-            <div className="border-b my-2 pb-2">
-              <p><span className="font-bold">Size</span>: {system.getDiameter()}km ({system.getGravity()}G)</p>
-              <p><span className="font-bold">Atmosphere</span>: {system.getAtmosphereType()} ({system.getTempType()})</p>
-              <p><span className="font-bold">Hydrographics</span>: {system.getHydroType()}</p>
-            </div>
+                {/* Physical Characteristics */}
+                <div className="border-b my-2 pb-2">
+                  <p><span className="font-bold">Size</span>: {system.getDiameter()}km ({system.getGravity()}G)</p>
+                  <p><span className="font-bold">Atmosphere</span>: {system.getAtmosphereType()} ({system.getTempType()})</p>
+                  <p><span className="font-bold">Hydrographics</span>: {system.getHydroType()}</p>
+                </div>
 
-            {/* Social Characteristics */}
-            <div className="border-b my-2 pb-2">
-              <p><span className="font-bold">Population</span>: {system.getPopType()}</p>
-              <p><span className="font-bold">Government</span>: {system.getGovernmentType(system.gov)}</p>
-              <p className="font-bold">Factions ({system.factions?.length})</p>
-              <ul className="list-disc list-outside pl-0">
-                {system.getFactionArrayVerbose().map((el, i) => {
-                  return (
-                    <li className="flex gap-2 ml-3" key={i}>
-                      {/* <FontAwesomeIcon className="relative top-1" icon={faHippo} width={16} /> */}
-                      {/* Bullet point. Can't get tailwind to work :( */}
-                      <div className="bg-black dark:bg-white w-[6px] h-[6px] rounded-full relative top-[9px]" />
-                      <div>
-                        <p>{el.gov}, {el.strength} Group</p>
-                        {el.details ? <p>{el.details}</p> : <></>}
-                      </div>
-                    </li>
-                  )
-                })}
-              </ul>
-              <p><span className="font-bold">Cultural Quirk</span>: {system.getCultureType()}</p>
-              <p><span className="font-bold">Law</span>: Level {system.law}</p>
-            </div>
-            <p>{system.details}</p>
-            {editable ? <button onClick={() => setEditMode(true)} className="absolute bottom-4 right-4 hover:scale-110 transition-all hover:cursor-pointer"><FontAwesomeIcon icon={faEdit} /><span className="absolute scale-0">Edit</span></button> : <></>} </> : <>
+                {/* Social Characteristics */}
+                <div className="border-b my-2 pb-2">
+                  <p><span className="font-bold">Population</span>: {system.getPopType()}</p>
+                  <p><span className="font-bold">Government</span>: {system.getGovernmentType(system.gov)}</p>
+                  <p className="font-bold">Factions ({system.factions?.length})</p>
+                  <ul className="list-disc list-outside pl-0">
+                    {system.getFactionArrayVerbose().map((el, i) => {
+                      return (
+                        <li className="flex gap-2 ml-3" key={i}>
+                          {/* <FontAwesomeIcon className="relative top-1" icon={faHippo} width={16} /> */}
+                          {/* Bullet point. Can't get tailwind to work :( */}
+                          <div className="bg-black dark:bg-white w-[6px] h-[6px] rounded-full relative top-[9px]" />
+                          <div>
+                            <p>{el.gov}, {el.strength} Group</p>
+                            {el.details ? <p>{el.details}</p> : <></>}
+                          </div>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  <p><span className="font-bold">Cultural Quirk</span>: {system.getCultureType()}</p>
+                  <p><span className="font-bold">Law</span>: Level {system.law}</p>
+                </div>
+                <p>{system.details}</p></> : <></>}
+              {editable ? <button onClick={() => setEditMode(true)} className="absolute bottom-4 right-4 hover:scale-110 transition-all hover:cursor-pointer"><FontAwesomeIcon icon={faEdit} /><span className="absolute scale-0">Edit</span></button> : <></>} </> : <>
 
-            {/* ========== EDIT MODE ========== */}
+              {/* ========== EDIT MODE ========== */}
 
-            <EditForm system={system} setSystem={setSystem} setEditMode={setEditMode} setMap={setMap} map={map} />
-          </>}
+              <EditForm system={system} setSystem={setSystem} setEditMode={setEditMode} setMap={setMap} map={map} />
+            </>}
         </div>
       </div>
     </>
@@ -608,7 +610,7 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             {/* Government input */}
             <label className="text-right" htmlFor="government">Government</label>
             <input className="border rounded col-span-2 pl-1" type="number" name="government" id="government" min={0} max={15} value={gov} onChange={e => setGov(Number(e.target.value) > 15 ? 15 : Number(e.target.value) < 0 ? 0 : Number(e.target.value))} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setPop(pop === 0 ? 0 : roll2D6() - 7 + pop)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate government for me</span></button>
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setGov(pop === 0 ? 0 : roll2D6() - 7 + pop)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate government for me</span></button>
 
             {/* Law input */}
             <label className="text-right" htmlFor="law">Law Level</label>
