@@ -7,7 +7,7 @@ import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDice, faEdit, faHippo, faMinus, faPlus, faTrash, faX } from "@fortawesome/free-solid-svg-icons"
-import { diceRange, EmptyParsec, faction, fullRange, map, starportRange } from "../util/types"
+import { diceRange, EmptyParsec, facilityCode, faction, fullRange, map, starportRange } from "../util/types"
 import crypto, { hash } from "crypto"
 import { useRouter } from "next/navigation"
 
@@ -538,6 +538,17 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
     setFactions(newArr)
   }
 
+  const updateFacilities = (fac: facilityCode) => {
+    const newArr = [...facilities]
+    if (newArr.findIndex(e => e === fac) !== -1) {
+      newArr.splice(newArr.findIndex(e => e === fac), 1)
+      setFacilities(newArr)
+    } else {
+      newArr.push(fac)
+      setFacilities(newArr)
+    }
+  }
+
   return (
     <form onSubmit={e => e.preventDefault()}>
       <h2 className="text-center text-2xl font-bold">Editing Parsec {createGridIDString(system.x, system.y)}</h2>
@@ -562,7 +573,7 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <div />
 
             {/* Starport input */}
-            <div className="col-span-4 grid grid-cols-3 md:px-42 px-32">
+            <div className="col-span-4 grid grid-cols-3 md:px-42 px-16">
               <div className="col-span-3 flex justify-center gap-2 ">
                 <p className="text-center underline">Starport Class</p>
                 <button className="hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setStarport(generateStarport())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">Generate starport for me</span></button>
@@ -635,7 +646,7 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Additional System Details</h3>
 
             {/* Temperature Input */}
-            <label className="text-right" htmlFor="temperature">Temperature</label>
+            <label className="text-right" htmlFor="temperature">Temp.</label>
             <input className="border rounded col-span-2 pl-1" type="number" name="temperature" id="temperature" min={2} max={12} value={temp} onChange={e => setTemp(Number(e.target.value) > 12 ? 12 : Number(e.target.value) < 2 ? 2 : Number(e.target.value))} />
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTemp(generateTemp())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate temperature for me</span></button>
 
@@ -688,7 +699,7 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setCulture(rollD66())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate culture for me</span></button>
 
             {/* Travel Code */}
-            <div className="col-span-4 grid grid-cols-6 md:px-42 px-32">
+            <div className="col-span-4 grid grid-cols-6 md:px-42 px-18">
               <p className="col-span-6 text-center">Travel Code</p>
               <label className="text-right pr-2" htmlFor="G">G</label>
               <input className="w-[15px] h-[15px] relative top-1" type="radio" radioGroup="travel-code" value="G" name="G" id="G" checked={travelCode === "G"} onChange={() => setTravelCode("G")} />
@@ -704,6 +715,24 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
               <input type="checkbox" name="gas-giant" id="gas-giant" checked={gasGiant} onChange={() => setGasGiant(!gasGiant)} />
               <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setGasGiant(roll2D6() < 10)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate gas giant for me</span></button>
             </div>
+
+            <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Facilities & Bases</h3>
+
+            {/* Bases and Highport */}
+            <div className="col-span-4 grid grid-cols-4 md:px-42 px-8">
+              <label className="text-right pr-2" htmlFor="H">Highport</label>
+              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="H" name="H" id="H" checked={facilities.findIndex(e => e === "H") !== -1} onChange={() => updateFacilities("H")} />
+              <label className="text-right pr-2" htmlFor="M">Military</label>
+              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="M" name="M" id="M" checked={facilities.findIndex(e => e === "M") !== -1} onChange={() => updateFacilities("M")} />
+              <label className="text-right pr-2" htmlFor="N">Naval</label>
+              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="N" name="N" id="N" checked={facilities.findIndex(e => e === "N") !== -1} onChange={() => updateFacilities("N")} />
+              <label className="text-right pr-2" htmlFor="S">Scout</label>
+              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="S" name="S" id="S" checked={facilities.findIndex(e => e === "S") !== -1} onChange={() => updateFacilities("S")} />
+              <label className="text-right pr-2" htmlFor="C">Corsair</label>
+              <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="C" name="C" id="C" checked={facilities.findIndex(e => e === "C") !== -1} onChange={() => updateFacilities("C")} />
+            </div>
+
+
 
             {/* Factions Input */}
             <h3 className="text-center col-span-4 text-xl border-b my-2">Factions</h3>
