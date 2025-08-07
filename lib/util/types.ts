@@ -32,7 +32,8 @@ export type yRange = IntRange<1, 40>
 export type faction = {
   strength: diceRange,
   gov: fullRange,
-  details?: string
+  details?: string,
+  name?: string
 }
 
 export class EmptyParsec {
