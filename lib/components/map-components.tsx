@@ -6,8 +6,8 @@ import { clampToDiceRange, clampToFullRange, clampToLawRange, clampToTechRange, 
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faDice, faEdit, faHippo, faMinus, faPlus, faX } from "@fortawesome/free-solid-svg-icons"
-import { diceRange, EmptyParsec, map, starportRange } from "../util/types"
+import { faDice, faEdit, faHippo, faMinus, faPlus, faTrash, faX } from "@fortawesome/free-solid-svg-icons"
+import { diceRange, EmptyParsec, faction, fullRange, map, starportRange } from "../util/types"
 import crypto, { hash } from "crypto"
 import { useRouter } from "next/navigation"
 
@@ -526,6 +526,18 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
     return clampToTechRange(tech)
   }
 
+  const createNewFaction = () => {
+    const newFaction: faction = { strength: 2, gov: 0 }
+    let newArr = [...factions]
+    newArr.push(newFaction)
+    setFactions(newArr)
+  }
+  const removeFaction = (i: number) => {
+    let newArr = [...factions]
+    newArr.splice(i, 1)
+    setFactions(newArr)
+  }
+
   return (
     <form onSubmit={e => e.preventDefault()}>
       <h2 className="text-center text-2xl font-bold">Editing Parsec {createGridIDString(system.x, system.y)}</h2>
@@ -621,18 +633,21 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
 
           <div className="grid grid-cols-4 gap-1">
             <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Additional System Details</h3>
-            {/* Gas giant input */}
-            <label className="text-right" htmlFor="gas-giant">Gas Giant</label>
-            <input type="checkbox" name="gas-giant" id="gas-giant" checked={gasGiant} onChange={() => setGasGiant(!gasGiant)} />
-            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all col-span-2" onClick={() => setGasGiant(roll2D6() < 10)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate gas giant for me</span></button>
 
             {/* Temperature Input */}
             <label className="text-right" htmlFor="temperature">Temperature</label>
             <input className="border rounded col-span-2 pl-1" type="number" name="temperature" id="temperature" min={2} max={12} value={temp} onChange={e => setTemp(Number(e.target.value) > 12 ? 12 : Number(e.target.value) < 2 ? 2 : Number(e.target.value))} />
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTemp(generateTemp())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate temperature for me</span></button>
 
+            {/* Gas giant input */}
+            <div className="col-span-4 flex justify-center gap-4">
+              <label className="text-right" htmlFor="gas-giant">Gas Giant</label>
+              <input type="checkbox" name="gas-giant" id="gas-giant" checked={gasGiant} onChange={() => setGasGiant(!gasGiant)} />
+              <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setGasGiant(roll2D6() < 10)}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate gas giant for me</span></button>
+            </div>
+
             {/* Factions Input */}
-            <h4 className="text-center col-span-4 text-lg underline">Factions</h4>
+            <h3 className="text-center col-span-4 text-xl border-b my-2">Factions</h3>
             <div className="col-span-4">
               {factions.map((el, i) => {
                 const updateStrength = (num: diceRange) => {
@@ -640,42 +655,64 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
                   newArr[i].strength = num
                   setFactions(newArr)
                 }
+
+                const updateGov = (num: number) => {
+                  //@ts-expect-error
+                  const newGov: fullRange = hexify(num)
+                  let newArr = [...factions]
+                  newArr[i].gov = newGov
+                  setFactions(newArr)
+                }
+
                 const updateName = (name: string) => {
                   let newArr = [...factions]
                   newArr[i].name = name
                   setFactions(newArr)
                 }
+
+                const updateDetails = (body: string) => {
+                  let newArr = [...factions]
+                  newArr[i].details = body
+                  setFactions(newArr)
+                }
                 return (
                   <div key={`faction${i}`} className="grid grid-cols-4">
 
-                    <label htmlFor={`faction-${i}-name`} className="col-span-1 text-right pr-2 font-bold">Faction {i + 1}</label>
-                    <input className="border rounded col-span-2 px-2" placeholder="Faction name" type="text" id={`faction-${i}-name`} name={`faction-${i}-name`} value={el.name ? el.name : ""} onChange={e => updateName(e.target.value)} />
+                    <div className="flex justify-center gap-4 col-span-4">
+                      <h3 className="text-center text-lg font-bold">Faction {i + 1}</h3>
+                      <button onClick={() => removeFaction(i)} className="hover:scale-110 hover:cursor-pointer"><FontAwesomeIcon icon={faTrash} /><span className="absolute scale-0">Delete faction {i + 1}</span></button>
+                    </div>
+                    {/* Faction name input */}
+                    <input className="border w-[75%] md:w-[60%] mx-auto rounded col-span-4 px-2 my-2" placeholder="Faction name" type="text" id={`faction-${i}-name`} name={`faction-${i}-name`} value={el.name ? el.name : ""} onChange={e => updateName(e.target.value)} />
                     <button></button>
-                    {/* Faction Strength */}
-                    <label htmlFor={`faction-${i}-strength`} className="text-right pr-2 relative top-1">Strength</label>
-                    <div className="col-span-3">
+                    {/* Faction Strength input */}
+                    <div className="col-span-4 flex justify-center">
+                      <label htmlFor={`faction-${i}-strength`} className="text-right pr-2">Strength</label>
                       <input
-                        className="border rounded justify-self-start pl-2 mb-6 mt-1"
+                        className="border rounded justify-self-start pl-2"
                         type="number" name={`faction-${i}-strength`} id={`faction-${i}-strength`}
                         min={2} max={12}
                         value={el.strength}
                         //  @ts-expect-error
                         onChange={e => { updateStrength(Number(e.target.value) < 2 ? 2 : Number(e.target.value) > 12 ? 12 : Number(e.target.value)) }}
                       />
-                      {/* Faction Government */}
+                      {/* Faction Government input */}
                       <label htmlFor={`faction-${i}-government`} className="text-right px-2">Government</label>
                       <input
-                        className="border rounded justify-self-start pl-2 mb-6 mt-1"
+                        className="border rounded justify-self-start pl-2"
                         type="number" name={`faction-${i}-government`} id={`faction-${i}-government`}
-                        min={2} max={12}
-                        value={el.gov}
-                        //  @ts-expect-error
-                        onChange={e => { updateStrength(Number(e.target.value) < 2 ? 2 : Number(e.target.value) > 12 ? 12 : Number(e.target.value)) }}
+                        min={0} max={15}
+                        value={deHexify(el.gov)}
+                        onChange={e => { updateGov(Number(e.target.value) < 0 ? 0 : Number(e.target.value) > 15 ? 15 : Number(e.target.value)) }}
                       />
                     </div>
+                    {/* faction details input */}
+                    <textarea onChange={e => updateDetails(e.target.value)} className="my-2 mx-auto col-span-4 border w-[75%] md:w-[60%] px-2 py-1" name={`faction-${i}-details`} placeholder="Faction summary" />
                   </div>
                 )
               })}
+              {factions.length < 3 ?
+                <button onClick={() => createNewFaction()} className="border block mx-auto rounded px-4 py-2 hover:cursor-pointer dark:hover:bg-slate-700 hover:bg-gray-100">Create Faction</button> : <></>}
             </div>
           </div>
         </div> : <></>}
