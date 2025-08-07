@@ -298,6 +298,7 @@ export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSyste
                   )
                 })}
                 {/* System notes */}
+                <h3 className="text-center text-xl font-bold">System Notes</h3>
                 <MDParse content={system.details ? system.details : ""} />
               </> : <></>}
             </div> :
