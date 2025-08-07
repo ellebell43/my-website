@@ -1,5 +1,12 @@
 import { map } from "@/lib/util/types";
 import MapperMapClient from "./client";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Traveller Mapper Tool",
+  description: "Randomly generate a new sector or subsector map. For use with the Traveller TTRPG",
+  openGraph: { images: '../opengraph-image.png' }
+}
 
 export default async function Page({ params, }: { params: Promise<{ map: string }> }) {
   const { map } = await params
