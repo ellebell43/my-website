@@ -2,7 +2,7 @@
 
 import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
 import StarSystem from "../util/starsystem"
-import { clampToDiceRange, clampToFullRange, clampToLawRange, clampToTechRange, createGridIDString, deHexify, determineIfSystem, hexify, roll1D6, roll2D6 } from "../util/functions"
+import { clampToDiceRange, clampToFullRange, clampToLawRange, clampToTechRange, createGridIDString, deHexify, determineIfSystem, hexify, roll1D6, roll2D6, rollD66 } from "../util/functions"
 import { randomSystem } from "../util/randomSystem"
 import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -638,6 +638,54 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <label className="text-right" htmlFor="temperature">Temperature</label>
             <input className="border rounded col-span-2 pl-1" type="number" name="temperature" id="temperature" min={2} max={12} value={temp} onChange={e => setTemp(Number(e.target.value) > 12 ? 12 : Number(e.target.value) < 2 ? 2 : Number(e.target.value))} />
             <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setTemp(generateTemp())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate temperature for me</span></button>
+
+            {/* culture Input */}
+            <label className="text-right" htmlFor="culture">Culture</label>
+            {/* @ts-expect-error */}
+            <select className="border rounded col-span-2 pl-1" value={culture} onChange={(e) => setCulture(Number(e.target.value))} name="culture" id="culture" >
+              <option value={11}>11 - Sexist</option>
+              <option value={12}>12 - Religious</option>
+              <option value={13}>13 - Artistic</option>
+              <option value={14}>14 - Ritualized</option>
+              <option value={15}>15 - Conservative</option>
+              <option value={16}>16 - Xenophobic</option>
+
+              <option value={21}>21 - Taboo</option>
+              <option value={22}>22 - Deceptive</option>
+              <option value={23}>23 - Liberal</option>
+              <option value={24}>24 - Honorable</option>
+              <option value={25}>25 - Influenced</option>
+              <option value={26}>26 - Fusion</option>
+
+              <option value={31}>31 - Barbaric</option>
+              <option value={32}>32 - Remnant</option>
+              <option value={33}>33 - Degenerate</option>
+              <option value={34}>34 - Progressive</option>
+              <option value={35}>35 - Recovering</option>
+              <option value={36}>36 - Nexus</option>
+
+              <option value={41}>41 - Tourist Attraction</option>
+              <option value={42}>42 - Violent</option>
+              <option value={43}>43 - Peaceful</option>
+              <option value={44}>44 - Obsessed</option>
+              <option value={45}>45 - Fashion</option>
+              <option value={46}>46 - At War</option>
+
+              <option value={51}>51 - Unusual custom around offworlders</option>
+              <option value={52}>52 - Unusual custom around starport</option>
+              <option value={53}>53 - Unusual custom around media</option>
+              <option value={54}>54 - Unusual custom around lifecycle</option>
+              <option value={55}>55 - Unusual custom around technology</option>
+              <option value={56}>56 - Unusual custom around social standings</option>
+
+              <option value={61}>61 - Unusual custom around trade</option>
+              <option value={62}>62 - Unusual custom around nobility</option>
+              <option value={63}>63 - Unusual custom around sex</option>
+              <option value={64}>64 - Unusual custom around eating</option>
+              <option value={65}>65 - Unusual custom around travel</option>
+              <option value={66}>66 - Unusual custom around conspiracy</option>
+            </select>
+            <button className="text-left hover:cursor-pointer hover:scale-110 transition-all" onClick={() => setCulture(rollD66())}><FontAwesomeIcon icon={faDice} /><span className="absolute scale-0">generate culture for me</span></button>
 
             {/* Gas giant input */}
             <div className="col-span-4 flex justify-center gap-4">
