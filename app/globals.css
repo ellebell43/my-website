@@ -43,6 +43,10 @@
   p {
     @apply my-2
   }
+
+  select, input, textarea {
+    @apply bg-gray-100 dark:bg-slate-700
+  }
 }
 
 body {
