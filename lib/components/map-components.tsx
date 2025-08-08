@@ -61,12 +61,12 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
       id={"hex" + props.id}
       onClick={() => { props.setDetails(system); props.setShowDetails(true); }}
     >
-      <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center  justify-between hover: cursor-pointer`}>
+      <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center justify-between hover: cursor-pointer`}>
         {/* Travel code ring */}
         <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 ${system instanceof StarSystem && system.travelCode == "A" ? "border-amber-300 dark:border-amber-500" : system instanceof StarSystem && system.travelCode == "R" ? "border-red-500 dark:border-red-700" : "border-white dark:border-slate-800"}`} />
         {/* Content container */}
         <div className="text-center relative">
-          <p className="text-center text-sms">{props.id}</p>
+          <p className="text-center m-0 bg-white dark:bg-slate-800">{props.id}</p>
           {system instanceof StarSystem ? <>
             {system.gasGiant ? <GasGiant /> : <></>}
             {system.facilities.includes("N") ? <NavalBase /> : <></>}
@@ -77,8 +77,8 @@ export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?:
           </> : <></>}
         </div>
         {system instanceof StarSystem ? <>
-          <p className="font-bold truncate text-center w-[110px] z-10 bg-white dark:bg-slate-800">{system.name}</p>
-          <p className="text-xs text-center z-10">{system.getUWPSmall()}</p>
+          <p className="m-0 relative top-0.5 h-fit truncate font-bold text-center w-[110px] z-20 bg-white dark:bg-slate-800">{system.name}</p>
+          <p className="m-0 text-xs relative  bg-white dark:bg-slate-800 py-1 text-center z-10">{system.getUWPSmall()}</p>
         </> : <></>}
       </div>
     </div>
@@ -195,11 +195,11 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
   else if (sector) return (<Map />)
   else {
     return (
-      <Zoom>
-        <div className="p-4 relative max-w-screen max-h-screen overflow-scroll">
+      <div className="p-4 relative max-w-screen max-h-screen overflow-scroll">
+        <Zoom>
           <Map />
-        </div>
-      </Zoom>
+        </Zoom>
+      </div>
     )
   }
 }
@@ -251,8 +251,11 @@ export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSyste
             <div className="relative">
               {/* Title Area */}
               <div className="">
-                <h2 className="text-center w-full font-bold text-xl">{system instanceof StarSystem ? system.getUWPBroken()[0] : `${createGridIDString(system.x, system.y)} Empty Parsec`}</h2>
-                {system instanceof StarSystem ? <p className="text-center w-full font-bold text-xl">{system.getUWPBroken()[1]}</p> : <></>}
+                <h2 className="text-center w-full font-bold text-xl mb-0">{system instanceof StarSystem ? `${system.getGridID()} ${system.name}` : `${createGridIDString(system.x, system.y)} Empty Parsec`}</h2>
+                {system instanceof StarSystem ? <>
+                  <p className="text-center w-full font-bold text-xl m-0">{system.getUWPSmall()}</p>
+                  <p className="text-center w-full italic m-0">{system.facilities.toString().replaceAll(",", " ")} {system.getTradeCodes().toString().replaceAll(",", " ")} {system.travelCode}</p>
+                </> : <></>}
                 {/* Close panel button */}
                 <button className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 right-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700" onClick={() => { setShowDetails(false) }}            >
                   <FontAwesomeIcon icon={faX} />
@@ -264,27 +267,26 @@ export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSyste
               {system instanceof StarSystem ? <>
                 {/* Starport and Trade */}
                 <div className="border-b my-2 pb-2">
-                  <p><span className="font-bold">Starport</span>: {system.getStarportQuality()} (Cr{system.getRandomBerthingCost()}; Fuel {system.getFuelType()})</p>
-                  <p><span className="font-bold">Facilities</span>: {system.getFacilitiesArrayVerbose().length > 0 ? system.getFacilitiesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
-                  <p><span className="font-bold">Bases</span>: {system.getBasesArrayVerbose().length > 0 ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
-                  <p><span className="font-bold">Trade Codes</span>: {system.getTradeCodesVerbose().length > 0 ? system.getTradeCodesVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+                  <p className="m-0"><span className="font-bold">Starport</span>: {system.getStarportQuality()} (Cr{system.getRandomBerthingCost()}; Fuel {system.getFuelType()})</p>
+                  <p className="m-0"><span className="font-bold">Facilities</span>: {system.getFacilitiesArrayVerbose().length > 0 ? system.getFacilitiesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+                  <p className="m-0"><span className="font-bold">Bases</span>: {system.getBasesArrayVerbose().length > 0 ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+                  <p className="m-0"><span className="font-bold">Trade Codes</span>: {system.getTradeCodesVerbose().length > 0 ? system.getTradeCodesVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
                 </div>
 
                 {/* Physical Characteristics */}
                 <div className="border-b my-2 pb-2">
-                  <p><span className="font-bold">Size</span>: {system.getDiameter()}km ({system.getGravity()}G)</p>
-                  <p><span className="font-bold">Atmosphere</span>: {system.getAtmosphereType()}</p>
-                  <p><strong>Temperature</strong>: {system.getTempType()}</p>
-                  <p><span className="font-bold">Hydrographics</span>: {system.getHydroType()}</p>
+                  <p className="m-0"><span className="font-bold">Size</span>: {system.getDiameter()}km ({system.getGravity()}G)</p>
+                  <p className="m-0"><span className="font-bold">Atmosphere</span>: {system.getAtmosphereType()}</p>
+                  <p className="m-0"><strong>Temperature</strong>: {system.getTempType()}</p>
+                  <p className="m-0"><span className="font-bold">Hydrographics</span>: {system.getHydroType()}</p>
                 </div>
 
                 {/* Social Characteristics */}
                 <div className="border-b my-2 pb-2">
-                  <p><span className="font-bold">Population</span>: {system.getPopType()}</p>
-                  <p><span className="font-bold">Government</span>: {system.getGovernmentType(system.gov)}</p>
-                  <p className="font-bold">Factions ({system.factions?.length})</p>
-                  <p><span className="font-bold">Cultural Quirk</span>: {system.getCultureType()}</p>
-                  <p><span className="font-bold">Law</span>: Level {system.law}</p>
+                  <p className="m-0"><span className="font-bold">Population</span>: {system.getPopType()}</p>
+                  <p className="m-0"><span className="font-bold">Government</span>: {system.getGovernmentType(system.gov)}</p>
+                  <p className="m-0"><span className="font-bold">Cultural Quirk</span>: {system.getCultureType()}</p>
+                  <p className="m-0"><span className="font-bold">Law</span>: Level {system.law}</p>
                 </div>
                 {/* Factions */}
                 <h3 className="text-center text-xl font-bold">Factions</h3>
@@ -292,7 +294,7 @@ export const DetailsPanel = (props: { system: StarSystem | EmptyParsec, setSyste
                   return (
                     <div key={`faction${i}`}>
                       <h4>Faction {i + 1}{el.name ? ` - ${el.name}` : ""}</h4>
-                      <p className="text-sm italic">{el.strength}, {el.gov} Group</p>
+                      <p className="text-sm italic m-0">{el.strength}, {el.gov} Group</p>
                       <MDParse content={el.details ? el.details : ""} />
                     </div>
                   )
@@ -829,7 +831,7 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
               <button onClick={() => createNewFaction()} className="border block mx-auto rounded px-4 py-2 hover:cursor-pointer dark:hover:bg-slate-700 hover:bg-gray-100">Create Faction</button> : <></>}
           </div>
           <h3 className="text-center col-span-4 text-xl border-b my-2">System Notes</h3>
-          <textarea className="block my-2 mx-auto col-span-4 border w-[75%] md:w-[60%] px-2 py-1" placeholder="System Notes" value={details} onChange={(e) => setDetails(e.target.value)} />
+          <textarea className="block my-2 mx-auto col-span-4 border w-full px-2 py-1" placeholder="System Notes" value={details} onChange={(e) => setDetails(e.target.value)} />
         </div> : <></>}
       <div className="flex justify-center gap-8">
         <button onClick={() => { setEditMode(false); setSystem(system) }} className="mt-4 border shadow py-1 px-4 rounded hover:opacity-75 hover:cursor-pointer bg-red-200 dark:bg-red-800">Cancel</button>

@@ -5,21 +5,17 @@ export const Planet = (props: { water: boolean, asteroid: boolean }) => {
   const { water } = props
   if (!props.asteroid) {
     return (
-      <div className={`${water ? "bg-blue-400" : "bg-yellow-700"} rounded-full border w-[50px] h-[50px]`} />
+      <div className={`${water ? "bg-blue-400 dark:bg-blue-900" : "bg-yellow-700 dark:bg-yellow-900"} rounded-full border w-[50px] h-[50px]`} />
     )
   } else {
-    const style = "w-[.1in] h-[.1in] border rounded-full bg-slate-400"
+    const style = "absolute border rounded-full bg-gray-400 dark:bg-gray-600"
     return (
-      <div className="flex flex-col items-center justify-center gap-1 relative bottom-3 rotate-45 scale-75">
-        <div className="flex gap-1">
-          <div className={`${style} w-[.17in] h-[.17in] relative top-4`} />
-          <div className="flex flex-col gap-1">
-            <div className={`${style} relative top-2 right-2`} />
-            <div className={`${style} relative top-2`} />
-            <div className={`${style} w-[.12in] h-[.12in] relative right-6 top-2`} />
-          </div>
-        </div>
-        <div className={`${style} w-[.14in] h-[.14in] relative bottom-1 left-1`} />
+      <div className="relative flex flex-col items-center justify-center gap-1 rounded-full w-[50px] h-[50px] rotate-45">
+        <div className={`${style} w-[6px] h-[6px] left-6 top-2`} />
+        <div className={`${style} w-[10px] h-[10px] right-2 top-3`} />
+        <div className={`${style} w-[10px] h-[10px] top-8`} />
+        <div className={`${style} w-[14px] h-[14px] left-3 top-4`} />
+        <div className={`${style} w-[8px] h-[8px] bottom-[16px] right-3`} />
       </div>
     )
   }
@@ -36,18 +32,18 @@ export const GasGiant = () => {
 
 export const NavalBase = () => {
   return (
-    <FontAwesomeIcon className="absolute top-[40px] left-[-15px] text-xs text-black dark:text-gray-100 w-3 h-3" icon={faStar} />
+    <FontAwesomeIcon className="absolute top-[45px] left-[-15px] text-xs text-black dark:text-gray-100 w-3 h-3" icon={faStar} />
   )
 }
 
 export const MilitaryBase = () => {
   return (
-    <FontAwesomeIcon className="absolute top-[60px] left-[-20px] text-xs text-black  dark:text-gray-100 w-3 h-3" icon={faPentagon} />
+    <FontAwesomeIcon className="absolute top-[65px] left-[-23px] text-xs text-black  dark:text-gray-100 w-3 h-3" icon={faPentagon} />
   )
 }
 
 export const ScoutBase = () => {
   return (
-    <FontAwesomeIcon className="absolute top-[80px] left-[-15px] text-xs text-black  dark:text-gray-100 -rotate-90 w-3 h-3" icon={faPlay} />
+    <FontAwesomeIcon className="absolute top-[85px] left-[-15px] text-xs text-black  dark:text-gray-100 -rotate-90 w-3 h-3" icon={faPlay} />
   )
 }

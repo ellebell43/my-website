@@ -39,6 +39,10 @@
   li {
     @apply list-disc ml-4
   }
+
+  p {
+    @apply my-2
+  }
 }
 
 body {
