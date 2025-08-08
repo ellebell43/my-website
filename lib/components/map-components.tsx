@@ -460,6 +460,7 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
     setCulture(newSystem.culture)
     setFacilities(newSystem.facilities)
     setDetails("")
+    setGasGiant(newSystem.gasGiant)
   }
 
   const createNewFaction = () => {
