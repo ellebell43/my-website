@@ -47,6 +47,10 @@
   select, input, textarea {
     @apply bg-gray-100 dark:bg-slate-700
   }
+
+  a {
+    @apply underline
+  }
 }
 
 body {
