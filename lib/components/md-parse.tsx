@@ -1,7 +1,9 @@
 import { marked } from 'marked'
 import parse from "html-react-parser"
+import { gfmHeadingId } from 'marked-gfm-heading-id'
 
 export default function MDParse(props: { content: string, noContainer?: boolean }) {
+  marked.use(gfmHeadingId())
   const htmlContent = marked.parse(props.content)
   if (props.noContainer) return <>{typeof htmlContent === "string" ? parse(htmlContent) : <></>}</>
   return (

@@ -16,6 +16,7 @@
     "@fortawesome/react-fontawesome": "^0.2.3",
     "html-react-parser": "^5.2.6",
     "marked": "^16.1.2",
+    "marked-gfm-heading-id": "^4.1.2",
     "mongodb": "^6.18.0",
     "next": "15.4.4",
     "react": "19.1.0",
