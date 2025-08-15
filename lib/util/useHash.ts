@@ -1,16 +1,16 @@
-// useHash.js
+'use client'
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 export const useHash = () => {
   const params = useParams()
-  const [hash, setHash] = useState(window.location.hash);
+  const [hash, setHash] = useState("");
   useEffect(() => {
     const onHashChange = () => {
-      setHash(window.location.hash);
+      if (typeof window !== undefined) setHash(window.location.hash);
     };
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
+    if (typeof window !== undefined) window.addEventListener('hashchange', onHashChange);
+    return () => { if (typeof window !== undefined) window.removeEventListener('hashchange', onHashChange); }
   }, [params]);
   return hash;
 };
