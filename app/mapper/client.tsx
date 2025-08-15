@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { DetailsPanel, SaveMapButton, Sector, Subsector } from "../../lib/components/map-components"
 import { EmptyParsec, map } from "../../lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
+import { useHash } from "@/lib/util/useHash"
 
 export default function MapperClient() {
   const [generateSystems, setGenerateSystems] = useState(true)
@@ -13,6 +14,32 @@ export default function MapperClient() {
   const [map, setMap] = useState<map>({ systems: [] })
   const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec>(map.systems[0])
   const [showDetails, setShowDetails] = useState(false)
+
+  const hash = useHash()
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.split('#')[1];
+      const x = Number(id.substring(0, 2))
+      const y = Number(id.substring(2))
+      let item = map.systems.find((el) => el.x === x && el.y === y)
+      if (item) {
+        // @ts-expect-error
+        if (item.size !== undefined) {
+          // @ts-expect-error
+          const system = new StarSystem(item.x, item.y, item.name, item.starport, item.size, item.atmos, item.hydro, item.pop, item.gov, item.law, item.tech, item.travelCode, item.temp, item.factions, item.culture, item.facilities, item.details, item.gasGiant)
+          setSystemDetails(system)
+          setShowDetails(true)
+        } else {
+          const system = new EmptyParsec(item.x, item.y)
+          setSystemDetails(system)
+          setShowDetails(true)
+        }
+      }
+    } else {
+      setShowDetails(false)
+    }
+  }, [hash])
 
   // Component for selecting grid size (subsector vs sector) and if systems are generated
   const InitPrompt = () => {
@@ -49,8 +76,8 @@ export default function MapperClient() {
       <button className="button-link fixed top-6 left-6 z-50" onClick={() => setPrompt(true)}>Regenerate</button>
       <div className="overflow-y-scroll overflow-x-scroll">
         {isSector ?
-          <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} setDetails={setSystemDetails} setShowDetails={setShowDetails} />
-          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={true} screenReader={screenReader} map={map} setMap={setMap} setDetails={setSystemDetails} setShowDetails={setShowDetails} />
+          <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} />
+          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={true} screenReader={screenReader} map={map} setMap={setMap} />
         }
       </div>
       {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
