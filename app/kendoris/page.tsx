@@ -20,7 +20,9 @@ export default async function Page() {
   return (
     <PrimaryPageWrapper>
       <h1>Kendoris Subsecotr</h1>
-      <MDParse content={content} noContainer={true} />
+      <div className="text-lg">
+        <MDParse content={content} noContainer={true} />
+      </div>
     </PrimaryPageWrapper>
   )
 }
