@@ -12,8 +12,6 @@ import crypto from "crypto"
 import { useRouter } from "next/navigation"
 import MDParse from "./md-parse"
 import Link from "next/link"
-import RouteSegmentInput from "./map-components/route-input"
-import RouteInput from "./map-components/route-input"
 
 // Create a single hex (parsec)
 export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function }) => {
@@ -752,10 +750,6 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <label className="text-right pr-2" htmlFor="C">Corsair</label>
             <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="C" name="C" id="C" checked={facilities.findIndex(e => e === "C") !== -1} onChange={() => updateFacilities("C")} />
           </div>
-
-          <RouteInput map={map} setMap={setMap} origin={{ x: system.x, y: system.y }} />
-
-
 
           {/* Factions Input */}
           <h3 className="text-center col-span-4 text-xl border-b my-2">Factions</h3>
