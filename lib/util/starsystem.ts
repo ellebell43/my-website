@@ -1,5 +1,5 @@
 import { clampToDiceRange, deHexify, hexify, roll1D3, roll1D6, roll2D6, rollD66 } from "./functions"
-import { xRange, yRange, starportRange, sizeRange, fullRange, popRange, numRange, faction, d66Range, travelCode, diceRange, tradeCode, facilityCode, lawRange } from "./types"
+import { xRange, yRange, starportRange, sizeRange, fullRange, popRange, numRange, faction, d66Range, travelCode, diceRange, tradeCode, facilityCode, lawRange, territory } from "./types"
 
 export default class StarSystem {
   // Class property types
@@ -21,6 +21,7 @@ export default class StarSystem {
   culture: d66Range
   facilities: facilityCode[]
   details?: string
+  territory?: territory
 
   constructor(
     // constructor arguments
@@ -41,7 +42,8 @@ export default class StarSystem {
     culture?: d66Range,
     facilities?: facilityCode[],
     details?: string,
-    gasGiant?: boolean) {
+    gasGiant?: boolean,
+    territory?: territory) {
     // constructor body
     this.x = x;
     this.y = y
@@ -61,6 +63,7 @@ export default class StarSystem {
     this.facilities = facilities ? facilities : this.#determineFacilities()
     this.details = details
     this.gasGiant = gasGiant !== undefined ? gasGiant : roll2D6() < 10
+    this.territory = territory
   }
 
   // === PRIVATE FUNCTIONS FOR DETERMINING OBJECT PROPERTIES ===
