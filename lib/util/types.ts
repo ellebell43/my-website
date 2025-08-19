@@ -42,15 +42,13 @@ export class EmptyParsec {
   constructor(x: xRange, y: yRange) { this.x = x; this.y = y }
 }
 
-export type routeSegment = {
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
+export type coordinate = {
+  x: number,
+  y: number
 }
 
 export type route = {
-  segments: routeSegment[],
+  path: coordinate[],
   name: string,
   color: string,
 }
