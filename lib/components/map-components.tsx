@@ -12,6 +12,8 @@ import crypto from "crypto"
 import { useRouter } from "next/navigation"
 import MDParse from "./md-parse"
 import Link from "next/link"
+import RouteSegmentInput from "./map-components/route-input"
+import RouteInput from "./map-components/route-input"
 
 // Create a single hex (parsec)
 export const Hex = (props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function }) => {
@@ -655,7 +657,7 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             </select>
           </div>
 
-          <p className="italic pt-2 text-center col-span-4">UWP: {name} {createGridIDString(system.x, system.y)} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}-{tech}</p>
+          <p className="italic pt-2 text-center col-span-4">UWP: {createGridIDString(system.x, system.y)} {name} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}-{tech}</p>
 
           <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Additional System Details</h3>
 
@@ -669,8 +671,6 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
               <option value="11">Hot (30° to 80°)</option>
               <option value="12">Boiling (&gt; 80°)</option>
             </select>
-
-            {/* Temperature Input */}
 
             {/* culture Input */}
             <label className="text-right" htmlFor="culture">Culture</label>
@@ -752,6 +752,8 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <label className="text-right pr-2" htmlFor="C">Corsair</label>
             <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="C" name="C" id="C" checked={facilities.findIndex(e => e === "C") !== -1} onChange={() => updateFacilities("C")} />
           </div>
+
+          <RouteInput map={map} setMap={setMap} origin={{ x: system.x, y: system.y }} />
 
 
 

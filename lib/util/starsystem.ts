@@ -143,7 +143,7 @@ export default class StarSystem {
   // Condense system data to a UWP string
   getUWP(): string {
     const id = `${this.x < 10 ? "0" + String(this.x) : this.x}${this.y < 10 ? "0" + String(this.y) : this.y}`
-    return `${this.name} ${id} ${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech} ${this.facilities.toString().replaceAll(",", " ")} ${this.getTradeCodes().toString().replaceAll(",", " ")} ${this.travelCode}`
+    return `${id} ${this.name} ${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech} ${this.facilities.toString().replaceAll(",", " ")} ${this.getTradeCodes().toString().replaceAll(",", " ")} ${this.travelCode}`
   }
   getUWPBroken(): string[] {
     const id = `${this.x < 10 ? "0" + String(this.x) : this.x}${this.y < 10 ? "0" + String(this.y) : this.y}`
