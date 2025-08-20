@@ -3,6 +3,7 @@ import Link from "next/link"
 import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
 import { createGridIDString, determineIfSystem } from "@/lib/util/functions"
 import { EmptyParsec, map } from "@/lib/util/types"
+import { randomSystem } from "@/lib/util/randomSystem"
 
 export default function Parsec(props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function }) {
   const { id, possibleSystem, screenReader } = props

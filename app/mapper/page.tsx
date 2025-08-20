@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import Map from "@/lib/components/map"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: "Traveller Mapper Tool",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <Map />
+  return <Suspense><Map /></Suspense>
 }

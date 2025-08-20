@@ -13,6 +13,7 @@ export default function Map(props: { map?: map }) {
   const path = usePathname()
   let params = useSearchParams()
 
+  // Map state
   const [generateSystems, setGenerateSystems] = useState(true)
   const [isSector, setIsSector] = useState(false)
   const [prompt, setPrompt] = useState(path.length < 9)
@@ -23,6 +24,7 @@ export default function Map(props: { map?: map }) {
   const [routeMode, setRouteMode] = useState(false)
   const [territoryMode, setTerritoryMode] = useState(false)
 
+  // Hash to determine which parsec is selected
   const hash = useHash()
 
   useEffect(() => {
@@ -33,12 +35,12 @@ export default function Map(props: { map?: map }) {
       let item = map.systems.find((el) => el.x === x && el.y === y)
       if (item) {
         // @ts-expect-error
-        if (item.size !== undefined) {
+        if (item.size !== undefined && !(routeMode || territoryMode)) {
           // @ts-expect-error
           const system = new StarSystem(item.x, item.y, item.name, item.starport, item.size, item.atmos, item.hydro, item.pop, item.gov, item.law, item.tech, item.travelCode, item.temp, item.factions, item.culture, item.facilities, item.details, item.gasGiant)
           setSystemDetails(system)
           setShowDetails(true)
-        } else {
+        } else if (!(routeMode || territoryMode)) {
           const system = new EmptyParsec(item.x, item.y)
           setSystemDetails(system)
           setShowDetails(true)
