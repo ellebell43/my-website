@@ -8,8 +8,6 @@ import { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faEdit, faMinus, faPlus, faTrash, faX } from "@fortawesome/free-solid-svg-icons"
 import { EmptyParsec, facilityCode, faction, fullRange, map } from "../util/types"
-import crypto from "crypto"
-import { useRouter } from "next/navigation"
 import MDParse from "./md-parse"
 import Link from "next/link"
 
@@ -352,72 +350,10 @@ const Zoom = (props: { children: React.ReactNode }) => {
         </button>
         <p className="border text-center text-[8px] bg-gray-200 dark:bg-gray-700">Zoom {zoom}</p>
       </div>
-      <div className={`origin-top-left`} style={{ transform: `scale(${zoom === 4 ? "1" : zoom === 3 ? ".75" : zoom === 2 ? ".50" : ".25"})` }}>
+      <div className={`origin-top-left pb-32 md:pb-28`} style={{ transform: `scale(${zoom === 4 ? "1" : zoom === 3 ? ".75" : zoom === 2 ? ".50" : ".25"})` }}>
         {props.children}
       </div>
     </>
-  )
-}
-
-export const SaveMapButton = (props: { map: map, new: boolean, setSaveSuccess?: Function }) => {
-  let [error, setError] = useState<string>()
-  let [pass, setPass] = useState<string>()
-  let router = useRouter()
-
-  // const router = useRouter()
-
-  async function saveMap() {
-    let hashedPass = crypto.createHash("sha256").update(String(pass)).digest("hex")
-    try {
-      if (props.new) {
-        console.log("attempting to save new map")
-        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", credentials: "include", method: "POST", body: JSON.stringify({ map: props.map, pass: hashedPass }) })
-        if (!res.ok) {
-          setError(`Failed to save. Error ${res.status}: ${res.statusText}`)
-          return
-        } else {
-          const response: { _id: string } = await res.json()
-          router.push(`/mapper/new?id=${response._id}&pass=${pass}`)
-        }
-      } else {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", method: "PATCH", body: JSON.stringify({ map: props.map, pass: hashedPass }), credentials: "include" })
-        if (!res.ok) {
-          if (res.status == 404) setError("Not saved. Incorrect Password")
-          else setError(`Failed to save. Error  ${res.status}: ${res.statusText}`)
-          return
-        } else {
-          if (props.setSaveSuccess) props.setSaveSuccess(true)
-          else setError("Map saved!")
-        }
-      }
-    } catch (error) {
-      setError(String(error))
-    }
-  }
-
-  return (
-    <form className="fixed bottom-4 md:bottom-6 right-4 md:right-6 flex flex-col max-w-[175] " onSubmit={e => { e.preventDefault(); saveMap() }}>
-      {/* If API error occurs, cover form with error message */}
-      {error ?
-        <div className="absolute top-0 left-0 bg-red-300 dark:bg-red-800 w-full h-full flex items-center justify-center overflow-y-scroll pt-4">
-          <p className="text-center">{error}</p>
-          {/* Dismiss error */}
-          <button onClick={() => setError(undefined)} className="absolute top-0 right-0"><FontAwesomeIcon icon={faX} /><span className="absolute scale-0">Dismiss error</span></button>
-        </div> : <></>}
-      <h2 className="absolute scale-0">Save map</h2>
-      {/* New password input. Used to GET map from database */}
-      <input id="password " disabled={!(error === undefined || error === "")} onChange={e => setPass(e.target.value)} className="bg-white dark:bg-slate-700  disabled:bg-gray-100 disabled:dark:bg-slate-600 disabled:text-gray-500 disabled:dark:text-gray-400 border rounded-t-md px-2 py-1" placeholder="New password" type="text" />
-      <label htmlFor="password" className="absolute scale-0">New password</label>
-      {/* Submit map to database */}
-      <button
-        className="border rounded-b-md bg-white dark:bg-slate-700 px-4 py-2 text-lg shadow transition-all hover:cursor-pointer disabled:bg-gray-100 disabled:dark:bg-slate-600 disabled:text-gray-500 disabled:dark:text-gray-400 disabled:hover:cursor-auto hover:bg-gray-100 dark:hover:bg-slate-800"
-        onClick={() => saveMap()}
-        type="button"
-        disabled={pass === undefined || pass === "" || !(error === undefined || error === "")}
-      >
-        {props.new ? "Save new map" : "Save"}
-      </button>
-    </form>
   )
 }
 
@@ -655,7 +591,7 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             </select>
           </div>
 
-          <p className="italic pt-2 text-center col-span-4">UWP: {name} {createGridIDString(system.x, system.y)} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}-{tech}</p>
+          <p className="italic pt-2 text-center col-span-4">UWP: {createGridIDString(system.x, system.y)} {name} {starport}{hexify(size)}{hexify(atmos)}{hexify(hydro)}{hexify(pop)}{hexify(gov)}{law}-{tech}</p>
 
           <h3 className="text-center mb-2 mt-4 border-b text-xl col-span-4">Additional System Details</h3>
 
@@ -669,8 +605,6 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
               <option value="11">Hot (30° to 80°)</option>
               <option value="12">Boiling (&gt; 80°)</option>
             </select>
-
-            {/* Temperature Input */}
 
             {/* culture Input */}
             <label className="text-right" htmlFor="culture">Culture</label>
@@ -752,8 +686,6 @@ const EditForm = (props: { system: StarSystem | EmptyParsec, setSystem: Function
             <label className="text-right pr-2" htmlFor="C">Corsair</label>
             <input className="w-[15px] h-[15px] relative top-1" type="checkbox" value="C" name="C" id="C" checked={facilities.findIndex(e => e === "C") !== -1} onChange={() => updateFacilities("C")} />
           </div>
-
-
 
           {/* Factions Input */}
           <h3 className="text-center col-span-4 text-xl border-b my-2">Factions</h3>

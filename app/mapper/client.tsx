@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { DetailsPanel, SaveMapButton, Sector, Subsector } from "../../lib/components/map-components"
+import { DetailsPanel, Sector, Subsector } from "../../lib/components/map-components"
 import { EmptyParsec, map } from "../../lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
 import { useHash } from "@/lib/util/useHash"
+import Toolbar from "@/lib/components/map-components/toolbar"
 
 export default function MapperClient() {
   const [generateSystems, setGenerateSystems] = useState(true)
@@ -45,16 +46,16 @@ export default function MapperClient() {
   const InitPrompt = () => {
     return (
       <div className="dark:bg-slate-900 bg-slate-100 min-h-screen min-w-scren">
-        <h1 className="text-3xl font-bol text-center mb-2 py-8">Traveller Map Tool</h1>
+        <h1 className="text-3xl font-bol text-center mb-2 py-8 mt-0">Traveller Map Tool</h1>
         <form onSubmit={() => setPrompt(false)} className="bg-slate-100 dark:bg-slate-800 shadow border rounded w-fit mx-auto p-6 flex flex-col gap-4">
           <div className="flex gap-4 items-center justify-start">
             <input type="checkbox" id="generate-systems" name="generate-systems" onChange={() => { setGenerateSystems(!generateSystems) }} checked={generateSystems} />
             <label htmlFor="generate-systems">Generate Systems</label>
           </div>
-          <div className="flex gap-4 items-center justify-start">
+          {/* <div className="flex gap-4 items-center justify-start">
             <input type="checkbox" id="screen-reader" name="screen-reader" onChange={() => { setScreenReader(!screenReader) }} checked={screenReader} />
             <label htmlFor="screen-reader">Screen Reader</label>
-          </div>
+          </div> */}
           <div className="flex gap-4 justify-start items-center">
             <input type="radio" id="subsector" name="sector" onChange={() => { setIsSector(false) }} checked={!isSector} />
             <label htmlFor="subsector">Subsector (8 x 10)</label>
@@ -72,16 +73,14 @@ export default function MapperClient() {
   if (prompt) return <InitPrompt />
   return (
     <div>
-      {/* REGENERATE BUTTON */}
-      <button className="button-link fixed top-6 left-6 z-50" onClick={() => setPrompt(true)}>Regenerate</button>
-      <div className="overflow-y-scroll overflow-x-scroll">
+      <div className="overflow-y-scroll overflow-x-scroll scroll-m-1">
         {isSector ?
           <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} />
-          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={true} screenReader={screenReader} map={map} setMap={setMap} />
+          : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} />
         }
       </div>
       {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
-      <SaveMapButton map={map} new={true} />
+      <Toolbar map={map} setMap={setMap} isNew={true} screenReader={screenReader} setScreenReader={setScreenReader} setPrompt={setPrompt} />
     </div>
   )
 }

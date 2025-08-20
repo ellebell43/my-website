@@ -1,5 +1,5 @@
 import { clampToDiceRange, deHexify, hexify, roll1D3, roll1D6, roll2D6, rollD66 } from "./functions"
-import { xRange, yRange, starportRange, sizeRange, fullRange, popRange, numRange, faction, d66Range, travelCode, diceRange, tradeCode, facilityCode, lawRange } from "./types"
+import { xRange, yRange, starportRange, sizeRange, fullRange, popRange, numRange, faction, d66Range, travelCode, diceRange, tradeCode, facilityCode, lawRange, territory } from "./types"
 
 export default class StarSystem {
   // Class property types
@@ -21,6 +21,7 @@ export default class StarSystem {
   culture: d66Range
   facilities: facilityCode[]
   details?: string
+  territory?: territory
 
   constructor(
     // constructor arguments
@@ -41,7 +42,8 @@ export default class StarSystem {
     culture?: d66Range,
     facilities?: facilityCode[],
     details?: string,
-    gasGiant?: boolean) {
+    gasGiant?: boolean,
+    territory?: territory) {
     // constructor body
     this.x = x;
     this.y = y
@@ -61,6 +63,7 @@ export default class StarSystem {
     this.facilities = facilities ? facilities : this.#determineFacilities()
     this.details = details
     this.gasGiant = gasGiant !== undefined ? gasGiant : roll2D6() < 10
+    this.territory = territory
   }
 
   // === PRIVATE FUNCTIONS FOR DETERMINING OBJECT PROPERTIES ===
@@ -140,7 +143,7 @@ export default class StarSystem {
   // Condense system data to a UWP string
   getUWP(): string {
     const id = `${this.x < 10 ? "0" + String(this.x) : this.x}${this.y < 10 ? "0" + String(this.y) : this.y}`
-    return `${this.name} ${id} ${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech} ${this.facilities.toString().replaceAll(",", " ")} ${this.getTradeCodes().toString().replaceAll(",", " ")} ${this.travelCode}`
+    return `${id} ${this.name} ${this.starport}${this.size}${this.atmos}${this.hydro}${this.pop}${this.gov}${this.law}-${this.tech} ${this.facilities.toString().replaceAll(",", " ")} ${this.getTradeCodes().toString().replaceAll(",", " ")} ${this.travelCode}`
   }
   getUWPBroken(): string[] {
     const id = `${this.x < 10 ? "0" + String(this.x) : this.x}${this.y < 10 ? "0" + String(this.y) : this.y}`
