@@ -1,6 +1,6 @@
 import { map } from "@/lib/util/types";
 import { Metadata } from "next";
-import Map from "@/lib/components/map-components/map";
+import Map from "@/lib/components/map";
 
 export const metadata: Metadata = {
   title: "Traveller Mapper Tool",

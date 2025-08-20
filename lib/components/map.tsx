@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { DetailsPanel, Sector, Subsector } from "@/lib/components/map-components"
+import { Sector, Subsector } from "./map-components/hex-grid-components"
 import { EmptyParsec, map } from "@/lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
 import { useHash } from "@/lib/util/useHash"
 import Toolbar from "@/lib/components/map-components/toolbar"
 import { usePathname, useSearchParams } from "next/navigation"
+import DetailsPanel from "./map-components/details-panel"
 
 export default function Map(props: { map?: map }) {
   const path = usePathname()
