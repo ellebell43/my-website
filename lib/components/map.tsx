@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { Sector, Subsector } from "./map-components/hex-grid-components"
-import { EmptyParsec, map } from "@/lib/util/types"
+import { EmptyParsec, map, route, territory } from "@/lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
 import { useHash } from "@/lib/util/useHash"
 import Toolbar from "@/lib/components/map-components/toolbar"
 import { usePathname, useSearchParams } from "next/navigation"
 import DetailsPanel from "./map-components/details-panel"
+import RouteAndTerritoryMenu from "./map-components/route-and-territory-menu"
 
 export default function Map(props: { map?: map }) {
   const path = usePathname()
@@ -19,10 +20,12 @@ export default function Map(props: { map?: map }) {
   const [prompt, setPrompt] = useState(path.length < 9)
   const [screenReader, setScreenReader] = useState(Boolean(params.get("screenReader")))
   const [map, setMap] = useState<map>(!props.map ? { systems: [] } : props.map)
-  const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec>(map.systems[0])
+  const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec | undefined>(map.systems[0])
   const [showDetails, setShowDetails] = useState(false)
   const [routeMode, setRouteMode] = useState(false)
+  const [routeToEdit, setRouteToEdit] = useState<route>()
   const [territoryMode, setTerritoryMode] = useState(false)
+  const [territoryToEdit, setTerritoryToEdit] = useState<territory>()
 
   // Hash to determine which parsec is selected
   const hash = useHash()
@@ -35,15 +38,15 @@ export default function Map(props: { map?: map }) {
       let item = map.systems.find((el) => el.x === x && el.y === y)
       if (item) {
         // @ts-expect-error
-        if (item.size !== undefined && !(routeMode || territoryMode)) {
+        if (item.size !== undefined) {
           // @ts-expect-error
           const system = new StarSystem(item.x, item.y, item.name, item.starport, item.size, item.atmos, item.hydro, item.pop, item.gov, item.law, item.tech, item.travelCode, item.temp, item.factions, item.culture, item.facilities, item.details, item.gasGiant)
           setSystemDetails(system)
-          setShowDetails(true)
-        } else if (!(routeMode || territoryMode)) {
+          if (!routeMode && !territoryMode) setShowDetails(true)
+        } else {
           const system = new EmptyParsec(item.x, item.y)
           setSystemDetails(system)
-          setShowDetails(true)
+          if (!routeMode && !territoryMode) setShowDetails(true)
         }
       }
     } else {
@@ -84,7 +87,8 @@ export default function Map(props: { map?: map }) {
           : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} />
         }
       </div>
-      {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
+      {showDetails && systemDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
+      <RouteAndTerritoryMenu map={map} setMap={setMap} routeMode={routeMode} territoryMode={territoryMode} setRouteToEdit={setRouteToEdit} setTerritoryToEdit={setTerritoryMode} />
       <Toolbar map={map} setMap={setMap} isNew={path.length < 9} screenReader={screenReader} setScreenReader={setScreenReader} setPrompt={setPrompt} routeMode={routeMode} setRouteMode={setRouteMode} territoryMode={territoryMode} setTerritoryMode={setTerritoryMode} />
     </div>
   )
