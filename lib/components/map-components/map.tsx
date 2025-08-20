@@ -6,14 +6,16 @@ import { EmptyParsec, map } from "@/lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
 import { useHash } from "@/lib/util/useHash"
 import Toolbar from "@/lib/components/map-components/toolbar"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 
 export default function Map(props: { map?: map }) {
   const path = usePathname()
+  let params = useSearchParams()
+
   const [generateSystems, setGenerateSystems] = useState(true)
   const [isSector, setIsSector] = useState(false)
   const [prompt, setPrompt] = useState(path.length < 9)
-  const [screenReader, setScreenReader] = useState(false)
+  const [screenReader, setScreenReader] = useState(Boolean(params.get("screenReader")))
   const [map, setMap] = useState<map>(!props.map ? { systems: [] } : props.map)
   const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec>(map.systems[0])
   const [showDetails, setShowDetails] = useState(false)
