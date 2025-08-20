@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import MapperClient from "./client"
+import Map from "@/lib/components/map"
 
 export const metadata: Metadata = {
   title: "Traveller Mapper Tool",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <MapperClient />
+  return <Map />
 }

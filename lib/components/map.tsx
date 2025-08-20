@@ -1,20 +1,27 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { DetailsPanel, Sector, Subsector } from "../../lib/components/map-components"
-import { EmptyParsec, map } from "../../lib/util/types"
+import { Sector, Subsector } from "./map-components/hex-grid-components"
+import { EmptyParsec, map } from "@/lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
 import { useHash } from "@/lib/util/useHash"
 import Toolbar from "@/lib/components/map-components/toolbar"
+import { usePathname, useSearchParams } from "next/navigation"
+import DetailsPanel from "./map-components/details-panel"
 
-export default function MapperClient() {
+export default function Map(props: { map?: map }) {
+  const path = usePathname()
+  let params = useSearchParams()
+
   const [generateSystems, setGenerateSystems] = useState(true)
   const [isSector, setIsSector] = useState(false)
-  const [prompt, setPrompt] = useState(true)
-  const [screenReader, setScreenReader] = useState(false)
-  const [map, setMap] = useState<map>({ systems: [] })
+  const [prompt, setPrompt] = useState(path.length < 9)
+  const [screenReader, setScreenReader] = useState(Boolean(params.get("screenReader")))
+  const [map, setMap] = useState<map>(!props.map ? { systems: [] } : props.map)
   const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec>(map.systems[0])
   const [showDetails, setShowDetails] = useState(false)
+  const [routeMode, setRouteMode] = useState(false)
+  const [territoryMode, setTerritoryMode] = useState(false)
 
   const hash = useHash()
 
@@ -52,10 +59,6 @@ export default function MapperClient() {
             <input type="checkbox" id="generate-systems" name="generate-systems" onChange={() => { setGenerateSystems(!generateSystems) }} checked={generateSystems} />
             <label htmlFor="generate-systems">Generate Systems</label>
           </div>
-          {/* <div className="flex gap-4 items-center justify-start">
-            <input type="checkbox" id="screen-reader" name="screen-reader" onChange={() => { setScreenReader(!screenReader) }} checked={screenReader} />
-            <label htmlFor="screen-reader">Screen Reader</label>
-          </div> */}
           <div className="flex gap-4 justify-start items-center">
             <input type="radio" id="subsector" name="sector" onChange={() => { setIsSector(false) }} checked={!isSector} />
             <label htmlFor="subsector">Subsector (8 x 10)</label>
@@ -80,7 +83,7 @@ export default function MapperClient() {
         }
       </div>
       {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
-      <Toolbar map={map} setMap={setMap} isNew={true} screenReader={screenReader} setScreenReader={setScreenReader} setPrompt={setPrompt} />
+      <Toolbar map={map} setMap={setMap} isNew={path.length < 9} screenReader={screenReader} setScreenReader={setScreenReader} setPrompt={setPrompt} routeMode={routeMode} setRouteMode={setRouteMode} territoryMode={territoryMode} setTerritoryMode={setTerritoryMode} />
     </div>
   )
 }

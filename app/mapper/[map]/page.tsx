@@ -1,6 +1,6 @@
 import { map } from "@/lib/util/types";
-import MapperMapClient from "./client";
 import { Metadata } from "next";
+import Map from "@/lib/components/map";
 
 export const metadata: Metadata = {
   title: "Traveller Mapper Tool",
@@ -18,7 +18,7 @@ export default async function Page({ params, }: { params: Promise<{ map: string 
       return <p>{res.status}: {res.statusText}</p>
     } else {
       const response: map = await res.json()
-      return <MapperMapClient map={response} />
+      return <Map map={response} />
     }
   } catch (error) {
     return <p>{String(error)}</p>
