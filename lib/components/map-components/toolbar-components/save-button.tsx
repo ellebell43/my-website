@@ -69,7 +69,7 @@ export const SaveButton = (props: { map: map, new: boolean }) => {
                   className="border rounded-br-md bg-white dark:bg-slate-700 px-4 py-2 text-lg shadow transition-all hover:cursor-pointer disabled:bg-gray-100 disabled:dark:bg-slate-600 disabled:text-gray-500 disabled:dark:text-gray-400 disabled:hover:cursor-auto hover:bg-gray-100 dark:hover:bg-slate-800"
                   onClick={() => saveMap()}
                   type="button"
-                  disabled={pass === undefined || pass === "" || !(error === undefined || error === "")}
+                  disabled={pass === undefined || pass === "" || error === "Map saved!"}
                 >
                   {props.new ? "Save new map" : "Save"}
                 </button>
