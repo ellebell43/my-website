@@ -14,7 +14,7 @@ export default function ZoomWrapper(props: { children: React.ReactNode }) {
   }
   return (
     <>
-      <div className="fixed top-2 right-2 flex flex-col z-50">
+      <div className="fixed top-2 right-2 flex flex-col z-50" id="zoom-wrapper">
         <button
           className={`border text-xs flex items-center justify-center ${zoom < 4 ? "bg-white dark:bg-gray-800" : "bg-gray-200 dark:bg-gray-600"} h-[40px] w-[40px] hover:bg-gray-100 dark:hover:bg-gray-600 disabled:hover:bg-gray-200 dark:disabled:bg-gray-600 hover:cursor-pointer disabled:hover:cursor-auto`}
           onClick={() => newZoom(true)}

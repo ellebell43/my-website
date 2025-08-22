@@ -78,4 +78,4 @@ export const deHexify = (item: fullRange): number => {
   return newItem
 }
 
-export const createGridIDString = (x: xRange, y: yRange): string => `${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y}`
+export const createGridIDString = (x: number, y: number): string => `${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y}`

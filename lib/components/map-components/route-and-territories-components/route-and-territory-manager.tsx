@@ -2,7 +2,7 @@ import { route } from "@/lib/util/types";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function RouteAndTerritoryManager(props: { routeMode: boolean, routes: route[], setRouteToEdit: Function, setWorkingIndex: Function, deleteRoute: Function, addNewItem: Function }) {
+export default function RouteAndTerritoryManager(props: { routeMode: boolean, routes: route[], setRouteToEdit: Function, setWorkingIndex: Function, deleteRoute: Function, addNewItem: Function, }) {
   const { routeMode, routes, setRouteToEdit, setWorkingIndex, deleteRoute, addNewItem } = props
   return (
     <>

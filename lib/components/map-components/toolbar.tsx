@@ -16,10 +16,13 @@ export default function Toolbar(props: { map: map, setMap: Function, isNew: bool
       <h2 className="absolute scale-0">Toolbar</h2>
       {/* Screen reader toggle */}
       <button onClick={() => setScreenReader(!screenReader)} className={`${buttonStyle(screenReader)}`}><FontAwesomeIcon icon={faTableCells} /><span className="absolute scale-0">Screen Reader Toggle</span></button>
-      <button onClick={() => { setRouteMode(!routeMode); if (territoryMode) setTerritoryMode(false) }} className={buttonStyle(routeMode)}><FontAwesomeIcon icon={faDiagramProject} /><span className="absolute scale-0">Route Mode {routeMode ? "On" : "Off"}</span></button>
+      {/* Route toggle */}
+      <button onClick={() => { setRouteMode(!routeMode); if (territoryMode) setTerritoryMode(false); router.push("#") }} className={buttonStyle(routeMode)}><FontAwesomeIcon icon={faDiagramProject} /><span className="absolute scale-0">Route Mode {routeMode ? "On" : "Off"}</span></button>
       {isNew ?
+        // Regenerate toggle
         <button onClick={() => setPrompt ? setPrompt(true) : undefined} className={buttonStyle(false)}><FontAwesomeIcon icon={faArrowsRotate} /><span className="absolute scale-0">Regenerate</span></button> :
-        <button onClick={() => { setTerritoryMode(!territoryMode); if (routeMode) setRouteMode(false) }} className={buttonStyle(territoryMode)}><FontAwesomeIcon icon={faFlag} /><span className="absolute scale-0">Territory Mode {territoryMode ? "On" : "Off"}</span></button>}
+        // Territory toggle
+        <button onClick={() => { setTerritoryMode(!territoryMode); if (routeMode) setRouteMode(false); router.push("#") }} className={buttonStyle(territoryMode)}><FontAwesomeIcon icon={faFlag} /><span className="absolute scale-0">Territory Mode {territoryMode ? "On" : "Off"}</span></button>}
       <SaveButton map={map} new={isNew} />
     </div>
   )

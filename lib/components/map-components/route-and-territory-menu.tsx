@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import RouteEditor from "./route-and-territories-components/route-editor";
 import RouteAndTerritoryManager from "./route-and-territories-components/route-and-territory-manager";
 
-export default function RouteAndTerritoryMenu(props: { map: map, setMap: Function, routeMode: boolean, territoryMode: boolean, setRouteToEdit: Function, setTerritoryToEdit: Function }) {
-  const { map, setMap, routeMode, territoryMode } = props
+export default function RouteAndTerritoryMenu(props: { map: map, setMap: Function, routeMode: boolean, territoryMode: boolean, setRouteToEdit: Function, setTerritoryToEdit: Function, setDisableDetails: Function }) {
+  const { map, setMap, routeMode, territoryMode, setDisableDetails } = props
 
   let [visible, setVisible] = useState(true)
   let [routes, setRoutes] = useState(map.routes ? map.routes : [])
@@ -54,7 +54,7 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
       <button className={`${visible ? "rotate-180" : "rotate-0"} hover:cursor-pointer transition-all text-2xl absolute top-0 left-0`} onClick={() => setVisible(!visible)}><FontAwesomeIcon icon={faAngleUp} /><span className="absolute scale-0">Show panel</span></button>
       {routeToEdit === undefined && territoryToEdit == undefined ?
         <RouteAndTerritoryManager setRouteToEdit={setRouteToEdit} routes={routes} setWorkingIndex={setWorkingIndex} deleteRoute={deleteRoute} addNewItem={addNewItem} routeMode={routeMode} /> : routeToEdit ?
-          <RouteEditor route={routeToEdit} setRouteToEdit={setRouteToEdit} setWorkingIndex={setWorkingIndex} updateRoute={updateRoute} /> : <></>}
+          <RouteEditor route={routeToEdit} setRouteToEdit={setRouteToEdit} setWorkingIndex={setWorkingIndex} updateRoute={updateRoute} setDisableDetails={setDisableDetails} /> : <></>}
     </div>
   )
 }

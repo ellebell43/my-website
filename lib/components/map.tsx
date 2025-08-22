@@ -22,10 +22,12 @@ export default function Map(props: { map?: map }) {
   const [map, setMap] = useState<map>(!props.map ? { systems: [] } : props.map)
   const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec | undefined>(map.systems[0])
   const [showDetails, setShowDetails] = useState(false)
-  const [routeMode, setRouteMode] = useState(false)
+  const [routeMode, setRouteMode] = useState(true)
+  const [disableDetails, setDisableDetails] = useState(false)
   const [routeToEdit, setRouteToEdit] = useState<route>()
+  const [showRoutes, setShowRoutes] = useState(true)
   const [territoryMode, setTerritoryMode] = useState(false)
-  const [territoryToEdit, setTerritoryToEdit] = useState<territory>()
+  const [showTerritories, setShowTerritories] = useState(true)
 
   // Hash to determine which parsec is selected
   const hash = useHash()
@@ -42,11 +44,11 @@ export default function Map(props: { map?: map }) {
           // @ts-expect-error
           const system = new StarSystem(item.x, item.y, item.name, item.starport, item.size, item.atmos, item.hydro, item.pop, item.gov, item.law, item.tech, item.travelCode, item.temp, item.factions, item.culture, item.facilities, item.details, item.gasGiant)
           setSystemDetails(system)
-          if (!routeMode && !territoryMode) setShowDetails(true)
+          if (!disableDetails) setShowDetails(true)
         } else {
           const system = new EmptyParsec(item.x, item.y)
           setSystemDetails(system)
-          if (!routeMode && !territoryMode) setShowDetails(true)
+          if (!disableDetails) setShowDetails(true)
         }
       }
     } else {
@@ -81,14 +83,14 @@ export default function Map(props: { map?: map }) {
   if (prompt) return <InitPrompt />
   return (
     <div>
-      <div className="overflow-y-scroll overflow-x-scroll scroll-m-1">
+      <div className="scroll-m-1">
         {isSector ?
           <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} />
           : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} />
         }
       </div>
       {showDetails && systemDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
-      <RouteAndTerritoryMenu map={map} setMap={setMap} routeMode={routeMode} territoryMode={territoryMode} setRouteToEdit={setRouteToEdit} setTerritoryToEdit={setTerritoryMode} />
+      <RouteAndTerritoryMenu map={map} setMap={setMap} routeMode={routeMode} territoryMode={territoryMode} setRouteToEdit={setRouteToEdit} setTerritoryToEdit={setTerritoryMode} setDisableDetails={setDisableDetails} />
       <Toolbar map={map} setMap={setMap} isNew={path.length < 9} screenReader={screenReader} setScreenReader={setScreenReader} setPrompt={setPrompt} routeMode={routeMode} setRouteMode={setRouteMode} territoryMode={territoryMode} setTerritoryMode={setTerritoryMode} />
     </div>
   )

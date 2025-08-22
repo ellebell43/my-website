@@ -37,7 +37,7 @@ export default function Parsec(props: { id: string, screenReader: boolean, possi
 
   // screen reader "hex"
   const ScreenReaderHex = () =>
-    <tr className={`border hover:cursor-pointer`}>
+    <tr className={`border hover:cursor-pointer`} id={`id${createGridIDString(system.x, system.y)}`}>
       <td><Link href={`#${createGridIDString(system.x, system.y)}`} onNavigate={() => { if (typeof window !== undefined) window.location.hash = `#${createGridIDString(system.x, system.y)}` }}>{id}</Link></td>
       <td>{system instanceof StarSystem ? system.name : ""}</td>
       <td>{system instanceof StarSystem ? system.getUWPSmall() : ""}</td>
@@ -50,10 +50,9 @@ export default function Parsec(props: { id: string, screenReader: boolean, possi
   const VisualHex = () =>
     <Link
       className={`hexagon-out bg-black dark:bg-gray-100 relative flex justify-center items-center no-underline`}
-      id={"hex" + props.id}
+      id={`id${createGridIDString(system.x, system.y)}`}
       href={`#${createGridIDString(system.x, system.y)}`}
       onNavigate={() => { if (typeof window !== undefined) window.location.hash = `#${createGridIDString(system.x, system.y)}` }}
-    // onClick={() => { props.setDetails(system); props.setShowDetails(true); }}
     >
       <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center justify-between hover: cursor-pointer`}>
         {/* Travel code ring */}
