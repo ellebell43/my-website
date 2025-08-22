@@ -65,9 +65,8 @@ export async function PATCH(req: NextRequest) {
     // connect to maps collection in the database
     const client = await dbClient()
     const maps = client.collection("maps")
-    console.log(map._id)
-    console.log(pass)
-    let result = await maps.updateOne({ _id: new ObjectId(map._id), pass: pass }, { $set: { systems: map.systems } })
+
+    let result = await maps.updateOne({ _id: new ObjectId(map._id), pass: pass }, { $set: { systems: map.systems, routes: map.routes, territories: map.territories } })
     // 200 on successful update of map object in the db
     if (result.matchedCount) return NextResponse.json({ _id: String(map._id) })
     // 404 NOT FOUND on no match with both password and map id
@@ -77,11 +76,4 @@ export async function PATCH(req: NextRequest) {
     console.log(error)
     return NextResponse.json(error, { status: 500 })
   }
-
-  //  // ======== this block should be moved to a PATCH endpoint ========
-  //       let result = await maps.updateOne({ _id: mapObject._id, pass: pass }, mapObject)
-  //       // 200 on successful update of map object in the db
-  //       if (result.matchedCount) return NextResponse.json({ _id: String(mapObject._id) })
-  //       // 404 NOT FOUND on no match with both password and map id
-  //       else return NextResponse.json({ message: `no object found with id ${mapObject._id} or incorrect password` }, { status: 404 })
 }

@@ -17,6 +17,8 @@ export const SaveButton = (props: { map: map, new: boolean }) => {
 
   async function saveMap() {
     let hashedPass = crypto.createHash("sha256").update(String(pass)).digest("hex")
+    console.log("Saving map")
+    console.log(props.map.routes)
     try {
       if (props.new) {
         const res = await fetch(`${process.env.NEXT_PUBLIC_HOST}/mapper/api`, { cache: "no-store", credentials: "include", method: "POST", body: JSON.stringify({ map: props.map, pass: hashedPass }) })

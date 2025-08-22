@@ -19,8 +19,6 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
     setMap(newMap)
   }, [routes])
 
-  console.log(map.routes)
-
   const addNewItem = () => {
     if (routeMode) {
       const arr = [...routes]
