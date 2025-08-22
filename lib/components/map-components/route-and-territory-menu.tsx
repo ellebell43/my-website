@@ -33,9 +33,10 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
     }
   }
 
-  const updateRouteName = (i: number, name: string) => {
+  const updateRoute = (route: route) => {
+    if (workingIndex === undefined) return
     const arr = [...routes]
-    arr[i].name = name
+    arr[workingIndex] = route
     setRoutes(arr)
   }
 
@@ -71,13 +72,38 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
     )
   }
 
-  const RouteEditor = () => {
-    if (!routeToEdit) return <></>
+  const RouteEditor = (props: { route: route }) => {
+    if (!routeToEdit || workingIndex === undefined) return <></>
+
+    let [route, setRoute] = useState(props.route)
+    let [addSegment, setAddSegment] = useState(false)
+    let [removeSegment, setRemoveSegment] = useState(false)
+    let [system1, setSystem1] = useState<{ x: number, y: number }>()
+    let [system2, setSystem2] = useState<{ x: number, y: number }>()
+
+    const updateRouteName = (name: string) => {
+      const newItem = { ...route }
+      newItem.name = name
+      setRoute(newItem)
+    }
+
+    const updateRouteColor = (color: string) => {
+      const newItem = { ...route }
+      newItem.color = color
+      setRoute(newItem)
+    }
+
     return (<>
-      <h2 className="text-center mt-0 p-0 text-lg">{routeToEdit.name} Edit</h2>
-      <div className="flex justify-center items-center gap-4">
-        <button className="border hover:pointer-cursor hover:opacity-75 px-2 py1 rounded">Done</button>
-        <button className="border hover:pointer-cursor hover:opacity-75 px-2 py1 rounded">Cancel</button>
+      <h2 className="text-center mt-0 p-0 text-lg font-bold">{routes[workingIndex].name} Edit</h2>
+      <div className="grid grid-cols-3 gap-2 px-4 max-w-[400px]">
+        <label htmlFor="route-name" className="text-right">Name</label>
+        <input name="route-name" id="route-name" type="text" className="border px-1 rounded col-span-2" value={route.name} onChange={e => updateRouteName(e.target.value)} />
+        <div className="flex justify-end">
+          <div style={{ background: route.color }} className="border w-full h-full mr-2" />
+          <label htmlFor="route-color" className="text-right">Color</label>
+        </div>
+        <input name="route-color" id="route-color" type="text" className={`border px-1 rounded col-span-2`} value={route.color} onChange={e => updateRouteColor(e.target.value)} />
+        <button type="submit" className="border hover:pointer-cursor hover:opacity-75 px-2 py-1 mt-4 w-[150px] mx-auto rounded col-span-3" onClick={() => { updateRoute(route); setRouteToEdit(undefined); setWorkingIndex(undefined) }}>Done</button>
       </div>
     </>)
   }
@@ -88,7 +114,7 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
       <button className={`${visible ? "rotate-180" : "rotate-0"} hover:cursor-pointer transition-all text-2xl absolute top-0 left-0`} onClick={() => setVisible(!visible)}><FontAwesomeIcon icon={faAngleUp} /><span className="absolute scale-0">Show panel</span></button>
       {routeToEdit === undefined && territoryToEdit == undefined ?
         <Manager /> : routeToEdit ?
-          <RouteEditor /> : <></>}
+          <RouteEditor route={routeToEdit} /> : <></>}
     </div>
   )
 }
