@@ -16,7 +16,7 @@ export default function Map(props: { map?: map }) {
 
   // Map state
   const [generateSystems, setGenerateSystems] = useState(true)
-  const [isSector, setIsSector] = useState(false)
+  const [isSector, setIsSector] = useState(props.map ? props.map.systems.length > 80 : false)
   const [prompt, setPrompt] = useState(path.length < 9)
   const [screenReader, setScreenReader] = useState(Boolean(params.get("screenReader")))
   const [map, setMap] = useState<map>(!props.map ? { systems: [] } : props.map)
