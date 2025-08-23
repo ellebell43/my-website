@@ -11,6 +11,32 @@ import EditForm from "./edit-form"
 export default function DetailsPanel(props: { system: StarSystem | EmptyParsec, setSystem: Function, setShowDetails: Function, editable: boolean, setMap: Function, map: map }) {
   let { system, setSystem, setShowDetails, editable, setMap, map } = props
   let [editMode, setEditMode] = useState(false)
+
+  const getTerritory = () => {
+    if (map.territories) {
+      for (let i = 0; i < map.territories.length; i++) {
+        if (map.territories[i].parsecs.findIndex(el => el.x === system.x && el.y === system.y) !== -1) return map.territories[i].name
+      }
+      return false
+    } else {
+      return false
+    }
+  }
+
+  const getRoutes = () => {
+    const arr: string[] = []
+    if (map.routes) {
+      for (let i = 0; i < map.routes.length; i++) {
+        if (map.routes[i].segments.findIndex(el => (el.x1 === system.x && el.y1 === system.y) || (el.x2 === system.x && el.y2 === system.y)) !== -1) {
+          const routeName = map.routes[i].name
+          if (arr.findIndex(el => el == routeName) === -1) arr.push(routeName)
+        }
+      }
+      return arr
+    } else {
+      return arr
+    }
+  }
   // if (!system) return <></>
   return (
     <>
@@ -38,8 +64,15 @@ export default function DetailsPanel(props: { system: StarSystem | EmptyParsec, 
                   <FontAwesomeIcon icon={faX} />
                   <p className="absolute scale-0">Close details panel for {createGridIDString(system.x, system.y)}</p>
                 </Link>
+                {/* Edit button */}
                 {editable ? <button onClick={() => setEditMode(true)} className="hover:cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800 transition-all absolute top-3 left-3 border rounded h-8 w-8 bg-slate-200 dark:bg-slate-700"><FontAwesomeIcon icon={faEdit} /><span className="absolute scale-0">Edit</span></button> : <></>}
               </div>
+
+              {system instanceof EmptyParsec ?
+                <div className="my-12">
+                  <p className="m-0"><span className="font-bold">Territory</span>: {getTerritory() ? getTerritory() : "N/A"}</p>
+                  <p className="m-0"><span className="font-bold">Routes</span>: {getRoutes().length > 0 ? getRoutes().toString().replaceAll(",", ", ") : "N/A"}</p>
+                </div> : <></>}
 
               {system instanceof StarSystem ? <>
                 {/* Starport and Trade */}
@@ -48,6 +81,8 @@ export default function DetailsPanel(props: { system: StarSystem | EmptyParsec, 
                   <p className="m-0"><span className="font-bold">Facilities</span>: {system.getFacilitiesArrayVerbose().length > 0 ? system.getFacilitiesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
                   <p className="m-0"><span className="font-bold">Bases</span>: {system.getBasesArrayVerbose().length > 0 ? system.getBasesArrayVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
                   <p className="m-0"><span className="font-bold">Trade Codes</span>: {system.getTradeCodesVerbose().length > 0 ? system.getTradeCodesVerbose().toString().replaceAll(",", ", ") : "N/A"}</p>
+                  <p className="m-0"><span className="font-bold">Territory</span>: {getTerritory() ? getTerritory() : "N/A"}</p>
+                  <p className="m-0"><span className="font-bold">Routes</span>: {getRoutes().length > 0 ? getRoutes().toString().replaceAll(",", ", ") : "N/A"}</p>
                 </div>
 
                 {/* Physical Characteristics */}
