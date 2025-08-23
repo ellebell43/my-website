@@ -1,0 +1,1 @@
+export default function clearHash() { window.history.pushState({}, "", "#") }

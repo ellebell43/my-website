@@ -78,4 +78,42 @@ export const deHexify = (item: fullRange): number => {
   return newItem
 }
 
-export const createGridIDString = (x: xRange, y: yRange): string => `${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y}`
+export const createGridIDString = (x: number, y: number): string => `${x < 10 ? "0" + x : x}${y < 10 ? "0" + y : y}`
+
+export function getFilteredColor(hex: string) {
+  if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+    const darkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // dark = #1d293d
+    // light = #ffffff
+    if (hex.length > 4) {
+      let r = hex.substring(1, 3)
+      let g = hex.substring(3, 5)
+      let b = hex.substring(5, 7)
+
+      let filteredR = (parseInt(r, 16) + parseInt(darkMode ? "1d" : "ff", 16)) / 2
+      let filteredG = (parseInt(g, 16) + parseInt(darkMode ? "29" : "ff", 16)) / 2
+      let filteredB = (parseInt(b, 16) + parseInt(darkMode ? "3d" : "ff", 16)) / 2
+
+      let newColor = "#" + Math.ceil(filteredR).toString(16) + Math.ceil(filteredG).toString(16) + Math.ceil(filteredB).toString(16)
+      if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(newColor)) { return newColor } else { return false }
+    } else {
+      let r = hex.substring(1, 2)
+      let g = hex.substring(2, 3)
+      let b = hex.substring(3, 4)
+
+      const filterR = darkMode ? (1 + parseInt("d", 16)) / 2 : 16
+      const filterG = darkMode ? (2 + 9) / 2 : 16
+      const filterB = darkMode ? (3 + parseInt("d", 16)) / 2 : 16
+
+      let filteredR = (parseInt(r, 16) + filterR) / 2
+      let filteredG = (parseInt(g, 16) + filterG) / 2
+      let filteredB = (parseInt(b, 16) + filterB) / 2
+
+      console.log(filterR, filterG, filterB)
+
+      let newColor = "#" + Math.ceil(filteredR).toString(16) + Math.ceil(filteredG).toString(16) + Math.ceil(filteredB).toString(16)
+      console.log(newColor)
+      if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(newColor)) { return newColor } else { return false }
+    }
+  } else return false
+}

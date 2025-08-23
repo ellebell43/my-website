@@ -42,25 +42,29 @@ export class EmptyParsec {
   constructor(x: xRange, y: yRange) { this.x = x; this.y = y }
 }
 
-export type coordinate = {
-  x: number,
-  y: number
+export type routeSegment = {
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number
 }
 
 export type route = {
-  path: coordinate[],
+  segments: routeSegment[],
   name: string,
   color: string,
 }
 
 export type territory = {
   name: string,
-  color: string
+  color: string,
+  parsecs: { x: number, y: number }[]
 }
 
 export type map = {
   _id?: ObjectId,
   pass?: string,
   routes?: route[],
+  territories?: territory[],
   systems: (StarSystem | EmptyParsec)[]
 }

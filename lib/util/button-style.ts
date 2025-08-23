@@ -1,0 +1,1 @@
+export const buttonStyle = "border px-2 py-1 rounded hover:bg-gray-300 dark:hover:bg-slate-700 hover:cursor-pointer"

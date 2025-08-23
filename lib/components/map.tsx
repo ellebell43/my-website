@@ -1,21 +1,35 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { DetailsPanel, Sector, Subsector } from "../../lib/components/map-components"
-import { EmptyParsec, map } from "../../lib/util/types"
+import { Sector, Subsector } from "./map-components/hex-grid-components"
+import { EmptyParsec, map, route, territory } from "@/lib/util/types"
 import StarSystem from "@/lib/util/starsystem"
 import { useHash } from "@/lib/util/useHash"
 import Toolbar from "@/lib/components/map-components/toolbar"
+import { usePathname, useSearchParams } from "next/navigation"
+import DetailsPanel from "./map-components/details-panel"
+import RouteAndTerritoryMenu from "./map-components/route-and-territory-menu"
 
-export default function MapperClient() {
+export default function Map(props: { map?: map }) {
+  const path = usePathname()
+  let params = useSearchParams()
+
+  // Map state
   const [generateSystems, setGenerateSystems] = useState(true)
-  const [isSector, setIsSector] = useState(false)
-  const [prompt, setPrompt] = useState(true)
-  const [screenReader, setScreenReader] = useState(false)
-  const [map, setMap] = useState<map>({ systems: [] })
-  const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec>(map.systems[0])
+  const [isSector, setIsSector] = useState(props.map ? props.map.systems.length > 80 : false)
+  const [prompt, setPrompt] = useState(path.length < 9)
+  const [screenReader, setScreenReader] = useState(Boolean(params.get("screenReader")))
+  const [map, setMap] = useState<map>(!props.map ? { systems: [] } : props.map)
+  const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec | undefined>(map.systems[0])
   const [showDetails, setShowDetails] = useState(false)
+  const [routeMode, setRouteMode] = useState(false)
+  const [disableDetails, setDisableDetails] = useState(false)
+  const [routeToEdit, setRouteToEdit] = useState<route>()
+  const [showRoutes, setShowRoutes] = useState(true)
+  const [territoryMode, setTerritoryMode] = useState(false)
+  const [showTerritories, setShowTerritories] = useState(true)
 
+  // Hash to determine which parsec is selected
   const hash = useHash()
 
   useEffect(() => {
@@ -30,11 +44,11 @@ export default function MapperClient() {
           // @ts-expect-error
           const system = new StarSystem(item.x, item.y, item.name, item.starport, item.size, item.atmos, item.hydro, item.pop, item.gov, item.law, item.tech, item.travelCode, item.temp, item.factions, item.culture, item.facilities, item.details, item.gasGiant)
           setSystemDetails(system)
-          setShowDetails(true)
+          if (!disableDetails) setShowDetails(true)
         } else {
           const system = new EmptyParsec(item.x, item.y)
           setSystemDetails(system)
-          setShowDetails(true)
+          if (!disableDetails) setShowDetails(true)
         }
       }
     } else {
@@ -52,10 +66,6 @@ export default function MapperClient() {
             <input type="checkbox" id="generate-systems" name="generate-systems" onChange={() => { setGenerateSystems(!generateSystems) }} checked={generateSystems} />
             <label htmlFor="generate-systems">Generate Systems</label>
           </div>
-          {/* <div className="flex gap-4 items-center justify-start">
-            <input type="checkbox" id="screen-reader" name="screen-reader" onChange={() => { setScreenReader(!screenReader) }} checked={screenReader} />
-            <label htmlFor="screen-reader">Screen Reader</label>
-          </div> */}
           <div className="flex gap-4 justify-start items-center">
             <input type="radio" id="subsector" name="sector" onChange={() => { setIsSector(false) }} checked={!isSector} />
             <label htmlFor="subsector">Subsector (8 x 10)</label>
@@ -73,14 +83,15 @@ export default function MapperClient() {
   if (prompt) return <InitPrompt />
   return (
     <div>
-      <div className="overflow-y-scroll overflow-x-scroll scroll-m-1">
+      <div className="scroll-m-1">
         {isSector ?
           <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} />
           : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} />
         }
       </div>
-      {showDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
-      <Toolbar map={map} setMap={setMap} isNew={true} screenReader={screenReader} setScreenReader={setScreenReader} setPrompt={setPrompt} />
+      {showDetails && systemDetails ? <DetailsPanel system={systemDetails} setSystem={setSystemDetails} setShowDetails={setShowDetails} editable={true} map={map} setMap={setMap} /> : <></>}
+      <RouteAndTerritoryMenu map={map} setMap={setMap} routeMode={routeMode} territoryMode={territoryMode} setRouteToEdit={setRouteToEdit} setTerritoryToEdit={setTerritoryMode} setDisableDetails={setDisableDetails} />
+      <Toolbar map={map} setMap={setMap} isNew={path.length < 9} screenReader={screenReader} setScreenReader={setScreenReader} setPrompt={setPrompt} routeMode={routeMode} setRouteMode={setRouteMode} territoryMode={territoryMode} setTerritoryMode={setTerritoryMode} />
     </div>
   )
 }
