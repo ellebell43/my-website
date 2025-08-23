@@ -22,7 +22,7 @@ export default function Map(props: { map?: map }) {
   const [map, setMap] = useState<map>(!props.map ? { systems: [] } : props.map)
   const [systemDetails, setSystemDetails] = useState<StarSystem | EmptyParsec | undefined>(map.systems[0])
   const [showDetails, setShowDetails] = useState(false)
-  const [routeMode, setRouteMode] = useState(true)
+  const [routeMode, setRouteMode] = useState(false)
   const [disableDetails, setDisableDetails] = useState(false)
   const [routeToEdit, setRouteToEdit] = useState<route>()
   const [showRoutes, setShowRoutes] = useState(true)

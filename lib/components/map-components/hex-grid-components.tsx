@@ -147,7 +147,7 @@ const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean, scr
 export const Sector = (props: { generateSystems: boolean, screenReader: boolean, map: map, setMap: Function }) => {
   const { generateSystems } = props
   return (
-    <div className="p-4 relative max-w-screen max-h-screen overflow-scroll" id="#map-container">
+    <div className="p-4 relative max-w-screen max-h-screen" id="#map-container">
       <ZoomWrapper>
         <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
         <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />

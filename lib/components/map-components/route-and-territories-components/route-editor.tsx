@@ -66,7 +66,7 @@ export default function RouteEditor(props: { route: route, updateRoute: Function
 
   return (<>
     <h2 className="text-center mt-0 p-0 text-lg font-bold">{route.name} Edit</h2>
-    <form className="grid grid-cols-3 gap-2 px-4" onSubmit={e => { e.preventDefault(); updateRoute(route); setRouteToEdit(undefined); setWorkingIndex(undefined); setDisableDetails(false) }}>
+    <form className="grid grid-cols-3 gap-2 px-4" onSubmit={e => { e.preventDefault(); updateRoute(route); setRouteToEdit(undefined); setWorkingIndex(undefined); setDisableDetails(false); router.push("#") }}>
       {/* Route name input */}
       <label htmlFor="route-name" className="text-right">Name</label>
       <input name="route-name" id="route-name" type="text" className="border px-1 rounded col-span-2" value={route.name} onChange={e => updateRouteName(e.target.value)} />
