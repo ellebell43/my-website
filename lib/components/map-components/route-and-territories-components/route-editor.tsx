@@ -3,7 +3,6 @@ import clearHash from "@/lib/util/clear-hash"
 import { createGridIDString } from "@/lib/util/functions"
 import { route } from "@/lib/util/types"
 import { useHash } from "@/lib/util/useHash"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export default function RouteEditor(props: { route: route, updateRoute: Function, setRouteToEdit: Function, setWorkingIndex: Function, setDisableDetails: Function }) {
@@ -23,7 +22,9 @@ export default function RouteEditor(props: { route: route, updateRoute: Function
     clearHash()
     if (!system1) return
     const newSegment = { x1: system1.x, y1: system1.y, x2: x, y2: y }
-    route.segments.push(newSegment)
+    const newRoute = { ...route }
+    newRoute.segments.push(newSegment)
+    setRoute(newRoute)
   }
 
   const deleteSegment = (x: number, y: number) => {
@@ -61,6 +62,7 @@ export default function RouteEditor(props: { route: route, updateRoute: Function
     const newItem = { ...route }
     newItem.color = color
     setRoute(newItem)
+    updateRoute(newItem)
   }
 
   return (<>

@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import RouteEditor from "./route-and-territories-components/route-editor";
 import RouteAndTerritoryManager from "./route-and-territories-components/route-and-territory-manager";
+import TerritoryEditor from "./route-and-territories-components/territory-editor";
 
 export default function RouteAndTerritoryMenu(props: { map: map, setMap: Function, routeMode: boolean, territoryMode: boolean, setRouteToEdit: Function, setTerritoryToEdit: Function, setDisableDetails: Function }) {
   const { map, setMap, routeMode, territoryMode, setDisableDetails } = props
@@ -21,6 +22,12 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
     setMap(newMap)
   }, [routes])
 
+  useEffect(() => {
+    let newMap = { ...map }
+    newMap.territories = territories
+    setMap(newMap)
+  }, [territories])
+
   const addNewItem = () => {
     if (routeMode) {
       const arr = [...routes]
@@ -30,7 +37,7 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
 
     if (territoryMode) {
       const arr = [...territories]
-      arr.push({ name: "New Route", color: "#FFFFFF", parsecs: [] })
+      arr.push({ name: "New Territory", color: "#FFFFFF", parsecs: [] })
       setTerritories(arr)
     }
   }
@@ -42,10 +49,23 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
     setRoutes(arr)
   }
 
+  const updateTerritory = (territory: territory) => {
+    if (workingIndex === undefined) return
+    const arr = [...territories]
+    arr[workingIndex] = territory
+    setTerritories(arr)
+  }
+
   const deleteRoute = (i: number) => {
     const arr = [...routes]
     arr.splice(i, 1)
     setRoutes(arr)
+  }
+
+  const deleteTerritory = (i: number) => {
+    const arr = [...territories]
+    arr.splice(i, 1)
+    setTerritories(arr)
   }
 
   if (!(routeMode || territoryMode)) return <></>
@@ -53,8 +73,21 @@ export default function RouteAndTerritoryMenu(props: { map: map, setMap: Functio
     <div style={{ bottom: visible && screen.width < 768 ? "45px" : !visible && screen.width < 768 ? "-180px" : visible ? "0px" : "-220px" }} className={`fixed left-0 md:left-[47px] w-screen max-w-[400px] bg-gray-100 dark:bg-slate-800 border-2 transition-all h-[260px] overflow-y-scroll p-1`}>
       <button className={`${visible ? "rotate-180" : "rotate-0"} hover:cursor-pointer transition-all text-2xl absolute top-0 left-0`} onClick={() => setVisible(!visible)}><FontAwesomeIcon icon={faAngleUp} /><span className="absolute scale-0">Show panel</span></button>
       {routeToEdit === undefined && territoryToEdit == undefined ?
-        <RouteAndTerritoryManager setRouteToEdit={setRouteToEdit} routes={routes} setWorkingIndex={setWorkingIndex} deleteRoute={deleteRoute} addNewItem={addNewItem} routeMode={routeMode} /> : routeToEdit ?
-          <RouteEditor route={routeToEdit} setRouteToEdit={setRouteToEdit} setWorkingIndex={setWorkingIndex} updateRoute={updateRoute} setDisableDetails={setDisableDetails} /> : <></>}
+        <RouteAndTerritoryManager
+          setRouteToEdit={setRouteToEdit}
+          routes={routes}
+          setWorkingIndex={setWorkingIndex}
+          deleteRoute={deleteRoute}
+          addNewItem={addNewItem}
+          routeMode={routeMode}
+          setTerritoryToEdit={setTerritoryToEdit}
+          territoryMode={territoryMode}
+          deleteTerritory={deleteTerritory}
+          territories={territories}
+        /> : routeToEdit ?
+          <RouteEditor route={routeToEdit} setRouteToEdit={setRouteToEdit} setWorkingIndex={setWorkingIndex} updateRoute={updateRoute} setDisableDetails={setDisableDetails} /> :
+          territoryToEdit ?
+            <TerritoryEditor territory={territoryToEdit} setTerritoryToEdit={setTerritoryToEdit} setWorkingIndex={setWorkingIndex} updateTerritory={updateTerritory} setDisableDetails={setDisableDetails} /> : <></>}
     </div>
   )
 }

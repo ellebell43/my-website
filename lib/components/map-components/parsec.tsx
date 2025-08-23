@@ -1,7 +1,7 @@
 import StarSystem from "@/lib/util/starsystem"
 import Link from "next/link"
 import { GasGiant, MilitaryBase, NavalBase, Planet, ScoutBase } from "./symbols"
-import { createGridIDString, determineIfSystem } from "@/lib/util/functions"
+import { createGridIDString, determineIfSystem, getFilteredColor } from "@/lib/util/functions"
 import { EmptyParsec, map } from "@/lib/util/types"
 import { randomSystem } from "@/lib/util/randomSystem"
 
@@ -30,6 +30,16 @@ export default function Parsec(props: { id: string, screenReader: boolean, possi
     else system = alreadyMapped
   }
 
+  const getTerritoryColor = (): string => {
+    if (props.map.territories === undefined) return ""
+    for (let i = 0; i < props.map.territories.length; i++) {
+      const hasTerritory = props.map.territories[i].parsecs.findIndex(el => (el.x === x && el.y === y)) !== -1
+      // @ts-ignore
+      if (hasTerritory && typeof getFilteredColor(props.map.territories[i].color) == "string") { return getFilteredColor(props.map.territories[i].color) }
+    }
+    return ""
+  }
+
   // determine if system POI has water or is asteroid to determine icon
   let water = system instanceof StarSystem ? system.hydro != 0 : false
   let asteroid = system instanceof StarSystem ? system.size == 0 : false
@@ -48,18 +58,21 @@ export default function Parsec(props: { id: string, screenReader: boolean, possi
 
   // visual hex
   const VisualHex = () =>
+    // out hex border/container
     <Link
       className={`hexagon-out bg-black dark:bg-gray-100 relative flex justify-center items-center no-underline`}
       id={`id${createGridIDString(system.x, system.y)}`}
       href={`#${createGridIDString(system.x, system.y)}`}
       onNavigate={() => { if (typeof window !== undefined) window.location.hash = `#${createGridIDString(system.x, system.y)}` }}
     >
-      <div className={`hexagon-in bg-white dark:bg-gray-800 flex flex-col items-center justify-between hover: cursor-pointer`}>
+      {/* inner hex to create border illusion */}
+      <div className={`hexagon-in bg-white dark:bg-slate-800 flex flex-col items-center justify-between hover: cursor-pointer`} style={{ background: getTerritoryColor() }}>
         {/* Travel code ring */}
-        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] border-2 ${system instanceof StarSystem && system.travelCode == "A" ? "border-amber-300 dark:border-amber-500" : system instanceof StarSystem && system.travelCode == "R" ? "border-red-500 dark:border-red-700" : "border-white dark:border-slate-800"}`} />
+        <div className={`absolute right-[26px] top-[15px] rounded-full w-[120px] h-[120px] ${system instanceof StarSystem && system.travelCode == "A" ? "border-amber-300 dark:border-amber-500" : system instanceof StarSystem && system.travelCode == "R" ? "border-red-500 dark:border-red-700" : "border-white dark:border-slate-800"} ${system instanceof StarSystem && system.travelCode !== "G" ? "border-2" : "border-0"}`} />
+
         {/* Content container */}
         <div className="text-center relative">
-          <p className="text-center m-0 bg-white dark:bg-slate-800">{props.id}</p>
+          <p className="text-center m-0 bg-white dark:bg-slate-800" style={{ background: getTerritoryColor() }}>{props.id}</p>
           {system instanceof StarSystem ? <>
             {system.gasGiant ? <GasGiant /> : <></>}
             {system.facilities.includes("N") ? <NavalBase /> : <></>}
@@ -70,8 +83,8 @@ export default function Parsec(props: { id: string, screenReader: boolean, possi
           </> : <></>}
         </div>
         {system instanceof StarSystem ? <>
-          <p className="m-0 relative top-0.5 h-fit truncate font-bold text-center w-[110px] z-20 bg-white dark:bg-slate-800">{system.name}</p>
-          <p className="m-0 text-xs relative  bg-white dark:bg-slate-800 py-1 text-center z-10">{system.getUWPSmall()}</p>
+          <p className="m-0 relative top-0.5 h-fit truncate font-bold text-center w-[110px] z-20 bg-white dark:bg-slate-800" style={{ background: getTerritoryColor() }}>{system.name}</p>
+          <p className="m-0 text-xs relative  py-1 text-center z-10 bg-white dark:bg-slate-800" style={{ background: getTerritoryColor() }}>{system.getUWPSmall()}</p>
         </> : <></>}
       </div>
     </Link>
