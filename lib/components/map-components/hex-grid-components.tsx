@@ -1,14 +1,6 @@
 'use client'
 
-import StarSystem from "../../util/starsystem"
-import { createGridIDString, deHexify, hexify } from "../../util/functions"
-import { randomSystem } from "../../util/randomSystem"
-import { useState } from "react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faEdit, faMinus, faPlus, faTrash, faX } from "@fortawesome/free-solid-svg-icons"
-import { EmptyParsec, facilityCode, faction, fullRange, map } from "../../util/types"
-import MDParse from "../md-parse"
-import Link from "next/link"
+import { map } from "../../util/types"
 import Parsec from "./parsec"
 import ZoomWrapper from "./zoom-wrapper"
 import Routes from "./routes"
@@ -103,7 +95,6 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
   )
 
   // screen reader friendly subsectors
-  // do not include local details panel if part of a sector
   if (props.screenReader && sector) return <MapForScreenReader />
   else if (props.screenReader && !sector) {
     return (
@@ -114,7 +105,6 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
     )
   }
   // General subsectors
-  // do not include local details panel if part of a sector
   else if (sector) return (<Map />)
   else {
     return (
@@ -147,7 +137,7 @@ const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean, scr
 export const Sector = (props: { generateSystems: boolean, screenReader: boolean, map: map, setMap: Function }) => {
   const { generateSystems } = props
   return (
-    <div className="p-4 relative max-w-screen max-h-screen" id="#map-container">
+    <div className="p-4 relative max-w-screen max-h-screen overflow-scroll" id="map-container">
       <ZoomWrapper>
         <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
         <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
