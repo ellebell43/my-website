@@ -1,4 +1,5 @@
 import { buttonStyle } from "@/lib/util/button-style"
+import clearHash from "@/lib/util/clear-hash"
 import { createGridIDString } from "@/lib/util/functions"
 import { route } from "@/lib/util/types"
 import { useHash } from "@/lib/util/useHash"
@@ -15,13 +16,11 @@ export default function RouteEditor(props: { route: route, updateRoute: Function
 
   useEffect(() => { setDisableDetails(true) }, [])
 
-  let router = useRouter()
-
   // Hash to determine which parsec is selected
   const hash = useHash()
 
   const createSegment = (x: number, y: number) => {
-    router.push("#")
+    clearHash()
     if (!system1) return
     const newSegment = { x1: system1.x, y1: system1.y, x2: x, y2: y }
     route.segments.push(newSegment)
@@ -29,7 +28,7 @@ export default function RouteEditor(props: { route: route, updateRoute: Function
 
   const deleteSegment = (x: number, y: number) => {
     if (!system1) return
-    router.push("#")
+    clearHash()
     const i = route.segments.findIndex(el => (el.x1 === x && el.y1 === y && el.x2 === system1.x && el.y2 === system1.y) || (el.x2 === x && el.y2 === y && el.x1 === system1.x && el.y1 === system1.y))
     const newRoute = { ...route }
     newRoute.segments.splice(i, 1)
@@ -47,8 +46,8 @@ export default function RouteEditor(props: { route: route, updateRoute: Function
         setSystem1(undefined)
         setAddSegment(false)
         setRemoveSegment(false)
+        clearHash()
       }
-      router.push("#")
     }
   }, [hash])
 
@@ -66,7 +65,7 @@ export default function RouteEditor(props: { route: route, updateRoute: Function
 
   return (<>
     <h2 className="text-center mt-0 p-0 text-lg font-bold">{route.name} Edit</h2>
-    <form className="grid grid-cols-3 gap-2 px-4" onSubmit={e => { e.preventDefault(); updateRoute(route); setRouteToEdit(undefined); setWorkingIndex(undefined); setDisableDetails(false); router.push("#") }}>
+    <form className="grid grid-cols-3 gap-2 px-4" onSubmit={e => { e.preventDefault(); updateRoute(route); setRouteToEdit(undefined); setWorkingIndex(undefined); setDisableDetails(false); clearHash() }}>
       {/* Route name input */}
       <label htmlFor="route-name" className="text-right">Name</label>
       <input name="route-name" id="route-name" type="text" className="border px-1 rounded col-span-2" value={route.name} onChange={e => updateRouteName(e.target.value)} />
