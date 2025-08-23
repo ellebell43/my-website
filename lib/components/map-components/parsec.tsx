@@ -6,7 +6,7 @@ import { EmptyParsec, map } from "@/lib/util/types"
 import { randomSystem } from "@/lib/util/randomSystem"
 
 export default function Parsec(props: { id: string, screenReader: boolean, possibleSystem?: boolean, style?: string, map: map, setMap: Function }) {
-  const { id, possibleSystem, screenReader } = props
+  const { id, possibleSystem, screenReader, map } = props
   // split id into x,y values
   const x = Number(id.substring(0, 2))
   const y = Number(id.substring(2))
@@ -28,6 +28,32 @@ export default function Parsec(props: { id: string, screenReader: boolean, possi
       system = new StarSystem(alreadyMapped.x, alreadyMapped.y, alreadyMapped.name, alreadyMapped.starport, alreadyMapped.size, alreadyMapped.atmos, alreadyMapped.hydro, alreadyMapped.pop, alreadyMapped.gov, alreadyMapped.law, alreadyMapped.tech, alreadyMapped.travelCode, alreadyMapped.temp, alreadyMapped.factions, alreadyMapped.culture, alreadyMapped.facilities, alreadyMapped.details, alreadyMapped.gasGiant)
     }
     else system = alreadyMapped
+  }
+
+  const getTerritory = () => {
+    if (map.territories) {
+      for (let i = 0; i < map.territories.length; i++) {
+        if (map.territories[i].parsecs.findIndex(el => el.x === system.x && el.y === system.y) !== -1) return map.territories[i].name
+      }
+      return false
+    } else {
+      return false
+    }
+  }
+
+  const getRoutes = () => {
+    const arr: string[] = []
+    if (map.routes) {
+      for (let i = 0; i < map.routes.length; i++) {
+        if (map.routes[i].segments.findIndex(el => (el.x1 === system.x && el.y1 === system.y) || (el.x2 === system.x && el.y2 === system.y)) !== -1) {
+          const routeName = map.routes[i].name
+          if (arr.findIndex(el => el == routeName) === -1) arr.push(routeName)
+        }
+      }
+      return arr
+    } else {
+      return arr
+    }
   }
 
   const getTerritoryColor = (): string => {
@@ -53,6 +79,8 @@ export default function Parsec(props: { id: string, screenReader: boolean, possi
       <td>{system instanceof StarSystem ? system.getUWPSmall() : ""}</td>
       <td>{system instanceof StarSystem ? String(system.gasGiant) : ""}</td>
       <td>{system instanceof StarSystem ? basesVerbose : ""}</td>
+      <td> {getTerritory() ? getTerritory() : ""}</td>
+      <td>{getRoutes().length > 0 ? getRoutes().toString().replaceAll(",", ", ") : ""}</td>
     </tr>
 
 

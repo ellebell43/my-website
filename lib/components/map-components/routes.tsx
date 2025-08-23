@@ -7,7 +7,7 @@ import React from "react";
 export default function Routes(props: { routes: route[] }) {
   const { routes } = props
 
-  return <>
+  return <div>
     {routes.map((a, ai) => {
       return a.segments.map((b, bi) => {
         // get grid ids of both ends of the segment
@@ -19,21 +19,20 @@ export default function Routes(props: { routes: route[] }) {
         // If neither item exists, return nothing
         if (!item1 || !item2) return <></>
         // Get items center position instead of a position of a corner
-        const zoomScrollY = document.querySelector("#map-container")?.scrollTop
-        const zoomScrollX = document.querySelector("#map-container")?.scrollLeft
+        const zoomScrollY = document.querySelector("#map-container")?.firstElementChild?.scrollTop
+        const zoomScrollX = document.querySelector("#map-container")?.firstElementChild?.scrollLeft
         const scrollX = zoomScrollX ? zoomScrollX : 0
         const scrollY = zoomScrollY ? zoomScrollY : 0
-        const pos1 = { x: item1.left + (70) + scrollX, y: item1.top + (60) + scrollY }
-        const pos2 = { x: item2.left + (70) + scrollX, y: item2.top + (60) + scrollY }
-        const container = document.querySelector("#map-container")?.getBoundingClientRect()
+        const pos1 = { x: item1.left + (item1.width / 2) + scrollX, y: item1.top + (item1.height / 2) + scrollY }
+        const pos2 = { x: item2.left + (item1.width / 2) + scrollX, y: item2.top + (item1.height / 2) + scrollY }
         return (
           <svg id={`route-${ai}-segment-${bi}`} key={`route-${ai}-segment-${bi}`} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }} className="opacity-50 pointer-events-none overflow-visible" >
             <title>{a.name} segment</title>
             <desc>Connecting {id1} to {id2}</desc>
-            <line stroke={a.color} strokeWidth={10} x1={pos1.x} y1={pos1.y} x2={pos2.x} y2={pos2.y} strokeLinecap="round" />
+            <line stroke={a.color} strokeWidth={item1.width / 20} x1={pos1.x} y1={pos1.y} x2={pos2.x} y2={pos2.y} strokeLinecap="round" />
           </svg>
         )
       })
     })}
-  </>
+  </div>
 }

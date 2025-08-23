@@ -1,9 +1,24 @@
+import clearHash from "@/lib/util/clear-hash"
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export default function ZoomWrapper(props: { children: React.ReactNode }) {
   let [zoom, setZoom] = useState<1 | 2 | 3 | 4>(4)
+
+  // Anytime the scale changes it refreshes the hash to ensure that routes are re-rendered at proper scale
+  // Probably could have just listened to changes in zoom rather than using a mutation observer. meh.
+  useEffect(() => {
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutationRecord) {
+        clearHash()
+      });
+    });
+
+    var target = document.getElementById('scale-container');
+    // @ts-ignore
+    observer.observe(target, { attributes: true, attributeFilter: ['style'] });
+  }, [])
 
   const newZoom = (up: boolean) => {
     let newZoom: 1 | 2 | 3 | 4 = zoom
@@ -12,6 +27,7 @@ export default function ZoomWrapper(props: { children: React.ReactNode }) {
     //@ts-expect-error
     setZoom(newZoom)
   }
+
   return (
     <>
       <div className="fixed top-2 right-2 flex flex-col z-50" id="zoom-wrapper">
@@ -33,7 +49,7 @@ export default function ZoomWrapper(props: { children: React.ReactNode }) {
         </button>
         <p className="border text-center text-[8px] bg-gray-200 dark:bg-gray-700">Zoom {zoom}</p>
       </div>
-      <div className={`origin-top-left pb-32 md:pb-28`} style={{ transform: `scale(${zoom === 4 ? "1" : zoom === 3 ? ".75" : zoom === 2 ? ".50" : ".25"})` }}>
+      <div id="scale-container" className={`origin-top-left pb-32 md:pb-28`} style={{ transform: `scale(${zoom === 4 ? "1" : zoom === 3 ? ".75" : zoom === 2 ? ".50" : ".25"})` }}>
         {props.children}
       </div>
     </>
