@@ -5,8 +5,13 @@ export default function Pomodoro() {
   let [active, setActive] = useState(false)
   let [isBreak, setIsBreak] = useState(false)
   let [elapsedTime, setElapsedTime] = useState(0) // time in seconds
-  let [timerLength, setTimerLength] = useState(0)
+  let [timerLength, setTimerLength] = useState(25 * 60) // 25 minutes by default
 
+  const defaultBreak = 10 * 60 // 10 minutes
+  const defaultTimer = 25 * 60 // 25 minutes
+
+  // initialize a 1 second and increase time elapsed if active
+  // remove 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (active) {
@@ -17,17 +22,25 @@ export default function Pomodoro() {
     return () => clearInterval(interval)
   }, [active])
 
+  useEffect(() => { if (elapsedTime === timerLength && mode === "Pomo") completePomo() }, [elapsedTime])
+
   const resetTime = () => {
     setActive(false)
     setElapsedTime(0)
   }
 
-  const parseTime = () => {
-    let hours = Math.floor(elapsedTime / 60 / 60)
-    let minutes = Math.floor((elapsedTime - (hours * 60 * 60)) / 60)
-    let seconds = Math.floor(elapsedTime - (minutes * 60))
+  const completePomo = () => {
+    const timerDoneSound = new Audio('audio/timer-complete.mp3')
+    timerDoneSound.play()
+    setActive(false)
+  }
 
-    return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`
+  const parseTime = () => {
+    let minutes = mode == "Stopwatch" ? Math.floor(elapsedTime / 60) : Math.floor((timerLength - elapsedTime) / 60)
+    let secondsRemaining = elapsedTime - (minutes * 60)
+    let seconds = mode == "Stopwatch" ? Math.floor(secondsRemaining) : Math.floor(timerLength - elapsedTime - (minutes * 60))
+
+    return `${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`
   }
 
   return (
