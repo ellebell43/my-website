@@ -11,7 +11,7 @@ import ToDo from "@/lib/components/start-page-components/to-do";
 export default function StartPageClient() {
   return (
     <PrimaryPageWrapper noMaxWidth={true}>
-      <div className="grid grid-cols-3 text-center">
+      <div className="grid md:grid-cols-3 grid-cols-1 text-center">
         <div id="col-1">
           <div>
             <p>unknown</p>
