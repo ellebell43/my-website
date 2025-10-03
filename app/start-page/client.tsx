@@ -7,6 +7,7 @@ import KiwiWidget from "@/lib/components/start-page-components/kiwi-widget";
 import MusicPlayer from "@/lib/components/start-page-components/music-player";
 import Pomodoro from "@/lib/components/start-page-components/pomodoro";
 import ToDo from "@/lib/components/start-page-components/to-do";
+import { DAVCalendar } from "tsdav";
 
 export default function StartPageClient() {
   return (

@@ -1,5 +1,14 @@
+import { useEffect, useState } from "react"
+import { createDAVClient, DAVCalendar, DAVResponse } from 'tsdav';
+
+
 export default function Events() {
+  const [isLoading, setIsLoading] = useState(true)
+
+
   return (
-    <p>Events</p>
+    <div>
+      <p>Events</p>
+    </div>
   )
 }

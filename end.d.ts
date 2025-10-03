@@ -4,5 +4,7 @@ namespace NodeJS {
     JOPLIN_CONNECTION_STRING: string,
     JOPLIN_TOKEN: string,
     NEXT_PUBLIC_HOST: string,
+    CALDAV_PASS: string,
+    CALDAV_USER: string
   }
 }
