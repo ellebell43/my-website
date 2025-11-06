@@ -38,7 +38,7 @@ export default async function Page() {
       }
       return (
         <PrimaryPageWrapper>
-          <h1>Kendoris Subsecotr</h1>
+          <h1>Kendoris Subsector</h1>
           <div className="text-lg">
             <MDParse content={content} noContainer={true} />
             <h1>Systems</h1>

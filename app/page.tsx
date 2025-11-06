@@ -31,7 +31,7 @@ export default function Page() {
       </div>
 
       <div className="flex justify-center gap-6 mt-12 text-5xl">
-        <Link rel="me" href="https://dice.camp/@ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faMastodon} /></Link>
+        <Link rel="me" href="https://cathode.church/@ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faMastodon} /></Link>
         <Link href="https://github.com/ellebell43/my-website"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faGithub} /></Link>
         <Link href="https://discord.com/users/ellebell43"><FontAwesomeIcon className="w-12 transition-all hover:opacity-80" icon={faDiscord} /></Link>
       </div>
