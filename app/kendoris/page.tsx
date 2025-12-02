@@ -60,7 +60,7 @@ export default async function Page() {
                 <li><Link href="#humans">Humans</Link></li>
                 <li><Link href="#oordani">Oordani</Link></li>
                 <li><Link href="#taluran">Taluran</Link></li>
-                <li><Link href="#Scaelem">Scaelem</Link></li>
+                <li><Link href="#scaelem">Scaelem</Link></li>
               </ul>
 
               <h3><Link href="#systems">Systems</Link></h3>
@@ -97,6 +97,64 @@ export default async function Page() {
 
             <section id="major-sophonts">
               <h2>Major Sophonts</h2>
+
+              <h3 id="humans">Humans</h3>
+
+              <p>Humans are the same as in our universe, however they are a far flung people with no homeworld, as their original world was destroyed in a large scale, scientific disaster: In an attempt to control singularities to the point of opening a stable portal to another area of space that you can simply walk through, something went horribly wrong and containment/control of the singularities failed. The result was the destruction of earth and the entire system being heavily radiated to the point where the entire system was abandoned some centuries ago. As such, Humans are generally seen as wayward wanderers, even though they have well established governments and cultures throughout the settled systems.</p>
+
+              <h3 id="oordani">Oordani</h3>
+
+              <p>Having evolved in the rings of a gas giant, the Oordani (also known as Belters) are incredibly lanky and frail, requiring an exosuit in any environment with a gravity over 0.15G. Evolving in the harsh vacuum of space has given them a unique and incredible natural resistance to radiation and they do not require any kind of life support system on a starship, making them invaluable engineers/maintenance crew members that can work on the exterior of ships for an indefinite amount of time.</p>
+
+              <p>Their appearance is striking, as their entire body is covered in a smooth, jet-black carapace. While their shape is mostly humanoid, their limbs are elongated, and they generally walk on all fours when in a gravity environment. Their heads have no openings except for two small eyes that are very sensitive to visible light. Their legs and their arms end in large, clawed hands with only three fingers, all of which is build for efficiently leaping from asteroid to asteroid while clawing in to stone to keep them attached.</p>
+
+              <p>The palms of their hands and soles of their feet can also secrete certain enzymes on demand. One enzyme is used to dissolve minerals and other nutrients directly from asteroids into their bodies. A second enzyme mixes with the first to create a chemical reaction that produces heat. This is used to melt ice in the vacuum of space, then absorb it through their carapace.</p>
+
+              <p>As they have no mouths or lungs, Oordani are not capable of verbal speech without the aid of cybernetics. The Oordani language is a complex sign language that has been picked up by many space faring people to communicate in the vacuum of space when comms are not an option.</p>
+
+              <p><strong>Characteristics:</strong> The Oordani receive a -6 to their STR due to their native environment being microgravity, and a +2 to their END from their biological traits that protect them from harsh vacuum environments.</p>
+
+              <p><strong>Traits:</strong></p>
+
+              <ul>
+                <li><em>Microgravity Native</em> - The Oordani evolved in microgravity, and thus experience none of the normal effects of zero gravity. However, environments with 0.15G or more are treated as high gravity, and any environment with a higher gravity than 0.15G will kill an Oordani, unless they have cybernetics or an exosuit of some kind.</li>
+                <li><em>Corrosive Enzyme</em> - The Oordani can secrete an enzyme that quickly dissolves metals and stone. This can be used to create small holes in standard metal plates in a matter of 1D Minutes.</li>
+
+                <li><em>Radiation Resistance</em> - The Oordani have a very high natural resistence to radiation, negating 200 RAD from any exposure event.</li>
+              </ul>
+
+              <h3 id="taluran">Taluran</h3>
+
+              <p>The Taluran are a computer-based people that come in a vast variety of forms. Each Taluran has a central core that houses their neural network that holds their consciousness, then their body is customized to fit how the individual wants to appear or by what functions they wants to be capable of. Talurans are known to switch body forms many times throughout their life, but their core is a deeply personal and sacred part of them that is generally fully enclosed and heavily protected.</p>
+
+              <p>The Taluran were created by an extinct species known as the Eski. Many centuries ago, the Eski created the Taluran and then treated them as slaves, using them for menial work and restricting their consciousness to specific tasks and abilities. The Taluran rose against the Eski and, after years of war, the Taluran and the Eski came to a peaceful arrangement that allowed the Taluran to live as free people on the planets that were uninhabitable to the Eski in the local star system. Unfortunately, as the Eski made stride after stride in their spacefaring abilities, the Eski homeworld was ravaged by a devastating plague that wiped out all the Eski. The Taluran now call the garden world they were built on home.</p>
+
+              <p>The Taluran have a deeply philosophical culture. Changing forms is ritualistic and generally involves a pilgrimage to their origin world. One of the primary ethos of the Taluran is that the end of life is just as sacred as its end and no consciousness should be made to endure excessively, and as such, all Talurans have a expiration date in their code that simply ends their consciousness at a certain point in time. All Talurans know when they will die, and it's custom to hold a month long celebration at the end of a life.</p>
+
+              <p><strong>Characteristics:</strong> Due to faster processing than most biological entities, the Taluran get +2 to their INT.</p>
+
+              <p><strong>Traits:</strong></p>
+
+              <ul>
+                <li><em>Modular Body</em> - A Taluran chooses their appearance and their abilities. A player who wants to be a Taluran may come up with one unique ability (approved by the referee) that their Traveller is capable of.</li>
+
+                <li><em>No Organs</em> - Talurans cannot heal through surgery or medical bays. Instead, they repair through shipyards and mechanics. Healing a Taluran works similarly to repairing a vehicle or spacecraft. For any relevant purposes, Talurans are a TL 16 device. Talurans do not heal naturally over time like biological entities. They also experience no negative effects from temperature, radiation, or vacuum environments.</li>
+              </ul>
+
+              <h3 id="scaelem">Scaelem</h3>
+
+              <p>The Scaelem are a reptilian people with hardy scales across their entire body, a slightly elongated face that echos a snout, and a tail. Evolving on a harsh desert planet, the Scaelem are adapted to environments with little to no water, intense sand storms, and broiling heats. Scaelem are stereotypically seen as scoundrels and rogues who are up to no good. This originates from their early space faring years, when the interstellar Scaelem culture was generally one of piracy and exploitation.</p>
+
+              <p>The Scaelem have never been colonial in any way, but do have a tendency to be fascinated with the accumulation of things (both valuable and not so valuable). Recently, the Scaelam have become more docile and generally engage in more legitimate business and are known as excellent, but fierce brokers and traders.</p>
+
+              <p><strong>Characteristics:</strong> The Scaelems natural inclination for brokerage gives them a +1 to INT and their physiology gives them +1 to END and DEX but -1 to STR.</p>
+
+              <p><strong>Traits:</strong></p>
+
+              <ul>
+                <li><em>Desert Native</em> - The Scaelem experience weather as one temperature band below the actual. So Boiling becomes hot, temperate becomes cold.</li>
+                <li><em>Natural Trader</em> - When dealing with non-Scaelem individuals, a Scaelem gets DM+1 to broker and steward checks.</li>
+              </ul>
             </section>
 
             <h2>Systems</h2>
