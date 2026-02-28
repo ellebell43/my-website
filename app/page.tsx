@@ -24,6 +24,7 @@ export default function Page() {
 
       <h2 className="border-b-2 mt-12 mb-6 text-4xl pb-4">Projects</h2>
       <div className="flex flex-col gap-8 max-w-[750px] mx-auto">
+        <ProjectCard href="/tracker" title="Health Tracker" description="Data analytics on my health! Part of my ongoing investigation into my chronic fatigue." right={true} />
         <ProjectCard href="/mapper" title="Traveller Mapper" description="A fun little tool for randomly generating, editing, and saving hex maps for the table top role play game, Traveller" />
         <ProjectCard href="/kendoris" title="Kendoris Subsector" description="A map of Kendoris Subsector, the setting for my current Traveller game that I'm running." right={true} />
         <ProjectCard href="https://recipes.ellebell.dev/g/the-council/" title="Mealie" description="My self hosted recipe manager. Got some recipes for me to add? DM me!" />
