@@ -11,6 +11,7 @@
  * You must authenticate before it allows you to fill out the form
  */
 
+import TrackerEntryForm from "@/lib/components/tracker-components/tracker-entry-form"
 import { Metadata } from "next/types"
 
 export const metadata: Metadata = {
@@ -22,5 +23,6 @@ export const metadata: Metadata = {
 export default function Page() {
   return <>
     <h1>Tracker!</h1>
+    <TrackerEntryForm />
   </>
 }

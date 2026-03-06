@@ -1,4 +1,5 @@
 type trackerDataIntervals = {
+  "8am"?: 0 | 1 | 2 | 3 | 4 | 5,
   "10am"?: 0 | 1 | 2 | 3 | 4 | 5,
   "12pm"?: 0 | 1 | 2 | 3 | 4 | 5,
   "2pm"?: 0 | 1 | 2 | 3 | 4 | 5,
@@ -14,20 +15,6 @@ export default class TrackerEntry {
   adhd: trackerDataIntervals
   activity: trackerDataIntervals
   social: trackerDataIntervals
-  oura: {
-    activity?: number,
-    readiness?: number,
-    sleep?: number
-  }
-  sleep: {
-    awake?: number,
-    rem?: number,
-    light?: number,
-    deep?: number,
-    naps?: [
-      { napTime: Date, napLength: number }
-    ]
-  }
   medications: {
     vitaminD?: boolean,
     estradiol?: boolean,
@@ -43,21 +30,21 @@ export default class TrackerEntry {
     adhd: trackerDataIntervals,
     activity: trackerDataIntervals,
     social: trackerDataIntervals,
-    oura: {
-      activity?: number,
-      readiness?: number,
-      sleep?: number,
-      steps?: number
-    },
-    sleep: {
-      awake?: number,
-      rem?: number,
-      light?: number,
-      deep?: number,
-      naps?: [
-        { napTime: Date, napLength: number }
-      ]
-    },
+    // oura: { <- PULL FROM OURA API
+    //   activity?: number,
+    //   readiness?: number,
+    //   sleep?: number,
+    //   steps?: number
+    // },
+    // sleep: {
+    //   awake?: number,
+    //   rem?: number,
+    //   light?: number,
+    //   deep?: number,
+    //   naps?: [
+    //     { napTime: Date, napLength: number }
+    //   ]
+    // },
     medications: {
       vitaminD?: boolean,
       estradiol?: boolean,
@@ -72,13 +59,11 @@ export default class TrackerEntry {
     this.adhd = adhd
     this.activity = activity
     this.social = social
-    this.oura = oura
-    this.sleep = sleep
     this.medications = medications
     this.tag = tag
   }
 }
 
 export function createEmptyTrackerEntry(): TrackerEntry {
-  return new TrackerEntry(new Date(), {}, {}, {}, {}, {}, {}, {}, {}, {})
+  return new TrackerEntry(new Date(), {}, {}, {}, {}, {}, {}, {})
 }
