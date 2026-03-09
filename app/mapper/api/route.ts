@@ -1,4 +1,4 @@
-import { dbClient } from "@/lib/util/dbClient";
+import { MapperDBClient } from "@/lib/util/dbClient";
 import { map } from "@/lib/util/types";
 import { ObjectId } from "mongodb";
 import { NextApiRequest } from "next";
@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const id = req.headers.get("id")
   if (!id) return NextResponse.json({ message: "no map id provided" }, { status: 400 })
   try {
-    let client = await dbClient()
+    let client = await MapperDBClient()
     const maps = client.collection("maps")
     let result = await maps.findOne({ _id: new ObjectId(id) })
     // 404 NOT FOUND if no map matching the provided id is found
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   if (!map._id) { map._id = new ObjectId(); newItem = true; }
   try {
     // connect to maps collection in the database
-    const client = await dbClient()
+    const client = await MapperDBClient()
     const maps = client.collection("maps")
     // If map is new, create new db document, otherwise update db document
     if (newItem) {
@@ -63,7 +63,7 @@ export async function PATCH(req: NextRequest) {
   if (!map || !pass) return NextResponse.json({ message: "missing map or password data" }, { status: 400 })
   try {
     // connect to maps collection in the database
-    const client = await dbClient()
+    const client = await MapperDBClient()
     const maps = client.collection("maps")
 
     let result = await maps.updateOne({ _id: new ObjectId(map._id), pass: pass }, { $set: { systems: map.systems, routes: map.routes, territories: map.territories } })
