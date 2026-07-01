@@ -27,8 +27,6 @@ export default function Page() {
         <ProjectCard href="https://guildsmenrpg.com" title="Guildsmen RPG" description="A free and open source table top role play game. Complete with website, character app, and community discord!" right={true} />
         <ProjectCard href="/mapper" title="Traveller Mapper" description="A fun little tool for randomly generating, editing, and saving hex maps for the table top role play game, Traveller" />
         <ProjectCard href="/kendoris" title="Kendoris Subsector" description="A map of Kendoris Subsector, the setting for a Traveller game I used to run." right={true} />
-        <ProjectCard href="https://recipes.ellebell.dev/g/the-council/" title="Mealie" description="My self hosted recipe manager. Got some recipes for me to add? DM me!" />
-        <p className="text-xl">I'm also running servers locally for Jellyfin (streaming my movies), Joplin (notes and to-dos), reverse proxy, and dynamic DNS!</p>
       </div>
 
       <div className="flex justify-center gap-6 mt-12 text-5xl">
