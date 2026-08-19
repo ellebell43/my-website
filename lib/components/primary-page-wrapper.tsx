@@ -1,6 +1,6 @@
 import { Winky_Sans } from "next/font/google"
 
-const winkySans = Winky_Sans({ weight: "500", subsets: ["latin"] })
+const winkySans = Winky_Sans({ weight: "500", subsets: ["latin"], fallback: ['arial'] })
 
 export default function PrimaryPageWrapper(props: { children: React.ReactNode }) {
   return (

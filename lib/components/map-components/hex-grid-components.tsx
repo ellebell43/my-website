@@ -4,6 +4,7 @@ import { map } from "../../util/types"
 import Parsec from "./parsec"
 import ZoomWrapper from "./zoom-wrapper"
 import Routes from "./routes"
+import ScrollContainer from "react-indiana-drag-scroll"
 
 // Create a column of 10 hexes (height of a subsector)
 const HexCol = (props: { id: string, start: number, screenReader: boolean, style?: string, possibleSystem?: boolean, map: map, setMap: Function }) => {
@@ -83,6 +84,8 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
           <th>UWP</th>
           <th>Gas Giant</th>
           <th>Bases</th>
+          <th>Territory</th>
+          <th>Routes</th>
         </tr>
       </thead>
       <tbody>
@@ -100,7 +103,6 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
     return (
       <div>
         <MapForScreenReader />
-        <Routes routes={props.map.routes ? props.map.routes : []} />
       </div>
     )
   }
@@ -108,12 +110,14 @@ export const Subsector = (props: { startX: 1 | 9 | 17 | 25, startY: 1 | 11 | 21 
   else if (sector) return (<Map />)
   else {
     return (
-      <div className="p-4 relative max-w-screen max-h-screen overflow-scroll" id="map-container">
-        <ZoomWrapper>
-          <Map />
+      <ScrollContainer className="max-h-screen">
+        <div className="p-4 relative max-w-screen max-h-screen">
+          <ZoomWrapper>
+            <Map />
+          </ZoomWrapper>
           <Routes routes={props.map.routes ? props.map.routes : []} />
-        </ZoomWrapper>
-      </div>
+        </div>
+      </ScrollContainer>
     )
   }
 }
@@ -137,14 +141,16 @@ const SubsectorRow = (props: { row: 1 | 2 | 3 | 4, generateSystems: boolean, scr
 export const Sector = (props: { generateSystems: boolean, screenReader: boolean, map: map, setMap: Function }) => {
   const { generateSystems } = props
   return (
-    <div className="p-4 relative max-w-screen max-h-screen overflow-scroll" id="map-container">
-      <ZoomWrapper>
-        <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
-        <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
-        <SubsectorRow row={3} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
-        <SubsectorRow row={4} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
+    <ScrollContainer className="max-h-screen">
+      <div className="p-4 relative max-w-screen max-h-screen">
+        <ZoomWrapper>
+          <SubsectorRow row={1} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
+          <SubsectorRow row={2} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
+          <SubsectorRow row={3} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
+          <SubsectorRow row={4} generateSystems={generateSystems} screenReader={props.screenReader} map={props.map} setMap={props.setMap} />
+        </ZoomWrapper>
         <Routes routes={props.map.routes ? props.map.routes : []} />
-      </ZoomWrapper>
-    </div>
+      </div>
+    </ScrollContainer>
   )
 }

@@ -9,6 +9,7 @@ import Toolbar from "@/lib/components/map-components/toolbar"
 import { usePathname, useSearchParams } from "next/navigation"
 import DetailsPanel from "./map-components/details-panel"
 import RouteAndTerritoryMenu from "./map-components/route-and-territory-menu"
+import Routes from "./map-components/routes"
 
 export default function Map(props: { map?: map }) {
   const path = usePathname()
@@ -83,7 +84,7 @@ export default function Map(props: { map?: map }) {
   if (prompt) return <InitPrompt />
   return (
     <div>
-      <div className="scroll-m-1">
+      <div className="scroll-m-1 relative" id="map-container">
         {isSector ?
           <Sector generateSystems={generateSystems} screenReader={screenReader} map={map} setMap={setMap} />
           : <Subsector generateSystems={generateSystems} startX={1} startY={1} sector={false} screenReader={screenReader} map={map} setMap={setMap} />
