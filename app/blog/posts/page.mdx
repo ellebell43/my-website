@@ -1,0 +1,46 @@
+---
+title: "Co-Op Pinball"
+slug: "co-op-pinball"
+date: "08.19.26"
+tags: ["gamedev", "pinball"]
+---
+
+# Co-Op Pinball
+
+08.19.26
+
+Steam is having their “Pins and Pegs” fest today, which showcases a variety of pinball, bowling, and other related games, and a friend asked me if that means there are any multiplayer pinball games. Obviously, most pinball-esque games can be multiplayer in the sense that you can have multiple players taking turns on a playfield to score points. But when looking for concurrent play games, there’s almost nothing out there (at least in the list of games for the fest). I could really only find one game that matched the criteria of multiplayer, simultaneous pinball.
+
+The game is called [Bumper Bout](https://store.steampowered.com/app/3938260/Bumper_Bout/), where two players compete on the same playfield. You earn points to send out more balls onto the playfield. Each player has a number of lives, and losing a ball on your side decreases the lives you have left. It looks like each player also picks a “hero” character that allows them to send unique “power balls”. Once you run out of lives, you’re out and the other player wins. A really fun concept! But sadly, it’s also the only game I found on my quick search that offers simultaneous multiplayer pinball. It’s also competitive, which means there isn’t a single cooperative version of this type of game (that I was able to find).
+
+That got me thinking: what would a cooperative pinball game look like where the players play simultaneously? I feel like there are a couple different ways to approach this and I’m not sure which option would make the best game. Maybe outlining these ideas will help me figure that out and maybe I’ll try to turn it into a working demo.
+
+## Split Flip
+
+In IRL pinball, there is a cooperative method of playing called “Split Flip” where two players play at the same time. Each player controls the flipper on either side of the playfield and the players work together to achieve the highest score possible. This is the easiest, most straightforward approach you can take to cooperative pinball, but as a video game I think this idea can be expanded on.
+
+I think it could be interesting to expand the idea of split flip into a procedurally generated game. Imagine a playfield that starts off really simple and the goal is to work with your teammate to get the ball as far up the playfield as possible. The difficulty could increase as you progress up the ramp and there could be specific goals along the way. 
+
+Alternatively, the game could be split into levels where each one introduces new mechanics and more difficulty. I think that would be a better approach than procedural generation, as procedural generation would be quite difficult to tune and design, whereas bespoke levels can be independently designed and tested. Also, procedural generation creates an endless game loop with no end-goal, and I really don’t like that as a concept.
+
+Some mechanical ideas for a game like this would be introducing multiple flippers for each player, moving obstacles, multi-ball, requiring *both* players to accomplish/activate something to progress, entities that actively work against you, etc.
+
+I quite like this idea and would love to explore it more.
+
+## Linked Playfields
+
+Another idea is what I call “linked” playfields. The idea is that each player has their own pinball playfield, but the actions that one player takes will affect the other player’s playfield, and together they work towards a shared goal. The exact mechanics of what this would be are still fuzzy, but I imagine you could make it so that certain targets you hit make other things appear/disappear on the other person’s field. You could also have targets that teleport the ball from one field to the other and make it so that players share one ball.
+
+This idea is interesting and could be explored more, but there is one glaring issue with it. I can easily see one player just sitting and waiting on the other player to accomplish a task and that would really suck the fun out of the game really quickly. Whereas split flip requires constant attention and action from both players simultaneously.
+
+## Pinball RPG
+
+This idea falls into a similar vein as puzzle RPGs. Each player (could easily be 1+ players) is a specific character with stats and abilities. Actions they take in combat sequences are done through a pinball playfield. Certain targets would do certain attacks and chaining them together would activate special abilities.
+
+This idea definitely leans more towards a single-player game, but I think it could easily be made into a compelling game for multiple players as well. Although, I ultimately think this idea shines the most as a single player game. Since puzzle RPGs aren’t really something I’m interested in, I don’t think I’ll explore this idea more
+
+## Final Thoughts
+
+I think once I started writing about Split Flip, I found the idea I wanted to pursue, but I’m glad I still game up with a couple other ideas that could be explored in the future (or integrated in later). Ultimately, I think Split Flip is the way to go. While it does limit the game to 2 players, I don’t think I want to make a party game. A direct, co-op game that is fun and engaging for 2 players seems like a good idea. It will also give me a chance to learn/practice level design and it has a lot of room for creating interesting a unique mechanics. The nature of pinball also leans into creating fun visual and sound effects that could make this idea a very compelling game.
+
+I think I’ll explore this more and start building out some demo mechanics for Split Flip (which seems to be my working title for the game at the moment). We’ll see what happens!
