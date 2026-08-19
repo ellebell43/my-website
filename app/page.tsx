@@ -24,6 +24,7 @@ export default function Page() {
 
       <h2 className="border-b-2 mt-12 mb-6 text-4xl pb-4">Projects</h2>
       <div className="flex flex-col gap-8 max-w-[750px] mx-auto">
+        <ProjectCard href="/blog" title="Blog" description="Little posts I write to get out my thoughts and show progress on my projects. Currently a WIP" />
         <ProjectCard href="https://guildsmenrpg.com" title="Guildsmen RPG" description="A free and open source table top role play game. Complete with website, character app, and community discord!" right={true} />
         <ProjectCard href="/mapper" title="Traveller Mapper" description="A fun little tool for randomly generating, editing, and saving hex maps for the table top role play game, Traveller" />
         <ProjectCard href="/kendoris" title="Kendoris Subsector" description="A map of Kendoris Subsector, the setting for a Traveller game I used to run." right={true} />
